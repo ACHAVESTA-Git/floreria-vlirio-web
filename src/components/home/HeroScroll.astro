@@ -60,7 +60,7 @@ const CTA_WA = waLink("Hola V'Lirio 🌷, quiero hacer un pedido");
       {
         TULIPANES.map((t) => (
           <g class="tulip" transform={`translate(${t.x},440)`} data-h={t.h}>
-            <line class="stem" x1="0" y1="0" x2="0" y2={-t.h} />
+            <rect class="stem" x="-2" y={-t.h} width="4" height={t.h} rx="2" />
             <path class="leaf" d={t.leaf} />
             <g transform={`translate(0,${-t.h})`}>
               <g class="bulb" style={`--h:${t.h}`}>
@@ -142,24 +142,19 @@ const CTA_WA = waLink("Hola V'Lirio 🌷, quiero hacer un pedido");
     height: auto;
   }
   .garden .stem {
-    stroke: var(--vl-follaje);
-    stroke-width: 4;
-    stroke-linecap: round;
+    fill: var(--vl-follaje);
     transform: scaleY(0.35);
-    transform-box: fill-box;
-    transform-origin: 50% 100%;
+    transform-origin: 0 0;
   }
   .garden .leaf {
     fill: var(--vl-follaje);
     opacity: 0;
     transform: scale(0.3);
-    transform-box: fill-box;
-    transform-origin: 50% 100%;
+    transform-origin: 0 0;
   }
   .garden .bulb {
     transform: translateY(calc(var(--h) * 0.65px)) scale(0.55);
-    transform-box: fill-box;
-    transform-origin: 50% 100%;
+    transform-origin: 0 0;
   }
   .garden .bulb path {
     fill: var(--vl-vino);
@@ -424,7 +419,7 @@ const CTA_WA = waLink("Hola V'Lirio 🌷, quiero hacer un pedido");
     const cta = section.querySelector<HTMLElement>('#heroCta');
     if (!garden || !intro || !hint || !cta) return;
 
-    const stems = q<SVGLineElement>('.garden .stem');
+    const stems = q<SVGRectElement>('.garden .stem');
     const leaves = q<SVGPathElement>('.garden .leaf');
     const bulbs = q<SVGGElement>('.garden .bulb');
     const lines = q<HTMLElement>('.msg-h .l');
