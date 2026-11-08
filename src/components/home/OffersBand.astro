@@ -1,0 +1,125 @@
+---
+import ProductCard from '../product/ProductCard.astro';
+import { getOfertas } from '../../lib/catalog';
+
+const ofertas = await getOfertas();
+---
+
+<section class="block" id="ofertas" aria-labelledby="ofertas-titulo">
+  <div class="wrap">
+    <div class="band">
+      <div class="intro">
+        <p class="eyebrow">Solo esta semana</p>
+        <h2 class="title" id="ofertas-titulo">Promociones flash</h2>
+        <p class="lead">Detalles especiales a un precio que también enamora.</p>
+
+        <div class="countdown" role="group" aria-label="Tiempo restante de las promociones">
+          <div><b data-cd="dias">00</b><small>días</small></div>
+          <div><b data-cd="horas">00</b><small>horas</small></div>
+          <div><b data-cd="min">00</b><small>min</small></div>
+        </div>
+
+        <a class="btn btn-primary" href="/catalogo">Ver todas las promos</a>
+        <p class="nota">* Descuentos de ejemplo para la demo.</p>
+      </div>
+
+      <div class="rail" role="region" aria-label="Ofertas de la semana" tabindex="0">
+        {ofertas.map((p) => <ProductCard producto={p} />)}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  /** Próximo domingo a las 23:59:59 (hora local). Si ya pasó, el de la semana siguiente. */
+  function proximoCierre(ahora: Date): Date {
+    const fin = new Date(ahora);
+    fin.setDate(ahora.getDate() + ((7 - ahora.getDay()) % 7));
+    fin.setHours(23, 59, 59, 0);
+    if (fin.getTime() <= ahora.getTime()) fin.setDate(fin.getDate() + 7);
+    return fin;
+  }
+
+  function pintarCuenta(): void {
+    const ahora = new Date();
+    let s = Math.max(0, Math.floor((proximoCierre(ahora).getTime() - ahora.getTime()) / 1000));
+    const dias = Math.floor(s / 86400);
+    s -= dias * 86400;
+    const horas = Math.floor(s / 3600);
+    s -= horas * 3600;
+    const min = Math.floor(s / 60);
+
+    const valores: Record<string, number> = { dias, horas, min };
+    for (const [clave, valor] of Object.entries(valores)) {
+      const el = document.querySelector<HTMLElement>(`[data-cd="${clave}"]`);
+      if (el) el.textContent = String(valor).padStart(2, '0');
+    }
+  }
+
+  pintarCuenta();
+  window.setInterval(pintarCuenta, 30000);
+</script>
+
+<style>
+  .band {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: 32px;
+    padding: 32px 20px;
+    border-radius: 36px;
+    background: var(--vl-blush);
+  }
+  .intro .title { margin-bottom: 12px; }
+  .lead { margin-bottom: 4px; color: var(--vl-tinta-suave); }
+  .countdown {
+    display: flex;
+    gap: 8px;
+    margin: 18px 0 22px;
+  }
+  .countdown div {
+    min-width: 62px;
+    padding: 8px 10px;
+    border-radius: 14px;
+    background: var(--vl-blanco);
+    box-shadow: var(--vl-shadow);
+    text-align: center;
+  }
+  .countdown b {
+    display: block;
+    font-family: var(--vl-font-ui);
+    font-size: 20px;
+    color: var(--vl-vino);
+  }
+  .countdown small {
+    font-size: 12px;
+    color: var(--vl-tinta-suave);
+  }
+  .nota {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--vl-tinta-suave);
+  }
+
+  .rail {
+    display: flex;
+    gap: 20px;
+    min-width: 0;
+    margin-inline: -20px;
+    padding: 8px 20px 32px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 20px;
+    scrollbar-width: thin;
+    overscroll-behavior-x: contain;
+  }
+
+  @media (min-width: 900px) {
+    .band {
+      grid-template-columns: 270px minmax(0, 1fr);
+      gap: 32px;
+      padding: 44px;
+    }
+    .rail { margin-inline: 0; padding: 8px 4px 32px; scroll-padding-inline: 4px; }
+  }
+</style>
