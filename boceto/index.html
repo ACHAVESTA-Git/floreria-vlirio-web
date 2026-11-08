@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Florería V'Lirio · Boceto home</title>
+<meta name="description" content="Boceto navegable del home de Florería V'Lirio: hero con scroll, categorías, destacados, ofertas y canasta de flores.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Luxurious+Script&family=Nunito:wght@400;600;800;900&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --vl-vino:#772A4C; --vl-vino-oscuro:#5A1F3A; --vl-frambuesa:#B4285A; --vl-coral:#CD3764;
+  --vl-rosa:#F79BA6; --vl-durazno:#F5CFC4; --vl-blush:#FFEBEB; --vl-crema:#FDF8F3; --vl-blanco:#FFFFFF;
+  --vl-tinta:#2E1A24; --vl-tinta-suave:#6B5560; --vl-follaje:#5E7D5A; --vl-girasol:#F2B53A;
+  --vl-font-script:'Luxurious Script',cursive; --vl-font-title:'Nunito',system-ui,sans-serif;
+  --vl-font-body:'Nunito',system-ui,sans-serif; --vl-font-ui:'Poppins',system-ui,sans-serif;
+  --shadow:0 10px 30px -12px rgb(119 42 76 / .25); --shadow-lg:0 24px 50px -18px rgb(119 42 76 / .35);
+  --ease:cubic-bezier(.22,1,.36,1); --radius:24px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--vl-crema);color:var(--vl-tinta);font-family:var(--vl-font-body);font-size:17px;line-height:1.55;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+:focus-visible{outline:3px solid var(--vl-frambuesa);outline-offset:3px;border-radius:8px}
+.wrap{width:min(1200px,100% - 32px);margin-inline:auto}
+.script{font-family:var(--vl-font-script);font-weight:400;color:var(--vl-vino)}
+.eyebrow{font-family:var(--vl-font-ui);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--vl-frambuesa);font-weight:600}
+h2.title{font-family:var(--vl-font-title);font-weight:900;font-size:clamp(28px,4vw,44px);line-height:1.1;color:var(--vl-vino)}
+.btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--vl-font-ui);font-weight:600;font-size:15px;border-radius:999px;padding:14px 26px;transition:transform .3s var(--ease),box-shadow .3s var(--ease),background .3s}
+.btn-primary{background:var(--vl-frambuesa);color:#fff;box-shadow:var(--shadow)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);background:#A12350}
+.btn-ghost{border:1.5px solid var(--vl-vino);color:var(--vl-vino);background:rgb(255 255 255 / .6)}
+.btn-ghost:hover{background:var(--vl-vino);color:#fff}
+
+/* ---------- Header ---------- */
+.header{position:fixed;inset:0 0 auto;z-index:50;transition:background .4s,box-shadow .4s,height .4s;height:84px;display:flex;align-items:center}
+.header.compact{height:64px;background:rgb(253 248 243 / .86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 6px 24px -16px rgb(119 42 76 / .4)}
+.header .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.logo{display:flex;align-items:center;gap:8px;color:var(--vl-vino)}
+.logo svg.tulips{width:44px;height:30px;flex:none}
+.logo .txt{display:flex;flex-direction:column;line-height:.9}
+.logo .txt .f{font-family:var(--vl-font-script);font-size:22px}
+.logo .txt .n{font-family:var(--vl-font-title);font-weight:900;font-size:22px;letter-spacing:.02em;display:flex;align-items:center}
+.logo .txt .n svg{width:17px;height:17px;margin-left:1px}
+.nav{display:flex;gap:28px;font-weight:600;font-size:15px}
+.nav a{position:relative;color:var(--vl-tinta)}
+.nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;background:var(--vl-frambuesa);transform:scaleX(0);transition:transform .3s var(--ease)}
+.nav a:hover::after,.nav a.active::after{transform:scaleX(1)}
+.actions{display:flex;align-items:center;gap:10px}
+.icon-btn{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;position:relative;transition:background .3s}
+.icon-btn:hover{background:var(--vl-blush)}
+.basket-btn{width:auto;padding:0 14px 0 10px;border-radius:999px;gap:8px;display:flex;align-items:center;background:var(--vl-blanco);box-shadow:var(--shadow);color:var(--vl-vino);font-family:var(--vl-font-ui);font-weight:600;font-size:14px}
+.basket-btn svg.basket{width:30px;height:30px;transform-origin:50% 85%}
+.basket-btn.sway svg.basket{animation:sway .5s var(--ease)}
+@keyframes sway{0%{transform:rotate(0)}30%{transform:rotate(-9deg)}65%{transform:rotate(7deg)}100%{transform:rotate(0)}}
+.heart-badge{position:absolute;top:-4px;left:26px;width:24px;height:22px;display:grid;place-items:center}
+.heart-badge svg{position:absolute;inset:0;width:100%;height:100%}
+.heart-badge span{position:relative;color:#fff;font-size:11px;font-weight:600;margin-top:-2px}
+.heart-badge.pulse{animation:pulse .5s var(--ease)}
+@keyframes pulse{0%{transform:scale(1)}45%{transform:scale(1.4)}100%{transform:scale(1)}}
+.burger{display:none}
+@media (max-width:900px){.nav{display:none}.burger{display:grid}.basket-btn .lbl{display:none}.logo .txt .f{font-size:18px}.logo .txt .n{font-size:19px}}
+
+/* ---------- Hero ---------- */
+.hero{height:330vh;position:relative;background:linear-gradient(180deg,var(--vl-crema) 0%,var(--vl-blush) 55%,var(--vl-crema) 100%)}
+.stage{position:sticky;top:0;height:100vh;overflow:hidden;display:grid;place-items:center}
+.garden{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:min(820px,120vw);height:auto}
+.garden .stem{stroke:var(--vl-follaje);stroke-width:4;stroke-linecap:round}
+.garden .leaf{fill:var(--vl-follaje);opacity:.85}
+.garden .bulb path{fill:var(--vl-vino)}
+.garden .bulb path.hl{fill:var(--vl-frambuesa);opacity:.55}
+.petal{position:absolute;width:18px;height:22px;border-radius:60% 0 60% 0;background:var(--vl-rosa);opacity:.7}
+.message{position:relative;z-index:3;text-align:center;padding:0 16px;max-width:900px}
+.message .l{display:block;font-family:var(--vl-font-title);font-weight:900;color:var(--vl-vino);font-size:clamp(30px,5.4vw,66px);line-height:1.08}
+.message .l.s{font-family:var(--vl-font-script);font-weight:400;font-size:clamp(46px,8vw,104px);line-height:1.1;color:var(--vl-frambuesa)}
+.message .l.sm{font-size:clamp(22px,3.4vw,40px);font-weight:800;color:var(--vl-tinta)}
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+.hero-photo{position:absolute;z-index:2;width:min(clamp(100px,14vw,230px),30vh);filter:drop-shadow(0 22px 26px rgb(119 42 76 / .28))}
+.hp1{left:2%;top:14%}.hp2{left:7%;bottom:3%;width:min(clamp(110px,16vw,260px),34vh)}.hp3{right:2%;top:12%}.hp4{right:6%;bottom:3%;width:min(clamp(110px,16vw,260px),34vh)}.hp5{left:50%;bottom:-8%;width:min(clamp(100px,12vw,180px),24vh);transform:translateX(-50%)}
+.message{margin-top:-4vh}
+.scroll-hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:4;font-family:var(--vl-font-ui);font-size:13px;color:var(--vl-vino);display:flex;flex-direction:column;align-items:center;gap:6px}
+.scroll-hint i{width:22px;height:34px;border:2px solid var(--vl-vino);border-radius:20px;position:relative}
+.scroll-hint i::after{content:"";position:absolute;left:50%;top:6px;width:4px;height:7px;margin-left:-2px;background:var(--vl-vino);border-radius:4px;animation:wheel 1.6s infinite}
+@keyframes wheel{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(12px)}}
+.hero-intro{position:absolute;top:22%;left:0;right:0;text-align:center;z-index:3}
+.hero-intro .script{font-size:clamp(40px,6vw,74px)}
+.hero-intro p{font-family:var(--vl-font-ui);color:var(--vl-tinta-suave);font-size:15px;letter-spacing:.06em}
+@media (max-width:700px){.hp1,.hp3{top:12%}.hp2,.hp4{bottom:6%}.hp5{display:none}}
+/* estado estático (sin JS / movimiento reducido) */
+.hero.static{height:auto}
+.hero.static .stage{position:relative;height:auto;min-height:100vh;padding:120px 0 80px}
+.hero.static .garden{opacity:.15}
+.hero.static .scroll-hint,.hero.static .hero-intro{display:none}
+
+/* ---------- Secciones ---------- */
+section.block{padding:96px 0}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:36px;flex-wrap:wrap}
+.section-head p{color:var(--vl-tinta-suave);max-width:520px}
+.section-head .script{font-size:34px;line-height:1}
+
+/* Categorías */
+.cats{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}
+.cat{position:relative;aspect-ratio:4/5;border-radius:var(--radius);background:linear-gradient(170deg,var(--vl-blush),var(--vl-durazno));padding:18px;display:flex;flex-direction:column;justify-content:flex-end;overflow:visible;box-shadow:var(--shadow);transition:transform .45s var(--ease),box-shadow .45s var(--ease);text-align:left;margin-top:34px}
+.cat img{position:absolute;left:50%;top:-30px;width:86%;height:74%;object-fit:contain;transform:translateX(-50%);transition:transform .5s var(--ease);filter:drop-shadow(0 14px 14px rgb(119 42 76 / .22))}
+.cat:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.cat:hover img{transform:translateX(-50%) translateY(-8px) rotate(2deg)}
+.cat b{font-family:var(--vl-font-title);font-weight:900;color:var(--vl-vino);font-size:20px;line-height:1.1}
+.cat small{font-family:var(--vl-font-ui);font-size:13px;color:var(--vl-tinta-suave)}
+.cat .arrow{position:absolute;right:14px;bottom:16px;width:32px;height:32px;border-radius:50%;background:#fff;display:grid;place-items:center;color:var(--vl-vino);transition:transform .35s var(--ease)}
+.cat:hover .arrow{transform:translateX(4px)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:34px;justify-content:center}
+.chip{font-family:var(--vl-font-ui);font-size:14px;font-weight:500;border:1px solid var(--vl-vino);color:var(--vl-vino);padding:9px 18px;border-radius:999px;display:inline-flex;gap:8px;align-items:center;transition:all .3s var(--ease);background:transparent}
+.chip:hover{background:var(--vl-vino);color:#fff}
+@media (max-width:1000px){.cats{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:640px){.cats{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 4px 16px;gap:14px}.cat{flex:0 0 62%;scroll-snap-align:start}}
+
+/* Producto */
+.rail{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 4px 24px;scrollbar-width:thin}
+.card{flex:0 0 272px;scroll-snap-align:start;background:var(--vl-blanco);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;position:relative;transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.card .ph{position:relative;aspect-ratio:1;border-radius:18px;background:radial-gradient(circle at 50% 58%,var(--vl-blush) 0 52%,transparent 53%),var(--vl-crema);display:grid;place-items:center;margin-bottom:8px}
+.card .ph img{width:84%;height:92%;object-fit:contain;filter:drop-shadow(0 12px 12px rgb(119 42 76 / .2));transition:transform .5s var(--ease)}
+.card:hover .ph img{transform:scale(1.05)}
+.card .fav{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:var(--shadow);color:var(--vl-frambuesa)}
+.card .fav[aria-pressed=true] svg path{fill:var(--vl-frambuesa)}
+.card .badge{position:absolute;top:10px;left:10px;background:var(--vl-frambuesa);color:#fff;font-family:var(--vl-font-ui);font-weight:600;font-size:13px;padding:4px 10px;border-radius:999px}
+.card h3{font-family:var(--vl-font-title);font-weight:800;font-size:19px;color:var(--vl-vino);line-height:1.2}
+.card p{font-size:14px;color:var(--vl-tinta-suave);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:43px}
+.price{font-family:var(--vl-font-ui);font-weight:600;font-size:20px;color:var(--vl-frambuesa);display:flex;gap:8px;align-items:baseline}
+.price s{font-size:14px;color:var(--vl-tinta-suave);font-weight:500}
+.card .row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:6px}
+.add{flex:1;justify-content:center;white-space:nowrap;background:var(--vl-frambuesa);color:#fff;border-radius:999px;padding:11px 14px;font-family:var(--vl-font-ui);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;transition:transform .25s var(--ease),background .3s}
+.add:hover{background:#A12350}.add:active{transform:scale(.95)}
+.add.done{background:var(--vl-follaje)}
+.add svg{width:18px;height:18px}
+.wa-mini{position:absolute;right:10px;bottom:10px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#fff;box-shadow:var(--shadow);color:#1DA851}
+.wa-mini:hover{background:#25D366;color:#fff}
+
+/* Ofertas */
+.offers{background:var(--vl-blush);border-radius:36px;padding:44px;display:grid;grid-template-columns:270px 1fr;gap:32px;align-items:center}
+.offers .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.offers .grid3 .card{flex:auto}
+.countdown{display:flex;gap:8px;margin:18px 0 22px}
+.countdown div{background:#fff;border-radius:14px;padding:8px 10px;text-align:center;min-width:58px;box-shadow:var(--shadow)}
+.countdown b{display:block;font-family:var(--vl-font-ui);font-size:20px;color:var(--vl-vino)}
+.countdown small{font-size:11px;color:var(--vl-tinta-suave)}
+.demo-note{font-size:12px;color:var(--vl-tinta-suave);margin-top:10px}
+@media (max-width:1000px){.offers{grid-template-columns:1fr;padding:32px 20px}.offers .grid3{display:flex;overflow-x:auto;scroll-snap-type:x mandatory}.offers .grid3 .card{flex:0 0 260px}}
+
+/* Cómo pedir */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;position:relative;margin-top:20px}
+.steps svg.line{position:absolute;top:44px;left:16%;width:68%;height:4px;overflow:visible}
+.steps svg.line path{stroke:var(--vl-rosa);stroke-width:3;stroke-dasharray:8 10;fill:none}
+.step{text-align:center;position:relative}
+.step .ic{width:88px;height:88px;margin:0 auto 18px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:var(--shadow);color:var(--vl-vino);position:relative;z-index:1}
+.step .ic svg{width:40px;height:40px}
+.step h3{font-family:var(--vl-font-title);font-weight:800;color:var(--vl-vino);font-size:20px}
+.step p{color:var(--vl-tinta-suave);font-size:15px;max-width:260px;margin:4px auto 0}
+@media (max-width:700px){.steps{grid-template-columns:1fr}.steps svg.line{display:none}}
+
+/* Visítanos */
+.visit{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center}
+.visit .photo{border-radius:32px;overflow:hidden;box-shadow:var(--shadow-lg);aspect-ratio:4/5;max-height:560px}
+.visit .photo img{width:100%;height:100%;object-fit:cover}
+.visit ul{list-style:none;display:grid;gap:14px;margin:22px 0}
+.visit li{display:flex;gap:12px;align-items:flex-start}
+.visit li svg{flex:none;width:22px;height:22px;color:var(--vl-frambuesa);margin-top:2px}
+.socials{display:flex;gap:10px;flex-wrap:wrap}
+.socials a{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--vl-vino);display:grid;place-items:center;color:var(--vl-vino);transition:all .3s}
+.socials a:hover{background:var(--vl-vino);color:#fff}
+.socials svg{width:20px;height:20px}
+@media (max-width:860px){.visit{grid-template-columns:1fr}}
+
+/* Footer */
+footer{background:var(--vl-vino);color:#F7E6EC;padding:70px 0 30px;margin-top:40px;position:relative}
+footer .border-tulips{position:absolute;top:-30px;left:0;width:100%;height:32px;color:var(--vl-vino)}
+footer .cols{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:32px}
+footer h4{font-family:var(--vl-font-ui);font-size:14px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;color:#fff}
+footer a{display:block;opacity:.85;margin:6px 0;font-size:15px}
+footer a:hover{opacity:1}
+footer .logo{color:#fff}
+footer .bottom{border-top:1px solid rgb(255 255 255 / .15);margin-top:40px;padding-top:20px;font-size:14px;opacity:.8;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+@media (max-width:800px){footer .cols{grid-template-columns:1fr 1fr}}
+
+/* Drawer canasta */
+.scrim{position:fixed;inset:0;background:rgb(46 26 36 / .4);opacity:0;pointer-events:none;transition:opacity .35s;z-index:80}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,100%);background:var(--vl-crema);z-index:90;transform:translateX(100%);transition:transform .45s var(--ease);display:flex;flex-direction:column;box-shadow:-20px 0 50px -20px rgb(119 42 76 / .4)}
+.drawer.on{transform:none}
+.drawer header{display:flex;justify-content:space-between;align-items:center;padding:22px 22px 14px}
+.drawer header h2{font-family:var(--vl-font-title);font-weight:900;color:var(--vl-vino);font-size:26px;display:flex;gap:10px;align-items:center}
+.drawer .items{flex:1;overflow:auto;padding:0 22px;display:flex;flex-direction:column;gap:12px}
+.item{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;background:#fff;border-radius:18px;padding:10px;box-shadow:var(--shadow)}
+.item img{width:64px;height:64px;object-fit:contain;background:var(--vl-blush);border-radius:14px;padding:4px}
+.item b{font-family:var(--vl-font-title);font-weight:800;color:var(--vl-vino);font-size:15px;display:block;line-height:1.2}
+.item small{font-family:var(--vl-font-ui);color:var(--vl-frambuesa);font-weight:600}
+.qty{display:flex;align-items:center;gap:6px;font-family:var(--vl-font-ui)}
+.qty button{width:28px;height:28px;border-radius:50%;border:1px solid var(--vl-rosa);color:var(--vl-vino)}
+.empty{text-align:center;padding:40px 10px;color:var(--vl-tinta-suave)}
+.empty svg{width:120px;height:120px;margin:0 auto 10px;color:var(--vl-vino)}
+.upsell{padding:14px 22px 0}
+.upsell h3{font-family:var(--vl-font-title);font-weight:800;font-size:15px;color:var(--vl-vino);margin-bottom:8px}
+.upsell .opts{display:flex;gap:8px;flex-wrap:wrap}
+.upsell .opts button{font-family:var(--vl-font-ui);font-size:13px;border:1px dashed var(--vl-vino);border-radius:999px;padding:7px 12px;color:var(--vl-vino)}
+.drawer footer{all:unset;display:block;padding:16px 22px 22px;border-top:1px solid var(--vl-durazno);background:#fff}
+.drawer textarea{width:100%;border:1px solid var(--vl-durazno);border-radius:14px;padding:10px 12px;font:inherit;font-size:14px;resize:none;height:62px;margin-bottom:12px;background:var(--vl-crema)}
+.total{display:flex;justify-content:space-between;font-family:var(--vl-font-ui);font-weight:600;font-size:18px;color:var(--vl-vino);margin-bottom:12px}
+.btn-wa{background:#25D366;color:#073B1E;width:100%;justify-content:center}
+.btn-wa:hover{background:#1FC05B}
+
+/* Girasoles en vuelo */
+.fly-layer{position:fixed;inset:0;pointer-events:none;z-index:9999}
+.fly{position:absolute;left:0;top:0;width:34px;height:34px;margin:-17px 0 0 -17px;will-change:transform}
+
+/* WhatsApp flotante */
+.wa-float{position:fixed;right:18px;bottom:18px;z-index:60;width:58px;height:58px;border-radius:50%;background:#25D366;color:#fff;display:grid;place-items:center;box-shadow:0 12px 24px -8px rgb(37 211 102 / .6);transition:transform .3s var(--ease)}
+.wa-float:hover{transform:scale(1.08)}
+.wa-float svg{width:30px;height:30px}
+.wa-tip{position:fixed;right:86px;bottom:30px;z-index:60;background:#fff;color:var(--vl-tinta);font-size:14px;padding:8px 14px;border-radius:14px 14px 4px 14px;box-shadow:var(--shadow);opacity:0;transform:translateY(8px);transition:all .4s var(--ease);pointer-events:none}
+.wa-tip.on{opacity:1;transform:none}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,30px);background:var(--vl-vino);color:#fff;padding:12px 18px;border-radius:999px;font-size:14px;z-index:95;opacity:0;transition:all .4s var(--ease);display:flex;gap:12px;align-items:center;max-width:calc(100% - 32px)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast button{color:#FFD7E2;font-weight:700;text-decoration:underline}
+
+/* Panel del boceto */
+.sketch-panel{position:fixed;left:16px;bottom:16px;z-index:70;background:#fff;border:1px dashed var(--vl-vino);border-radius:16px;padding:10px 12px;font-family:var(--vl-font-ui);font-size:12px;color:var(--vl-vino);box-shadow:var(--shadow);max-width:250px}
+.sketch-panel b{display:block;letter-spacing:.12em;margin-bottom:6px}
+.sketch-panel .seg{display:flex;gap:4px;flex-wrap:wrap}
+.sketch-panel .seg button{border:1px solid var(--vl-rosa);border-radius:999px;padding:4px 9px;font-size:12px}
+.sketch-panel .seg button[aria-pressed=true]{background:var(--vl-vino);color:#fff;border-color:var(--vl-vino)}
+.sketch-panel .x{position:absolute;top:4px;right:8px;font-size:14px}
+@media (max-width:640px){.sketch-panel{left:8px;bottom:84px;max-width:210px}}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<!-- Símbolos SVG reutilizables -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-heart" viewBox="0 0 24 22"><path d="M12 21s-8.5-5.3-10.6-10.2C-.1 6.2 3 1.5 7.1 1.5c2.2 0 3.8 1.2 4.9 2.8 1.1-1.6 2.7-2.8 4.9-2.8 4.1 0 7.2 4.7 5.7 9.3C20.5 15.7 12 21 12 21z" fill="currentColor"/></symbol>
+    <symbol id="i-heart-o" viewBox="0 0 24 22"><path d="M12 19.6s-7.6-4.8-9.5-9.2C1.2 6.6 3.8 2.6 7.3 2.6c2 0 3.5 1.1 4.7 2.9 1.2-1.8 2.7-2.9 4.7-2.9 3.5 0 6.1 4 4.8 7.8-1.9 4.4-9.5 9.2-9.5 9.2z" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-basket" viewBox="0 0 40 40">
+      <path d="M9 17c0-7 5-12 11-12s11 5 11 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M4.5 16.5h31l-3.4 16.2a3 3 0 0 1-2.9 2.3H10.8a3 3 0 0 1-2.9-2.3L4.5 16.5z" fill="currentColor" opacity=".14"/>
+      <path d="M4.5 16.5h31l-3.4 16.2a3 3 0 0 1-2.9 2.3H10.8a3 3 0 0 1-2.9-2.3L4.5 16.5z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M6.3 22.5h27.4M7.5 28.3h25M13 16.5l1.6 18.5M20 16.5V35M27 16.5l-1.6 18.5" stroke="currentColor" stroke-width="1.4" opacity=".7"/>
+    </symbol>
+    <symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.2-.3-.2-.6-.4z"/></symbol>
+    <symbol id="i-tulip" viewBox="0 0 40 30"><g fill="currentColor"><path d="M20 3l-3 5-3-4c-2 4-2 9 1 11h10c3-2 3-7 1-11l-3 4z"/><path d="M8 9l-2 3-2-2.5c-1.3 2.6-1.3 6 .7 7.3h6.6c2-1.3 2-4.7.7-7.3l-2 2.5z" opacity=".85"/><path d="M32 9l-2 3-2-2.5c-1.3 2.6-1.3 6 .7 7.3h6.6c2-1.3 2-4.7.7-7.3l-2 2.5z" opacity=".85"/></g><g stroke="currentColor" stroke-width="1.3"><path d="M20 15v14M8 17v10M32 17v10"/></g></symbol>
+    <symbol id="i-sunflower" viewBox="0 0 40 40">
+      <g fill="#F2B53A">
+        <ellipse cx="20" cy="7" rx="4" ry="7"/><ellipse cx="20" cy="33" rx="4" ry="7"/><ellipse cx="7" cy="20" rx="7" ry="4"/><ellipse cx="33" cy="20" rx="7" ry="4"/>
+        <ellipse cx="10.8" cy="10.8" rx="4" ry="7" transform="rotate(-45 10.8 10.8)"/><ellipse cx="29.2" cy="29.2" rx="4" ry="7" transform="rotate(-45 29.2 29.2)"/>
+        <ellipse cx="29.2" cy="10.8" rx="4" ry="7" transform="rotate(45 29.2 10.8)"/><ellipse cx="10.8" cy="29.2" rx="4" ry="7" transform="rotate(45 10.8 29.2)"/>
+      </g>
+      <circle cx="20" cy="20" r="7.5" fill="#5A1F3A"/><circle cx="20" cy="20" r="4" fill="#772A4C"/>
+    </symbol>
+    <symbol id="i-flytulip" viewBox="0 0 40 40"><path d="M20 4l-4.5 7-5-5.5c-3 6-3 14 1.5 17h16c4.5-3 4.5-11 1.5-17l-5 5.5z" fill="#B4285A"/><path d="M20 4l-4.5 7 4.5 12 4.5-12z" fill="#772A4C"/><path d="M20 23v14" stroke="#5E7D5A" stroke-width="2.4" stroke-linecap="round"/><path d="M20 32c-4 0-7-3-8-6 4 0 7 2 8 6z" fill="#5E7D5A"/></symbol>
+    <symbol id="i-flyrose" viewBox="0 0 40 40"><circle cx="20" cy="18" r="13" fill="#CD3764"/><path d="M20 9c5 0 8 4 6 8-2 4-8 4-9 0-1-3 2-5 4-4" fill="none" stroke="#772A4C" stroke-width="2.2" stroke-linecap="round"/><path d="M11 22c3 4 9 6 15 2" fill="none" stroke="#772A4C" stroke-width="2" stroke-linecap="round"/><path d="M14 31c2 3 4 5 6 6 2-1 4-3 6-6" fill="#5E7D5A"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<!-- ============ HEADER ============ -->
+<header class="header" id="header">
+  <div class="wrap">
+    <a href="#inicio" class="logo" aria-label="Florería V'Lirio, inicio">
+      <svg class="tulips" aria-hidden="true"><use href="#i-tulip"/></svg>
+      <span class="txt"><span class="f">Florería</span><span class="n">V'LIRI<svg aria-hidden="true"><use href="#i-heart"/></svg></span></span>
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a href="#inicio" class="active">Inicio</a><a href="#categorias">Catálogo</a><a href="#ocasiones">Ocasiones</a><a href="#visitanos">Nosotros</a><a href="#visitanos">Contacto</a>
+    </nav>
+    <div class="actions">
+      <a class="icon-btn" data-wa="Hola V'Lirio 🌷, quiero información sobre sus arreglos" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp" style="color:#1DA851"><svg width="24" height="24"><use href="#i-wa"/></svg></a>
+      <button class="icon-btn basket-btn" id="basketBtn" aria-label="Mi canasta, 0 productos" aria-haspopup="dialog">
+        <svg class="basket" aria-hidden="true"><use href="#i-basket"/></svg>
+        <span class="heart-badge" id="badge"><svg aria-hidden="true" style="color:var(--vl-frambuesa)"><use href="#i-heart"/></svg><span id="count">0</span></span>
+        <span class="lbl">Mi canasta</span>
+      </button>
+      <button class="icon-btn burger" aria-label="Abrir menú"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- ============ HERO CON SCROLL ============ -->
+<section class="hero" id="inicio" aria-label="Bienvenida">
+  <div class="stage">
+    <div class="hero-intro" id="heroIntro">
+      <p>FLORERÍA EN COMAS · LIMA</p>
+      <div class="script">bienvenido a V'Lirio</div>
+    </div>
+
+    <svg class="garden" id="garden" viewBox="0 0 820 440" aria-hidden="true"></svg>
+
+    <div class="message" id="message">
+      <span class="l sm">Aquí no solo vendemos flores,</span>
+      <span class="l">entregamos momentos</span>
+      <span class="l s">que llegan al corazón</span>
+      <div class="hero-cta" id="heroCta">
+        <a href="#categorias" class="btn btn-primary">Ver catálogo <svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-ghost" data-wa="Hola V'Lirio 🌷, quiero hacer un pedido" target="_blank" rel="noopener"><svg width="18" height="18"><use href="#i-wa"/></svg> Pedir por WhatsApp</a>
+      </div>
+    </div>
+
+    <img class="hero-photo hp1" src="img/ramo-gerberas-rosas-papel-fucsia.webp" alt="Ramo de gerberas y rosas en papel fucsia">
+    <img class="hero-photo hp2" src="img/buchon-girasoles.webp" alt="Buchón de girasoles">
+    <img class="hero-photo hp3" src="img/box-rosas-rosadas-feliz-cumpleanos.webp" alt="Box de rosas rosadas con topper de feliz cumpleaños">
+    <img class="hero-photo hp4" src="img/ramo-rosas-fucsia-papel-lila.webp" alt="Ramo de rosas fucsia en papel lila">
+    <img class="hero-photo hp5" src="img/box-corazon-girasoles-lirios-peluche-lotso.webp" alt="Box corazón con girasoles, lirios y peluche">
+
+    <div class="scroll-hint" id="scrollHint"><i></i>Desliza para descubrir</div>
+  </div>
+</section>
+
+<!-- ============ CATEGORÍAS Y OCASIONES ============ -->
+<section class="block" id="categorias">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Nuestro catálogo</div>
+        <h2 class="title">Encuentra el detalle perfecto</h2>
+      </div>
+      <p>Elige por tipo de arreglo o por la ocasión que quieres celebrar. Cada uno se arma a mano, el mismo día.</p>
+    </div>
+    <div class="cats" id="cats"></div>
+    <div class="chips" id="ocasiones" aria-label="Filtrar por ocasión"></div>
+  </div>
+</section>
+
+<!-- ============ DESTACADOS ============ -->
+<section class="block" style="padding-top:20px">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="script">hechos con amor</span>
+        <h2 class="title">Los más pedidos</h2>
+      </div>
+      <a href="#categorias" class="btn btn-ghost">Ver todo el catálogo</a>
+    </div>
+    <div class="rail" id="featured"></div>
+  </div>
+</section>
+
+<!-- ============ OFERTAS ============ -->
+<section class="block" style="padding-top:20px">
+  <div class="wrap">
+    <div class="offers">
+      <div>
+        <div class="eyebrow">Solo esta semana</div>
+        <h2 class="title">Ofertas de la semana</h2>
+        <p style="color:var(--vl-tinta-suave);margin-top:8px">Detalles especiales a un precio que también enamora.</p>
+        <div class="countdown" id="countdown" aria-label="Tiempo restante de la oferta"></div>
+        <a href="#categorias" class="btn btn-primary">Ver todas las ofertas</a>
+        <p class="demo-note">* Descuentos de ejemplo para la demo.</p>
+      </div>
+      <div class="grid3" id="offers"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CÓMO PEDIR ============ -->
+<section class="block" style="background:linear-gradient(180deg,var(--vl-crema),var(--vl-blush))">
+  <div class="wrap" style="text-align:center">
+    <div class="eyebrow">Fácil y rápido</div>
+    <h2 class="title" style="margin-bottom:30px">Así de simple es sorprender</h2>
+    <div class="steps">
+      <svg class="line" viewBox="0 0 100 4" preserveAspectRatio="none"><path d="M0 2 H100"/></svg>
+      <div class="step"><div class="ic"><svg><use href="#i-basket"/></svg></div><h3>Elige tus flores</h3><p>Explora el catálogo y agrégalas a tu canasta.</p></div>
+      <div class="step"><div class="ic"><svg viewBox="0 0 24 24"><use href="#i-wa"/></svg></div><h3>Envía tu pedido</h3><p>Con un clic nos llega tu pedido por WhatsApp.</p></div>
+      <div class="step"><div class="ic"><svg viewBox="0 0 24 22"><use href="#i-heart-o"/></svg></div><h3>Lo llevamos con cariño</h3><p>Lo preparamos a mano y lo entregamos donde nos digas.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VISÍTANOS ============ -->
+<section class="block" id="visitanos">
+  <div class="wrap visit">
+    <div class="photo"><img src="img/cf-ramo-mixto-lirios-blanco-rosa-frente-tienda.webp" alt="Fachada de Florería V'Lirio con un ramo en primer plano" loading="lazy"></div>
+    <div>
+      <span class="script" style="font-size:36px">te esperamos</span>
+      <h2 class="title">Visítanos en Comas</h2>
+      <ul>
+        <li><svg viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.5" fill="currentColor"/></svg><span>Av. Gerardo Unger 2488, puerta 2<br>Mercado Unicachi de Comas · Puestos 186, 188 y 189</span></li>
+        <li><svg viewBox="0 0 24 24"><use href="#i-wa"/></svg><span>933 099 986 · 902 275 046 · 974 048 878</span></li>
+        <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Horario por confirmar</span></li>
+        <li><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18" stroke="currentColor" stroke-width="2"/></svg><span>Pagos: Yape · Plin · Transferencia</span></li>
+      </ul>
+      <div class="socials">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg></a>
+        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M14 8h3V4h-3a4 4 0 0 0-4 4v3H7v4h3v7h4v-7h3l1-4h-4V8z" fill="currentColor"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M15 3c.4 2.5 2 4 4.5 4.2v3.4c-1.7 0-3.2-.5-4.5-1.4V15a6 6 0 1 1-6-6v3.5a2.5 2.5 0 1 0 2.5 2.5V3H15z" fill="currentColor"/></svg></a>
+        <a data-wa="Hola V'Lirio 🌷, quiero información" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><use href="#i-wa"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <svg class="border-tulips" viewBox="0 0 1200 32" preserveAspectRatio="none" aria-hidden="true" id="borderTulips"></svg>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <div class="logo"><svg class="tulips" style="width:44px;height:30px"><use href="#i-tulip"/></svg><span class="txt"><span class="f">Florería</span><span class="n">V'LIRI<svg><use href="#i-heart"/></svg></span></span></div>
+        <p style="margin-top:14px;opacity:.85;font-size:15px">Flores que dicen lo que el corazón siente.</p>
+      </div>
+      <div><h4>Catálogo</h4><a href="#categorias">Ramos</a><a href="#categorias">Buchones</a><a href="#categorias">Box</a><a href="#categorias">Tulipanes</a></div>
+      <div><h4>Ocasiones</h4><a href="#ocasiones">Amor</a><a href="#ocasiones">Cumpleaños</a><a href="#ocasiones">Graduación</a><a href="#ocasiones">Condolencias</a></div>
+      <div><h4>Contacto</h4><a data-wa="Hola V'Lirio 🌷" target="_blank" rel="noopener">WhatsApp</a><a href="mailto:vliriofloreria5@gmail.com">vliriofloreria5@gmail.com</a><a href="#visitanos">Unicachi de Comas</a></div>
+    </div>
+    <div class="bottom"><span>© 2026 Corporación Vlirio S.A.C.</span><span>Hecho con ♥ en Lima</span></div>
+  </div>
+</footer>
+
+<!-- Canasta -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true">
+  <header>
+    <h2 id="drawerTitle"><svg width="32" height="32" style="color:var(--vl-vino)"><use href="#i-basket"/></svg>Mi canasta</h2>
+    <button class="icon-btn" id="closeDrawer" aria-label="Cerrar canasta"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+  </header>
+  <div class="items" id="items"></div>
+  <div class="upsell" id="upsell">
+    <h3>¿Le agregas un detalle?</h3>
+    <div class="opts">
+      <button data-extra="ferrero">+ Ferrero Rocher 4u · S/15</button>
+      <button data-extra="peluche">+ Peluche · S/35</button>
+      <button data-extra="kisses">+ Kisses · S/20</button>
+    </div>
+  </div>
+  <footer>
+    <textarea id="cardMsg" placeholder="Mensaje para la tarjeta (opcional)"></textarea>
+    <div class="total"><span>Total</span><span id="total">S/0</span></div>
+    <a class="btn btn-wa" id="checkout" target="_blank" rel="noopener"><svg width="20" height="20"><use href="#i-wa"/></svg> Pedir por WhatsApp</a>
+  </footer>
+</aside>
+
+<div class="fly-layer" id="flyLayer" aria-hidden="true"></div>
+<a class="wa-float" data-wa="Hola V'Lirio 🌷, quiero información sobre sus arreglos" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp"><svg><use href="#i-wa"/></svg></a>
+<div class="wa-tip" id="waTip">¿Te ayudamos a elegir? 🌷</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="sketch-panel" id="sketchPanel">
+  <button class="x" aria-label="Ocultar panel" onclick="this.parentElement.remove()">×</button>
+  <b>BOCETO · DEMO</b>
+  Flor de la animación al agregar:
+  <div class="seg" id="flowerSeg" style="margin-top:6px">
+    <button data-f="girasol" aria-pressed="true">Girasol</button>
+    <button data-f="tulipan" aria-pressed="false">Tulipán</button>
+    <button data-f="producto" aria-pressed="false">Según producto</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+/* ====== Config ====== */
+const WHATSAPP_NUMBER = '51967446580'; // número de pruebas (demo). Producción: 51933099986
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const waLink = t => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t)}`;
+document.querySelectorAll('[data-wa]').forEach(a => a.href = waLink(a.dataset.wa));
+
+/* ====== Datos (en el proyecto real: Content Collections) ====== */
+const P = [
+  {id:'resplandor-dorado', n:'Resplandor Dorado', d:'Buchón de 25 girasoles con listón y frase a elección.', p:200, img:'buchon-girasoles', f:'girasol'},
+  {id:'rose-rubi', n:'Rose Rubí', d:'Base corazón con 12 rosas, 2 girasoles, lirios y peluche Lotso.', p:140, img:'box-corazon-girasoles-lirios-peluche-lotso', f:'girasol'},
+  {id:'campo-amanecer', n:'Campo Amanecer', d:'Ramo de 5 tulipanes amarillos y naranjas con finos follajes.', p:80, img:'ramo-tulipanes-amarillos-papel-olivo', f:'tulipan'},
+  {id:'dulces-primaveras', n:'Dulces Primaveras', d:'Box de 12 rosas con topping a elección y tarjeta.', p:60, img:'box-rosas-rosadas-feliz-cumpleanos', f:'rosa'},
+  {id:'ternura-de-amor', n:'Ternura de Amor', d:'Box de 7 rosas con peluche y fino follaje.', p:85, img:'arreglo-rosas-rojas-lirios-peluche-oso', f:'rosa'},
+  {id:'edeliz', n:'Edeliz', d:'Ramo de una docena de rosas, claveles y finos follajes.', p:50, img:'ramo-rosas-rojas-papel-rojo', f:'rosa'},
+  {id:'esencia-zafiro', n:'Esencia Zafiro', d:'Arreglo de 12 rosas azules y astromelias.', p:90, img:'ramo-rosas-azules-lirios-papel-azul', f:'rosa'},
+  {id:'dulce-pasion', n:'Dulce Pasión', d:'Ramo de 3 varas de lirios acompañado de lluvia.', p:85, img:'ramo-rosas-rosadas-lirios-papel-blanco', f:'rosa'},
+];
+const OFFERS = [
+  {id:'dulces-corazones', n:'Dulces Corazones', d:'Ramo de 4 gerberas con finos follajes en papel coreano.', p:60, o:51, img:'ramo-gerberas-rosadas-papel-salmon', f:'rosa'},
+  {id:'aura-de-amor', n:'Aura de Amor', d:'Ramo de 6 rosas y claveles con finos follajes.', p:30, o:27, img:'ramo-rosas-fucsia-papel-lila', f:'rosa'},
+  {id:'perla-rosada', n:'Perla Rosada', d:'Ramo de 7 tulipanes rosados y finos follajes.', p:130, o:110, img:'ramo-tulipanes-rosados-papel-azul', f:'tulipan'},
+];
+const EXTRAS = {ferrero:{id:'ferrero',n:'Ferrero Rocher 4u',p:15,img:'arreglo-rosas-rojas-globo-corazon-ferrero',f:'rosa'},peluche:{id:'peluche',n:'Peluche',p:35,img:'arreglo-rosas-rojas-lirio-peluche-panda',f:'rosa'},kisses:{id:'kisses',n:'Kisses',p:20,img:'arreglo-lirios-rosas-rojas-ferrero-hello-kitty',f:'rosa'}};
+const CATS = [
+  {s:'ramos',n:'Ramos',from:20,img:'ramo-gerberas-rosas-papel-fucsia'},
+  {s:'buchones',n:'Buchones',from:70,img:'buchon-girasoles'},
+  {s:'arreglos',n:'Arreglos',from:60,img:'arreglo-tropical-girasol-lirio-caja-roja'},
+  {s:'box',n:'Box',from:55,img:'box-corazon-girasoles-lirios-peluche-lotso'},
+  {s:'tulipanes',n:'Tulipanes',from:50,img:'ramo-tulipanes-amarillos-papel-olivo'},
+  {s:'extras',n:'Peluches y chocolates',from:10,img:'arreglo-rosas-rojas-globo-corazon-ferrero'},
+];
+const OCAS = [['amor','♥ Amor'],['aniversario','✦ Aniversario'],['cumpleanos','🎂 Cumpleaños'],['graduacion','🎓 Graduación'],['condolencias','🕊 Condolencias'],['mejorate-pronto','☀ Mejórate pronto'],['nacimientos','👶 Nacimientos']];
+const ALL = Object.fromEntries([...P,...OFFERS,...Object.values(EXTRAS)].map(x=>[x.id,x]));
+const img = n => `img/${n}.webp`;
+const soles = n => 'S/' + (Number.isInteger(n) ? n : n.toFixed(2));
+
+/* ====== Render ====== */
+document.getElementById('cats').innerHTML = CATS.map(c => `
+  <a class="cat" href="#" data-cat="${c.s}">
+    <img src="${img(c.img)}" alt="${c.n}" loading="lazy">
+    <b>${c.n}</b><small>Desde S/${c.from}</small>
+    <span class="arrow"><svg width="16" height="16"><use href="#i-arrow"/></svg></span>
+  </a>`).join('');
+document.getElementById('ocasiones').innerHTML = OCAS.map(([s,l]) => `<a href="#" class="chip" data-oca="${s}">${l}</a>`).join('');
+const card = x => `
+  <article class="card">
+    <div class="ph">
+      ${x.o ? `<span class="badge">-${Math.round((1-x.o/x.p)*100)}%</span>` : ''}
+      <img src="${img(x.img)}" alt="${x.n}" loading="lazy">
+      <button class="fav" aria-pressed="false" aria-label="Agregar ${x.n} a favoritos"><svg width="18" height="17" viewBox="0 0 24 22"><path d="M12 19.6s-7.6-4.8-9.5-9.2C1.2 6.6 3.8 2.6 7.3 2.6c2 0 3.5 1.1 4.7 2.9 1.2-1.8 2.7-2.9 4.7-2.9 3.5 0 6.1 4 4.8 7.8-1.9 4.4-9.5 9.2-9.5 9.2z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+      <a class="wa-mini" target="_blank" rel="noopener" href="${waLink(`Hola V'Lirio 🌷, quiero el ${x.n} (${soles(x.o||x.p)}). ¿Está disponible?`)}" aria-label="Pedir ${x.n} por WhatsApp"><svg width="20" height="20"><use href="#i-wa"/></svg></a>
+    </div>
+    <h3>${x.n}</h3>
+    <p>${x.d}</p>
+    <div class="price">${x.o ? `${soles(x.o)} <s>${soles(x.p)}</s>` : soles(x.p)}</div>
+    <div class="row">
+      <button class="add" data-add="${x.id}"><svg><use href="#i-basket"/></svg><span>Agregar a la canasta</span></button>
+    </div>
+  </article>`;
+document.getElementById('featured').innerHTML = P.map(card).join('');
+document.getElementById('offers').innerHTML = OFFERS.map(card).join('');
+
+/* ====== Toast ====== */
+const toastEl = document.getElementById('toast'); let toastT;
+function toast(html){ toastEl.innerHTML = html; toastEl.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(()=>toastEl.classList.remove('on'), 3200); }
+document.querySelectorAll('[data-cat]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); toast(`En la web real esto abre <b>/catalogo?categoria=${a.dataset.cat}</b>`); }));
+document.querySelectorAll('[data-oca]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); toast(`En la web real esto abre <b>/catalogo?ocasion=${a.dataset.oca}</b>`); }));
+document.addEventListener('click', e => { const f = e.target.closest('.fav'); if (f) { const on = f.getAttribute('aria-pressed') !== 'true'; f.setAttribute('aria-pressed', on); f.querySelector('path').setAttribute('fill', on ? 'currentColor' : 'none'); } });
+
+/* ====== Canasta ====== */
+const store = { get(){ try { return JSON.parse(localStorage.getItem('vl-canasta')) || {}; } catch { return {}; } }, set(v){ try { localStorage.setItem('vl-canasta', JSON.stringify(v)); } catch {} } };
+let basket = store.get();
+const $ = id => document.getElementById(id);
+const countOf = () => Object.values(basket).reduce((a,b)=>a+b,0);
+const priceOf = x => x.o || x.p;
+function renderCount(){ const c = countOf(); $('count').textContent = c; $('basketBtn').setAttribute('aria-label', `Mi canasta, ${c} producto${c===1?'':'s'}`); }
+function renderDrawer(){
+  const ids = Object.keys(basket).filter(id => ALL[id]);
+  $('items').innerHTML = ids.length ? ids.map(id => { const x = ALL[id]; return `
+    <div class="item"><img src="${img(x.img)}" alt=""><div><b>${x.n}</b><small>${soles(priceOf(x))}</small></div>
+    <div class="qty"><button data-q="${id}" data-d="-1" aria-label="Quitar uno">−</button><span>${basket[id]}</span><button data-q="${id}" data-d="1" aria-label="Agregar uno">+</button></div></div>`; }).join('')
+    : `<div class="empty"><svg><use href="#i-basket"/></svg><p><b style="color:var(--vl-vino)">Tu canasta está esperando flores</b><br>Explora el catálogo y elige tu favorita.</p></div>`;
+  const total = ids.reduce((s,id)=>s+priceOf(ALL[id])*basket[id],0);
+  $('total').textContent = soles(total);
+  const lines = ids.map(id => `• ${basket[id]} × ${ALL[id].n} — ${soles(priceOf(ALL[id])*basket[id])}`).join('\n');
+  const msg = $('cardMsg').value.trim();
+  $('checkout').href = waLink(`Hola V'Lirio 🌷, quiero hacer este pedido:\n${lines}\nTotal: ${soles(total)}${msg ? `\nMensaje para la tarjeta: "${msg}"` : ''}`);
+  $('checkout').style.opacity = ids.length ? 1 : .5; $('checkout').style.pointerEvents = ids.length ? 'auto' : 'none';
+}
+function add(id, n=1){ basket[id] = (basket[id]||0) + n; if (basket[id] <= 0) delete basket[id]; store.set(basket); renderDrawer(); }
+$('items').addEventListener('click', e => { const b = e.target.closest('[data-q]'); if (b) { add(b.dataset.q, +b.dataset.d); renderCount(); } });
+$('upsell').addEventListener('click', e => { const b = e.target.closest('[data-extra]'); if (b) { add(b.dataset.extra); renderCount(); bump(); } });
+$('cardMsg').addEventListener('input', renderDrawer);
+function openDrawer(){ renderDrawer(); $('drawer').classList.add('on'); $('scrim').classList.add('on'); $('drawer').setAttribute('aria-hidden','false'); $('closeDrawer').focus(); }
+function closeDrawer(){ $('drawer').classList.remove('on'); $('scrim').classList.remove('on'); $('drawer').setAttribute('aria-hidden','true'); $('basketBtn').focus(); }
+$('basketBtn').addEventListener('click', openDrawer); $('closeDrawer').addEventListener('click', closeDrawer); $('scrim').addEventListener('click', closeDrawer);
+addEventListener('keydown', e => { if (e.key === 'Escape' && $('drawer').classList.contains('on')) closeDrawer(); });
+renderCount(); renderDrawer();
+
+/* ====== Animación: flores volando a la canasta ====== */
+let flowerMode = 'girasol';
+$('flowerSeg').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (!b) return; flowerMode = b.dataset.f; $('flowerSeg').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+const symbolFor = x => { const m = flowerMode === 'producto' ? x.f : flowerMode; return m === 'tulipan' ? 'i-flytulip' : m === 'rosa' ? 'i-flyrose' : 'i-sunflower'; };
+function bump(){ const b = $('basketBtn'); b.classList.remove('sway'); void b.offsetWidth; b.classList.add('sway'); const h = $('badge'); h.classList.remove('pulse'); void h.offsetWidth; h.classList.add('pulse'); }
+let inFlight = 0;
+function flyToBasket(fromEl, product, onDone){
+  if (reduceMotion) { onDone(); bump(); return; }
+  const a = fromEl.getBoundingClientRect(), t = $('basketBtn').querySelector('svg.basket').getBoundingClientRect();
+  const sx = a.left + a.width/2, sy = a.top + a.height/2, ex = t.left + t.width/2, ey = t.top + t.height/2 + 4;
+  const N = Math.min(5, 8 - inFlight); if (N <= 0) { onDone(); bump(); return; }
+  let landed = 0;
+  for (let i = 0; i < N; i++) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    el.setAttribute('class','fly'); el.innerHTML = `<use href="#${symbolFor(product)}"/>`;
+    $('flyLayer').appendChild(el); inFlight++;
+    const spread = (i - (N-1)/2) * 70 + (Math.random()*40-20);
+    const cx = sx + spread + (ex - sx) * .25, cy = Math.min(sy, ey) - 120 - Math.random()*120;
+    const rot = (Math.random() > .5 ? 1 : -1) * (180 + Math.random()*180);
+    const steps = 22, frames = [];
+    for (let k = 0; k <= steps; k++) {
+      const u = k/steps, x = (1-u)*(1-u)*sx + 2*(1-u)*u*cx + u*u*ex, y = (1-u)*(1-u)*sy + 2*(1-u)*u*cy + u*u*ey;
+      const s = u < .15 ? .4 + u/.15*.75 : 1.15 - (u-.15)/.85*.8;
+      frames.push({ transform:`translate(${x}px,${y}px) rotate(${rot*u}deg) scale(${s})`, opacity: u > .92 ? (1-u)/.08 : 1 });
+    }
+    const anim = el.animate(frames, { duration: 820 + Math.random()*120, delay: i*70, easing:'cubic-bezier(.45,0,.55,1)', fill:'both' });
+    anim.onfinish = () => { el.remove(); inFlight--; landed++; if (landed === 1) bump(); if (landed === N) { onDone(); bump(); } };
+  }
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-add]'); if (!b) return;
+  const x = ALL[b.dataset.add];
+  b.classList.add('done'); b.querySelector('span').textContent = '✓ Agregado';
+  setTimeout(()=>{ b.classList.remove('done'); b.querySelector('span').textContent = 'Agregar a la canasta'; }, 1300);
+  add(x.id);
+  flyToBasket(b, x, () => { renderCount(); toast(`<span>${x.n} se agregó a tu canasta</span><button onclick="openDrawerFromToast()">Ver canasta</button>`); });
+});
+window.openDrawerFromToast = () => { toastEl.classList.remove('on'); openDrawer(); };
+
+/* ====== Cuenta regresiva (hasta el domingo 23:59) ====== */
+function tick(){ const now = new Date(), end = new Date(now); end.setDate(now.getDate() + ((7 - now.getDay()) % 7)); end.setHours(23,59,59,0); let s = Math.max(0, (end - now)/1000|0);
+  const d = s/86400|0; s%=86400; const h = s/3600|0; s%=3600; const m = s/60|0;
+  $('countdown').innerHTML = [[d,'días'],[h,'horas'],[m,'min']].map(([v,l]) => `<div><b>${String(v).padStart(2,'0')}</b><small>${l}</small></div>`).join(''); }
+tick(); setInterval(tick, 30000);
+
+/* ====== Header compacto + tip de WhatsApp ====== */
+let tipShown = false;
+addEventListener('scroll', () => { $('header').classList.toggle('compact', scrollY > 80);
+  if (!tipShown && scrollY > innerHeight * 3.4) { tipShown = true; $('waTip').classList.add('on'); setTimeout(()=>$('waTip').classList.remove('on'), 4000); } }, { passive:true });
+
+/* ====== Jardín de tulipanes (SVG, como el arco del logo) ====== */
+(function buildGarden(){
+  const g = $('garden'), xs = [110,210,310,410,510,610,710], hs = [170,230,280,330,280,230,170], NS = 'http://www.w3.org/2000/svg';
+  g.innerHTML = xs.map((x,i) => { const h = hs[i], side = i % 2 ? -1 : 1; return `
+    <g class="tulip" transform="translate(${x},440)">
+      <line class="stem" x1="0" y1="0" x2="0" y2="${-h}"/>
+      <path class="leaf" d="M0 ${-h*.32} C ${side*34} ${-h*.42}, ${side*44} ${-h*.62}, ${side*40} ${-h*.72} C ${side*20} ${-h*.62}, ${side*6} ${-h*.5}, 0 ${-h*.36}Z"/>
+      <g transform="translate(0,${-h})"><g class="bulb">
+        <path d="M-22 0 C-28 -22 -24 -44 -15 -54 L-8 -38 L0 -60 L8 -38 L15 -54 C24 -44 28 -22 22 0 C14 10 -14 10 -22 0Z"/>
+        <path class="hl" d="M0 -60 L8 -38 L15 -54 C22 -42 24 -22 18 -2 C12 4 4 6 0 6Z"/>
+      </g></g>
+    </g>`; }).join('');
+  // borde de tulipanes del footer
+  $('borderTulips').innerHTML = Array.from({length:24},(_,i)=>`<use href="#i-tulip" x="${i*50}" y="0" width="50" height="34" style="color:var(--vl-vino)"/>`).join('');
+  // pétalos flotantes
+  const st = document.querySelector('.stage');
+  for (let i = 0; i < 9; i++) { const p = document.createElement('span'); p.className = 'petal'; p.style.left = (8 + Math.random()*84) + '%'; p.style.top = (10 + Math.random()*70) + '%'; p.style.transform = `rotate(${Math.random()*360}deg) scale(${.6+Math.random()*.8})`; st.appendChild(p); }
+})();
+
+/* ====== Hero con scroll (GSAP ScrollTrigger) ====== */
+(function hero(){
+  const hero = document.querySelector('.hero');
+  if (reduceMotion || !window.gsap || !window.ScrollTrigger) { hero.classList.add('static'); document.querySelectorAll('.petal').forEach(p=>p.remove()); return; }
+  gsap.registerPlugin(ScrollTrigger);
+  const tulips = gsap.utils.toArray('.garden .tulip');
+  const lines = gsap.utils.toArray('#message .l');
+  const photos = gsap.utils.toArray('.hero-photo');
+  // Estado inicial: tulipanes ya brotando (la primera pantalla nunca está vacía)
+  tulips.forEach(t => { gsap.set(t.querySelector('.stem'), { scaleY:.35, transformOrigin:'50% 100%' });
+    gsap.set(t.querySelector('.leaf'), { scale:.3, transformOrigin:'50% 100%', opacity:0 });
+    const h = +t.querySelector('.stem').getAttribute('y2') * -1; gsap.set(t.querySelector('.bulb'), { y: h*.65, scale:.55, transformOrigin:'50% 100%' }); });
+  gsap.set(lines, { opacity:0, y:40, filter:'blur(10px)' });
+  gsap.set('#heroCta', { opacity:0, y:20 });
+  photos.forEach((p,i) => gsap.set(p, { opacity:0, x: (i % 2 ? 1 : -1) * 320, y: 60, rotate: (i % 2 ? 1 : -1) * 12 }));
+  gsap.set('.hp5', { x:0, y:260 });
+  // pequeña entrada al cargar
+  gsap.from('.garden', { y:60, opacity:0, duration:1.2, ease:'power2.out' });
+  gsap.from('#heroIntro > *', { y:20, opacity:0, duration:1, stagger:.15, ease:'power2.out', delay:.2 });
+
+  const tl = gsap.timeline({ defaults:{ ease:'power2.out' }, scrollTrigger:{ trigger:hero, start:'top top', end:'bottom bottom', scrub:1 } });
+  tl.to('#scrollHint', { opacity:0, duration:.5 }, 0)
+    .to('#heroIntro', { opacity:0, y:-40, duration:1.2 }, .3)
+    .to(tulips.map(t=>t.querySelector('.stem')), { scaleY:1, duration:3, stagger:{ each:.12, from:'center' } }, 0)
+    .to(tulips.map(t=>t.querySelector('.bulb')), { y:0, scale:1, rotate:(i)=> (i-3)*3, duration:3, stagger:{ each:.12, from:'center' } }, 0)
+    .to(tulips.map(t=>t.querySelector('.leaf')), { scale:1, opacity:.85, duration:2.4, stagger:{ each:.12, from:'center' } }, .6)
+    .to('.petal', { y:()=> -120 - Math.random()*200, x:()=> Math.random()*120-60, rotate:'+=180', duration:6, stagger:.05 }, 0)
+    .to('#garden', { opacity:.12, y:80, scale:.92, transformOrigin:'50% 100%', duration:1.6 }, 3.6)
+    .to(lines, { opacity:1, y:0, filter:'blur(0px)', duration:1.4, stagger:.7 }, 3.8)
+    .to(photos, { opacity:1, x:0, y:0, rotate:(i)=> [-6,4,6,-4,0][i], duration:2.2, stagger:.25, ease:'power3.out' }, 6.6)
+    .to('#heroCta', { opacity:1, y:0, duration:1 }, 7.6)
+    .to('.petal', { opacity:0, duration:1 }, 8)
+    .to({}, { duration:1 });
+})();
+</script>
+</body>
+</html>
