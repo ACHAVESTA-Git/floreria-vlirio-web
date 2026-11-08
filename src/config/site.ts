@@ -1,5 +1,5 @@
 /** Número de WhatsApp en un solo lugar. Demo = número de pruebas. Producción: '51933099986' */
-export const WHATSAPP_NUMBER = '51967446580';
+export const WHATSAPP_NUMBER = '51936688729';
 
 export const SITE = {
   nombre: "Florería V'Lirio",
