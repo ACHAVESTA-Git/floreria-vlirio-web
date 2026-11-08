@@ -1,0 +1,111 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getProductos, precioFinal, type Producto } from '../../lib/catalog';
+import { soles } from '../../config/site';
+
+export async function getStaticPaths() {
+  const productos = await getProductos();
+  return productos.map((producto) => ({ params: { slug: producto.id }, props: { producto } }));
+}
+
+interface Props {
+  producto: Producto;
+}
+
+const { producto } = Astro.props;
+const { nombre, descripcion, precio, precioOferta, imagen } = producto.data;
+const vigente = precioFinal(producto.data);
+---
+
+<BaseLayout title={nombre} description={descripcion}>
+  <section class="detalle wrap">
+    <a class="volver" href="/catalogo">← Volver al catálogo</a>
+    <div class="grid">
+      <div class="foto">
+        <Image src={imagen} width={480} alt={`Foto de ${nombre}`} loading="eager" />
+      </div>
+      <div class="info">
+        <h1 class="title">{nombre}</h1>
+        <p class="desc">{descripcion}</p>
+        <p class="precio">
+          {precioOferta !== undefined && <s>{soles(precio)}</s>}
+          <span>{soles(vigente)}</span>
+        </p>
+        <p class="pronto">Próximamente</p>
+        <button type="button" class="btn btn-primary" data-add={producto.id}>Agregar a la canasta</button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .detalle {
+    padding-top: 140px;
+    padding-bottom: 96px;
+  }
+  .volver {
+    display: inline-block;
+    margin-bottom: 24px;
+    padding: 6px 0;
+    font-family: var(--vl-font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--vl-vino);
+  }
+  .grid {
+    display: grid;
+    gap: 40px;
+    align-items: center;
+  }
+  @media (min-width: 860px) {
+    .grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .foto {
+    padding: 24px;
+    border-radius: var(--vl-radius);
+    background: var(--vl-blush);
+  }
+  .foto img {
+    width: min(100%, 480px);
+    height: auto;
+    margin-inline: auto;
+    object-fit: contain;
+    filter: var(--vl-drop);
+  }
+  .info .title {
+    margin-bottom: 12px;
+  }
+  .desc {
+    max-width: 46ch;
+    margin-bottom: 16px;
+    color: var(--vl-tinta-suave);
+  }
+  .precio {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 28px;
+    color: var(--vl-coral);
+  }
+  .precio s {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--vl-tinta-suave);
+  }
+  .pronto {
+    display: inline-block;
+    margin: 14px 0 22px;
+    padding: 6px 14px;
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-durazno);
+    color: var(--vl-vino);
+    font-family: var(--vl-font-ui);
+    font-size: 14px;
+    font-weight: 600;
+  }
+</style>
