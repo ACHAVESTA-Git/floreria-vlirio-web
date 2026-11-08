@@ -1,0 +1,293 @@
+---
+/**
+ * Header sticky: logo, navegación, WhatsApp, canasta y menú móvil a pantalla completa.
+ * Se compacta (84px -> 64px, vidrio + blur) al pasar 80px de scroll.
+ */
+import Logo from './Logo.astro';
+import BasketButton from '../basket/BasketButton.astro';
+import { waLink } from '../../config/site';
+
+const WA_HREF = waLink("Hola V'Lirio 🌷, quiero información sobre sus arreglos");
+
+const enlaces = [
+  { href: '/#inicio', texto: 'Inicio' },
+  { href: '/catalogo', texto: 'Catálogo' },
+  { href: '/#ocasiones', texto: 'Ocasiones' },
+  { href: '/#visitanos', texto: 'Nosotros' },
+  { href: '/#visitanos', texto: 'Contacto' },
+] as const;
+---
+
+<header class="site-header" id="site-header">
+  <div class="wrap bar">
+    <a href="/" class="brand" aria-label="Florería V'Lirio, ir al inicio">
+      <Logo />
+    </a>
+
+    <nav class="nav" aria-label="Principal">
+      {enlaces.map((e) => <a href={e.href}>{e.texto}</a>)}
+    </nav>
+
+    <div class="actions">
+      <a class="wa-head" href={WA_HREF} target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+        <svg width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-wa" /></svg>
+        <span class="lbl">WhatsApp</span>
+      </a>
+      <BasketButton />
+      <button type="button" class="burger" aria-expanded="false" aria-controls="menu-movil" aria-label="Abrir menú" data-burger>
+        <svg width="24" height="24" aria-hidden="true" focusable="false"><use href="#i-menu" data-burger-icon /></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="menu-movil" id="menu-movil" hidden data-menu>
+  <nav aria-label="Menú móvil">
+    <ul>
+      {enlaces.map((e) => (
+        <li><a href={e.href} data-menu-link>{e.texto}</a></li>
+      ))}
+    </ul>
+  </nav>
+  <a class="btn btn-wa menu-wa" href={WA_HREF} target="_blank" rel="noopener" data-menu-link>
+    <svg width="20" height="20" aria-hidden="true" focusable="false"><use href="#i-wa" /></svg>
+    Pedir por WhatsApp
+  </a>
+</div>
+
+<style>
+  .site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    height: 84px;
+    display: flex;
+    align-items: center;
+    transition: height 0.4s var(--vl-ease), background-color 0.4s, box-shadow 0.4s;
+  }
+  .site-header.compact {
+    height: 64px;
+    background: var(--vl-header-glass);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 6px 24px -16px color-mix(in srgb, var(--vl-vino) 40%, transparent);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .brand {
+    display: inline-flex;
+    color: var(--vl-vino);
+    border-radius: 12px;
+  }
+  .nav {
+    display: flex;
+    gap: 28px;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .nav a {
+    position: relative;
+    color: var(--vl-tinta);
+    padding: 6px 0;
+  }
+  .nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--vl-frambuesa);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s var(--vl-ease);
+  }
+  .nav a:hover::after,
+  .nav a:focus-visible::after {
+    transform: scaleX(1);
+  }
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .wa-head {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 46px;
+    padding: 0 18px;
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-whatsapp);
+    color: var(--vl-whatsapp-tinta);
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: background 0.3s;
+  }
+  .wa-head:hover {
+    background: var(--vl-whatsapp-hover);
+  }
+  .wa-head svg {
+    flex: none;
+  }
+  .burger {
+    display: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    place-items: center;
+    color: var(--vl-vino);
+    transition: background 0.3s;
+  }
+  .burger:hover {
+    background: var(--vl-blush);
+  }
+
+  /* Menú móvil: panel a pantalla completa, hermano del header (el blur crea un bloque contenedor para fixed) */
+  .menu-movil {
+    position: fixed;
+    inset: 0;
+    z-index: 49;
+    background: var(--vl-blush);
+    padding: 112px 16px 32px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .menu-movil[hidden] {
+    display: none;
+  }
+  .menu-movil:not([hidden]) {
+    animation: menu-in 0.3s var(--vl-ease);
+  }
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .menu-movil ul {
+    display: grid;
+  }
+  .menu-movil a {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--vl-durazno);
+    font-family: var(--vl-font-title);
+    font-weight: 900;
+    font-size: 26px;
+    color: var(--vl-vino);
+  }
+  .menu-wa {
+    width: 100%;
+    justify-content: center;
+    margin-top: auto;
+    min-height: 52px;
+  }
+
+  @media (max-width: 899px) {
+    .nav {
+      display: none;
+    }
+    .burger {
+      display: grid;
+    }
+    .wa-head {
+      width: 46px;
+      height: 46px;
+      padding: 0;
+      justify-content: center;
+    }
+    .wa-head .lbl {
+      display: none;
+    }
+  }
+  @media (min-width: 900px) {
+    .menu-movil {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  const header = document.getElementById('site-header');
+  const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  const icono = document.querySelector<SVGUseElement>('[data-burger-icon]');
+  const enlacesMenu: HTMLElement[] = menu ? Array.from(menu.querySelectorAll<HTMLElement>('a')) : [];
+  const mq = window.matchMedia('(min-width: 900px)');
+
+  function abrir(): void {
+    if (!burger || !menu) return;
+    menu.hidden = false;
+    burger.setAttribute('aria-expanded', 'true');
+    burger.setAttribute('aria-label', 'Cerrar menú');
+    icono?.setAttribute('href', '#i-close');
+    document.documentElement.style.overflow = 'hidden';
+    enlacesMenu[0]?.focus();
+  }
+
+  function cerrar(devolverFoco = true): void {
+    if (!burger || !menu || menu.hidden) return;
+    menu.hidden = true;
+    burger.setAttribute('aria-expanded', 'false');
+    burger.setAttribute('aria-label', 'Abrir menú');
+    icono?.setAttribute('href', '#i-menu');
+    document.documentElement.style.overflow = '';
+    if (devolverFoco) burger.focus();
+  }
+
+  burger?.addEventListener('click', () => {
+    if (menu?.hidden) abrir();
+    else cerrar();
+  });
+
+  // Clic en un enlace del menú: cierra sin devolver el foco (la página navega o abre WhatsApp)
+  menu?.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('a')) cerrar(false);
+  });
+
+  // Escape cierra y devuelve el foco al botón; Tab queda dentro del menú mientras está abierto
+  document.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (!menu || menu.hidden) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      cerrar();
+      return;
+    }
+    if (e.key !== 'Tab' || !burger) return;
+    const lista: HTMLElement[] = [burger, ...enlacesMenu];
+    const i = lista.indexOf(document.activeElement as HTMLElement);
+    let siguiente: number;
+    if (e.shiftKey) siguiente = i <= 0 ? lista.length - 1 : i - 1;
+    else siguiente = i === -1 || i === lista.length - 1 ? 0 : i + 1;
+    e.preventDefault();
+    lista[siguiente]?.focus();
+  });
+
+  // Pasar a escritorio con el menú abierto: cerrar sin mover el foco
+  mq.addEventListener('change', (e) => {
+    if (e.matches) cerrar(false);
+  });
+
+  const onScroll = (): void => {
+    header?.classList.toggle('compact', window.scrollY > 80);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>
