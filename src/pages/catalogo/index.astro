@@ -87,7 +87,7 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
 
   <section class="listado">
     <div id="filters" class="filters">
-      <div class="wrap">
+      <div class="wrap barra">
         <div class="tabs" role="group" aria-label="Tipo de arreglo">
           <button type="button" class="tab" data-filter-cat="todos" aria-pressed="true">Todos</button>
           {
@@ -105,34 +105,30 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
           }
         </div>
 
-        <div class="controles">
-          <div class="orden">
-            <label for="sort">Ordenar por</label>
-            <select id="sort">
-              <option value="relevancia">Más pedidos</option>
-              <option value="menor">Menor precio</option>
-              <option value="mayor">Mayor precio</option>
-            </select>
-          </div>
+        <div class="orden">
+          <label for="sort">Ordenar por</label>
+          <select id="sort">
+            <option value="relevancia">Más pedidos</option>
+            <option value="menor">Menor precio</option>
+            <option value="mayor">Mayor precio</option>
+          </select>
+        </div>
 
-          <div class="rango" role="group" aria-label="Rango de precio">
-            <div class="campo">
-              <label class="sr-only" for="min">Precio mínimo</label>
-              <span class="pref" aria-hidden="true">S/</span>
-              <input id="min" type="number" inputmode="numeric" min="0" placeholder="Mín" />
-            </div>
-            <div class="campo">
-              <label class="sr-only" for="max">Precio máximo</label>
-              <span class="pref" aria-hidden="true">S/</span>
-              <input id="max" type="number" inputmode="numeric" min="0" placeholder="Máx" />
-            </div>
+        <div class="rango" role="group" aria-label="Rango de precio">
+          <div class="campo">
+            <label class="sr-only" for="min">Precio mínimo</label>
+            <span class="pref" aria-hidden="true">S/</span>
+            <input id="min" type="number" inputmode="numeric" min="0" placeholder="Mín" />
           </div>
-
-          <div class="acc">
-            <button type="button" id="clear" class="btn btn-ghost clear">Limpiar filtros</button>
-            <p id="results-count" class="count" role="status" aria-live="polite">{productos.length} productos</p>
+          <div class="campo">
+            <label class="sr-only" for="max">Precio máximo</label>
+            <span class="pref" aria-hidden="true">S/</span>
+            <input id="max" type="number" inputmode="numeric" min="0" placeholder="Máx" />
           </div>
         </div>
+
+        <button type="button" id="clear" class="btn btn-ghost clear" hidden>Limpiar filtros</button>
+        <p id="results-count" class="count" role="status" aria-live="polite">{productos.length} productos</p>
       </div>
     </div>
 
@@ -209,47 +205,54 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
     display: none;
   }
 
-  /* ---------- Barra de filtros (sticky) ---------- */
+  /* ---------- Barra de filtros ---------- */
   .listado {
     padding-bottom: 96px;
   }
   .filters {
-    position: relative; /* en móvil la barra ocupa ~200px: solo es sticky desde 900px */
+    position: relative;
     z-index: 40;
-    padding: 14px 0 12px;
-    background: var(--vl-header-glass);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    padding: 12px 0;
+    background: var(--vl-crema); /* opaca: las tarjetas no se transparentan bajo los chips */
     border-bottom: 1px solid var(--vl-durazno);
-    box-shadow: var(--vl-shadow);
   }
 
-  @media (min-width: 900px) {
-    .filters {
-      position: sticky;
-      top: 64px;
-    }
+  /* Rejilla plana: en móvil todo apilado; la barra solo es sticky desde 900px */
+  .barra {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'tabs tabs'
+      'chips chips'
+      'orden orden'
+      'rango rango'
+      'clear count';
+    align-items: center;
+    gap: 10px 12px;
   }
+  .tabs { grid-area: tabs; }
+  .chips-f { grid-area: chips; }
+  .orden { grid-area: orden; }
+  .rango { grid-area: rango; }
+  .clear { grid-area: clear; justify-self: start; }
+  .count { grid-area: count; justify-self: end; }
 
-  /* Filas scrollables en móvil: sin barra visible y con snap */
+  /* Filas de una sola línea con scroll horizontal (sin barra visible) */
   .tabs,
   .chips-f {
     display: flex;
+    flex-wrap: nowrap;
     gap: 8px;
+    min-width: 0;
     overflow-x: auto;
     scroll-snap-type: x proximity;
     scrollbar-width: none;
-    overscroll-behavior-x: contain;
     margin-inline: -16px;
-    padding: 4px 16px;
-    scroll-padding-inline: 16px;
+    padding: 2px 16px;
   }
   .tabs::-webkit-scrollbar,
   .chips-f::-webkit-scrollbar {
     display: none;
-  }
-  .chips-f {
-    margin-top: 10px;
   }
 
   .tab,
@@ -261,42 +264,43 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
     font-size: 14px;
     line-height: 1;
     white-space: nowrap;
-    padding: 10px 16px;
+    min-height: 40px;
+    padding: 0 16px;
     border: 1px solid var(--vl-vino);
     border-radius: var(--vl-radius-pill);
     background: transparent;
     color: var(--vl-vino);
+    /* evita el zoom por doble toque y el resaltado gris al pulsar chips seguidos */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
     transition:
-      background 0.3s var(--vl-ease),
-      color 0.3s var(--vl-ease);
+      background-color 0.18s ease,
+      color 0.18s ease;
   }
   .chip-f {
     font-weight: 500;
-    padding: 8px 14px;
-  }
-  .tab:hover,
-  .chip-f:hover {
-    background: var(--vl-blush);
+    min-height: 36px;
+    padding: 0 14px;
   }
   .tab[aria-pressed='true'],
   .chip-f[aria-pressed='true'] {
     background: var(--vl-vino);
     color: var(--vl-blanco);
   }
-
-  /* Controles: en móvil, orden + precio en la primera fila y acciones en la segunda */
-  .controles {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px 12px;
-    margin-top: 12px;
+  /* El hover solo existe con mouse: en táctil se quedaba "pegado" tras tocar */
+  @media (hover: hover) {
+    .tab[aria-pressed='false']:hover,
+    .chip-f[aria-pressed='false']:hover {
+      background: var(--vl-blush);
+    }
   }
+
+  /* Orden y precio */
   .orden {
     display: flex;
     align-items: center;
     gap: 8px;
-    flex: 1 1 100%; /* en móvil el orden ocupa su propia fila */
     min-width: 0;
     font-family: var(--vl-font-ui);
     font-weight: 600;
@@ -320,8 +324,7 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
   }
   .rango {
     display: flex;
-    gap: 6px;
-    flex: 1 1 100%; /* y el rango de precio la suya, para que Mín/Máx se lean completos */
+    gap: 8px;
     min-width: 0;
   }
   .campo {
@@ -331,7 +334,7 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
   }
   .campo input {
     width: 100%;
-    padding: 0 12px 0 36px;
+    padding: 0 12px 0 34px;
   }
   .pref {
     position: absolute;
@@ -344,22 +347,18 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
     color: var(--vl-tinta-suave);
     pointer-events: none;
   }
-  .acc {
-    flex: 1 1 100%;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px 12px;
-  }
   .clear {
     padding: 8px 16px;
     font-size: 14px;
+  }
+  .clear[hidden] {
+    display: none; /* .btn define display y pisaba el atributo hidden */
   }
   .count {
     font-family: var(--vl-font-ui);
     font-size: 14px;
     color: var(--vl-tinta-suave);
+    white-space: nowrap;
   }
 
   /* ---------- Grilla ---------- */
@@ -401,41 +400,90 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
     color: var(--vl-vino);
   }
 
-  /* ---------- Tablet y escritorio ---------- */
+  /* ---------- Tablet ---------- */
   @media (min-width: 760px) {
     .hdr-img {
       width: 260px;
+    }
+    .barra {
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas:
+        'tabs tabs'
+        'chips chips'
+        'orden rango'
+        'clear count';
     }
     .tabs,
     .chips-f {
       flex-wrap: wrap;
       overflow: visible;
       margin-inline: 0;
-      padding: 0;
-    }
-    .chips-f {
-      margin-top: 12px;
-    }
-    .controles {
-      flex-wrap: nowrap;
-      margin-top: 14px;
-    }
-    .orden,
-    .rango {
-      flex: 0 0 auto;
+      padding-inline: 0;
     }
     .orden {
-      width: 270px;
+      width: 280px;
     }
     .rango {
       width: 240px;
     }
-    .acc {
-      flex: 1 1 auto;
-      justify-content: flex-end;
-    }
     .grid {
       scroll-margin-top: 170px;
+    }
+  }
+
+  /* ---------- Escritorio ancho (>=1240px, el contenedor llega a 1200px): compacta en 2 filas y fija al hacer scroll ---------- */
+  @media (min-width: 1240px) {
+    .filters {
+      position: sticky;
+      top: 64px;
+      padding: 8px 0;
+      box-shadow: var(--vl-shadow);
+    }
+    .barra {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      grid-template-areas:
+        'tabs orden count'
+        'chips rango clear';
+      gap: 6px 14px;
+    }
+    .orden {
+      width: auto;
+    }
+    .rango {
+      width: auto;
+    }
+    .campo {
+      flex: none;
+      width: 96px;
+    }
+    .tab {
+      min-height: 34px;
+      padding: 0 14px;
+      font-size: 13.5px;
+    }
+    .chip-f {
+      min-height: 30px;
+      padding: 0 12px;
+      font-size: 13px;
+    }
+    .orden select,
+    .campo input {
+      height: 34px;
+      font-size: 13.5px;
+    }
+    .orden select {
+      flex: none;
+      width: 140px;
+    }
+    .clear {
+      padding: 6px 14px;
+      font-size: 13.5px;
+    }
+    .count {
+      font-size: 13.5px;
+    }
+    .grid {
+      scroll-margin-top: 150px;
     }
   }
 
