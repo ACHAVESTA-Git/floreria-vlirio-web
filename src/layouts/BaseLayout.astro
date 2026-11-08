@@ -1,0 +1,82 @@
+---
+import '@fontsource/nunito/latin-400.css';
+import '@fontsource/nunito/latin-600.css';
+import '@fontsource/nunito/latin-800.css';
+import '@fontsource/nunito/latin-900.css';
+import '@fontsource/poppins/latin-500.css';
+import '@fontsource/poppins/latin-600.css';
+import '@fontsource/luxurious-script/latin-400.css';
+import '../styles/tokens.css';
+import '../styles/global.css';
+
+import Icons from '../components/layout/Icons.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import WhatsAppFloat from '../components/layout/WhatsAppFloat.astro';
+import BasketDrawer from '../components/basket/BasketDrawer.astro';
+import Toast from '../components/basket/Toast.astro';
+import { getCatalogMap } from '../lib/catalog';
+import { SITE } from '../config/site';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = SITE.eslogan } = Astro.props;
+const tituloCompleto = `${title} · ${SITE.nombre}`;
+const catalogo = await getCatalogMap();
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_PE" />
+    <meta property="og:site_name" content={SITE.nombre} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+    <Icons />
+    <Header />
+    <main id="contenido">
+      <slot />
+    </main>
+    <Footer />
+    <WhatsAppFloat />
+    <BasketDrawer />
+    <Toast />
+    <script type="application/json" id="vl-catalog" set:html={JSON.stringify(catalogo)}></script>
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: 16px;
+    top: -80px;
+    z-index: 100;
+    padding: 12px 20px;
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-vino);
+    color: var(--vl-blanco);
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 15px;
+    transition: top 0.2s;
+  }
+  .skip-link:focus {
+    top: 12px;
+  }
+  main {
+    display: block;
+    padding-top: 0;
+  }
+</style>
