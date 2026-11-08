@@ -113,6 +113,15 @@ const CTA_WA = waLink("Hola V'Lirio 🌷, quiero hacer un pedido");
 
     <div class="scroll-hint" id="scrollHint" aria-hidden="true"><i></i>Desliza para descubrir</div>
   </div>
+  <noscript>
+    <style>
+      .hero .hero-photo,
+      .hero .message .l,
+      .hero .hero-cta {
+        opacity: 1 !important;
+      }
+    </style>
+  </noscript>
 </section>
 
 <style>
@@ -336,6 +345,13 @@ const CTA_WA = waLink("Hola V'Lirio 🌷, quiero hacer un pedido");
   }
 
   /* ---------- Estado estático (reduced-motion o sin GSAP) ---------- */
+  /* Antes de que GSAP esté listo, el mensaje, los CTAs y las fotos permanecen ocultos
+     (evita el parpadeo y mantiene el LCP en el texto de bienvenida). */
+  .hero:not(.static) .hero-photo,
+  .hero:not(.static) .message .l,
+  .hero:not(.static) .hero-cta {
+    opacity: 0;
+  }
   .hero.static {
     height: auto;
   }

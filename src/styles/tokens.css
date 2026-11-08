@@ -39,6 +39,7 @@
   --vl-shadow-drawer: -20px 0 50px -20px rgb(119 42 76 / 0.4);
   --vl-drop: drop-shadow(0 12px 12px rgb(119 42 76 / 0.2));
   --vl-scrim: rgb(46 26 36 / 0.4);
+  --vl-vidrio: rgb(255 255 255 / 0.6);
   --vl-header-glass: rgb(253 248 243 / 0.86);
   --vl-ease: cubic-bezier(0.22, 1, 0.36, 1);
   /* Medidas */

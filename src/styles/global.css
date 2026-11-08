@@ -28,7 +28,7 @@ ul { list-style: none; }
 }
 .btn-primary { background: var(--vl-frambuesa); color: var(--vl-blanco); box-shadow: var(--vl-shadow); }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--vl-shadow-lg); background: var(--vl-frambuesa-oscuro); }
-.btn-ghost { border: 1.5px solid var(--vl-vino); color: var(--vl-vino); background: rgb(255 255 255 / 0.6); }
+.btn-ghost { border: 1.5px solid var(--vl-vino); color: var(--vl-vino); background: var(--vl-vidrio); }
 .btn-ghost:hover { background: var(--vl-vino); color: var(--vl-blanco); }
 .btn-wa { background: var(--vl-whatsapp); color: var(--vl-whatsapp-tinta); }
 .btn-wa:hover { background: var(--vl-whatsapp-hover); }

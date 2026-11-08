@@ -4,7 +4,22 @@
     {
       "name": "boceto",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4321", "--directory", "/Users/anthonychavesta/Desktop/floreria-vlirio/boceto"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4321",
+        "--directory",
+        "/Users/anthonychavesta/Desktop/floreria-vlirio/boceto"
+      ],
+      "port": 4321
+    },
+    {
+      "name": "astro-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 4321
     }
   ]

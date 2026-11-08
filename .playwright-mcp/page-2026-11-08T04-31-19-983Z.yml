@@ -1,0 +1,410 @@
+- generic [active] [ref=e1]:
+  - link "Saltar al contenido" [ref=e2] [cursor=pointer]:
+    - /url: "#contenido"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "Florería V'Lirio, ir al inicio" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]: V'LIRI
+      - generic [ref=e33]:
+        - link "Escríbenos por WhatsApp" [ref=e34] [cursor=pointer]:
+          - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20informaci%C3%B3n%20sobre%20sus%20arreglos
+        - button "Mi canasta, 0 productos" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: "0"
+        - button "Abrir menú" [ref=e45] [cursor=pointer]
+  - main [ref=e48]:
+    - region "Bienvenida" [ref=e49]:
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - paragraph [ref=e52]: FLORERÍA EN COMAS · LIMA
+          - generic [ref=e53]: bienvenido a V'Lirio
+        - generic [ref=e106]:
+          - heading "Aquí no solo vendemos flores, entregamos momentos que llegan al corazón" [level=1] [ref=e107]:
+            - generic [ref=e108]: Aquí no solo vendemos flores,
+            - generic [ref=e109]: entregamos momentos
+            - generic [ref=e110]: que llegan al corazón
+          - generic [ref=e111]:
+            - link "Ver catálogo" [ref=e112] [cursor=pointer]:
+              - /url: /#categorias
+            - link "Pedir por WhatsApp" [ref=e115] [cursor=pointer]:
+              - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20hacer%20un%20pedido
+        - img "Ramo de gerberas y rosas envuelto en papel fucsia" [ref=e119]
+        - img "Buchón de girasoles" [ref=e121]
+        - img "Box de rosas rosadas con topper de feliz cumpleaños" [ref=e123]
+        - generic [aria-hidden] [ref=e124]: Desliza para descubrir
+    - region [ref=e126]:
+      - generic [ref=e127]:
+        - generic [ref=e128]:
+          - generic [ref=e129]:
+            - generic [ref=e130]: Nuestro catálogo
+            - heading "Encuentra el detalle perfecto" [level=2] [ref=e131]
+          - paragraph [ref=e132]: Elige por tipo de arreglo o por la ocasión que quieres celebrar.
+        - generic [ref=e133]:
+          - link "Arreglo de ramos de Florería V'Lirio Ramos Desde S/27" [ref=e134] [cursor=pointer]:
+            - /url: /catalogo?categoria=ramos
+            - img "Arreglo de ramos de Florería V'Lirio" [ref=e136]
+            - generic [ref=e137]:
+              - generic [ref=e138]: Ramos
+              - generic [ref=e139]: Desde S/27
+          - link "Arreglo de buchones de Florería V'Lirio Buchones Desde S/200" [ref=e143] [cursor=pointer]:
+            - /url: /catalogo?categoria=buchones
+            - img "Arreglo de buchones de Florería V'Lirio" [ref=e145]
+            - generic [ref=e146]:
+              - generic [ref=e147]: Buchones
+              - generic [ref=e148]: Desde S/200
+          - link "Arreglo de arreglos de Florería V'Lirio Arreglos Desde S/70" [ref=e152] [cursor=pointer]:
+            - /url: /catalogo?categoria=arreglos
+            - img "Arreglo de arreglos de Florería V'Lirio" [ref=e154]
+            - generic [ref=e155]:
+              - generic [ref=e156]: Arreglos
+              - generic [ref=e157]: Desde S/70
+          - link "Arreglo de box de Florería V'Lirio Box Desde S/60" [ref=e161] [cursor=pointer]:
+            - /url: /catalogo?categoria=box
+            - img "Arreglo de box de Florería V'Lirio" [ref=e163]
+            - generic [ref=e164]:
+              - generic [ref=e165]: Box
+              - generic [ref=e166]: Desde S/60
+          - link "Arreglo de tulipanes de Florería V'Lirio Tulipanes Desde S/80" [ref=e170] [cursor=pointer]:
+            - /url: /catalogo?categoria=tulipanes
+            - img "Arreglo de tulipanes de Florería V'Lirio" [ref=e172]
+            - generic [ref=e173]:
+              - generic [ref=e174]: Tulipanes
+              - generic [ref=e175]: Desde S/80
+          - link "Arreglo de peluches y chocolates de Florería V'Lirio Peluches y chocolates Desde S/15" [ref=e179] [cursor=pointer]:
+            - /url: /catalogo?categoria=extras
+            - img "Arreglo de peluches y chocolates de Florería V'Lirio" [ref=e181]
+            - generic [ref=e182]:
+              - generic [ref=e183]: Peluches y chocolates
+              - generic [ref=e184]: Desde S/15
+        - navigation "Buscar por ocasión" [ref=e188]:
+          - link "Amor" [ref=e189] [cursor=pointer]:
+            - /url: /catalogo?ocasion=amor
+          - link "Aniversario" [ref=e192] [cursor=pointer]:
+            - /url: /catalogo?ocasion=aniversario
+          - link "Cumpleaños" [ref=e195] [cursor=pointer]:
+            - /url: /catalogo?ocasion=cumpleanos
+          - link "Graduación" [ref=e200] [cursor=pointer]:
+            - /url: /catalogo?ocasion=graduacion
+          - link "Condolencias" [ref=e204] [cursor=pointer]:
+            - /url: /catalogo?ocasion=condolencias
+          - link "Mejórate pronto" [ref=e207] [cursor=pointer]:
+            - /url: /catalogo?ocasion=mejorate-pronto
+          - link "Nacimientos" [ref=e211] [cursor=pointer]:
+            - /url: /catalogo?ocasion=nacimientos
+    - region [ref=e214]:
+      - generic [ref=e215]:
+        - generic [ref=e216]:
+          - generic [ref=e217]:
+            - paragraph [ref=e218]: hechos con amor
+            - heading "Los más pedidos" [level=2] [ref=e219]
+          - link "Ver todo el catálogo" [ref=e220] [cursor=pointer]:
+            - /url: /catalogo
+        - region "Productos más pedidos" [ref=e224]:
+          - article [ref=e225]:
+            - generic [ref=e226]:
+              - 'img "Resplandor Dorado: Buchón de 25 girasoles con listón y frase a elección." [ref=e227]'
+              - button "Guardar Resplandor Dorado en favoritos" [ref=e228] [cursor=pointer]
+              - link "Pedir Resplandor Dorado por WhatsApp" [ref=e231] [cursor=pointer]:
+                - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20el%20Resplandor%20Dorado%20(S%2F200).%20%C2%BFEst%C3%A1%20disponible%3F
+            - heading [level=3] [ref=e234]:
+              - link "Resplandor Dorado" [ref=e235] [cursor=pointer]:
+                - /url: /catalogo/resplandor-dorado
+            - paragraph [ref=e236]: Buchón de 25 girasoles con listón y frase a elección.
+            - paragraph [ref=e237]:
+              - generic [ref=e238]: S/200
+            - button "Agregar a la canasta" [ref=e240] [cursor=pointer]
+          - article [ref=e244]:
+            - generic [ref=e245]:
+              - 'img "Rose Rubí: Base corazón con 12 rosas, 2 girasoles, lirios y peluche Lotso." [ref=e246]'
+              - button "Guardar Rose Rubí en favoritos" [ref=e247] [cursor=pointer]
+              - link "Pedir Rose Rubí por WhatsApp" [ref=e250] [cursor=pointer]:
+                - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20el%20Rose%20Rub%C3%AD%20(S%2F140).%20%C2%BFEst%C3%A1%20disponible%3F
+            - heading [level=3] [ref=e253]:
+              - link "Rose Rubí" [ref=e254] [cursor=pointer]:
+                - /url: /catalogo/rose-rubi
+            - paragraph [ref=e255]: Base corazón con 12 rosas, 2 girasoles, lirios y peluche Lotso.
+            - paragraph [ref=e256]:
+              - generic [ref=e257]: S/140
+            - button "Agregar a la canasta" [ref=e259] [cursor=pointer]
+          - article [ref=e263]:
+            - generic [ref=e264]:
+              - 'img "Campo Amanecer: Ramo de 5 tulipanes amarillos y naranjas con finos follajes." [ref=e265]'
+              - button "Guardar Campo Amanecer en favoritos" [ref=e266] [cursor=pointer]
+              - link "Pedir Campo Amanecer por WhatsApp" [ref=e269] [cursor=pointer]:
+                - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20el%20Campo%20Amanecer%20(S%2F80).%20%C2%BFEst%C3%A1%20disponible%3F
+            - heading [level=3] [ref=e272]:
+              - link "Campo Amanecer" [ref=e273] [cursor=pointer]:
+                - /url: /catalogo/campo-amanecer
+            - paragraph [ref=e274]: Ramo de 5 tulipanes amarillos y naranjas con finos follajes.
+            - paragraph [ref=e275]:
+              - generic [ref=e276]: S/80
+            - button "Agregar a la canasta" [ref=e278] [cursor=pointer]
+          - article [ref=e282]:
+            - generic [ref=e283]:
+              - 'img "Dulces Primaveras: Box de 12 rosas con topping a elección y tarjeta." [ref=e284]'
+              - button "Guardar Dulces Primaveras en favoritos" [ref=e285] [cursor=pointer]
+              - link "Pedir Dulces Primaveras por WhatsApp" [ref=e288] [cursor=pointer]:
+                - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20el%20Dulces%20Primaveras%20(S%2F60).%20%C2%BFEst%C3%A1%20disponible%3F
+            - heading [level=3] [ref=e291]:
+              - link "Dulces Primaveras" [ref=e292] [cursor=pointer]:
+                - /url: /catalogo/dulces-primaveras
+            - paragraph [ref=e293]: Box de 12 rosas con topping a elección y tarjeta.
+            - paragraph [ref=e294]:
+              - generic [ref=e295]: S/60
+            - button "Agregar a la canasta" [ref=e297] [cursor=pointer]
+          - article [ref=e301]:
+            - generic [ref=e302]:
+              - 'img "Ternura de Amor: Box de 7 rosas con peluche y fino follaje." [ref=e303]'
+              - button "Guardar Ternura de Amor en favoritos" [ref=e304] [cursor=pointer]
+              - link "Pedir Ternura de Amor por WhatsApp" [ref=e307] [cursor=pointer]:
+                - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20el%20Ternura%20de%20Amor%20(S%2F85).%20%C2%BFEst%C3%A1%20disponible%3F
+            - heading [level=3] [ref=e310]:
+              - link "Ternura de Amor" [ref=e311] [cursor=pointer]:
+                - /url: /catalogo/ternura-de-amor
+            - paragraph [ref=e312]: Box de 7 rosas con peluche y fino follaje.
+            - paragraph [ref=e313]:
+              - generic [ref=e314]: S/85
+            - button "Agregar a la canasta" [ref=e316] [cursor=pointer]
+          - article [ref=e320]:
+            - generic [ref=e321]:
+              - 'img "Edeliz: Ramo de una docena de rosas, claveles y finos follajes en papel coreano." [ref=e322]'
+              - button "Guardar Edeliz en favoritos" [ref=e323] [cursor=pointer]
+              - link "Pedir Edeliz por WhatsApp" [ref=e326] [cursor=pointer]:
+                - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20el%20Edeliz%20(S%2F50).%20%C2%BFEst%C3%A1%20disponible%3F
+            - heading [level=3] [ref=e329]:
+              - link "Edeliz" [ref=e330] [cursor=pointer]:
+                - /url: /catalogo/edeliz
+            - paragraph [ref=e331]: Ramo de una docena de rosas, claveles y finos follajes en papel coreano.
+            - paragraph [ref=e332]:
+              - generic [ref=e333]: S/50
+            - button "Agregar a la canasta" [ref=e335] [cursor=pointer]
+          - article [ref=e339]:
+            - generic [ref=e340]:
+              - 'img "Rose Energy: Arreglo de 7 rosas rojas y 1 lirio rosado." [ref=e341]'
+              - button "Guardar Rose Energy en favoritos" [ref=e342] [cursor=pointer]
+              - link "Pedir Rose Energy por WhatsApp" [ref=e345] [cursor=pointer]:
+                - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20el%20Rose%20Energy%20(S%2F70).%20%C2%BFEst%C3%A1%20disponible%3F
+            - heading [level=3] [ref=e348]:
+              - link "Rose Energy" [ref=e349] [cursor=pointer]:
+                - /url: /catalogo/rose-energy
+            - paragraph [ref=e350]: Arreglo de 7 rosas rojas y 1 lirio rosado.
+            - paragraph [ref=e351]:
+              - generic [ref=e352]: S/70
+            - button "Agregar a la canasta" [ref=e354] [cursor=pointer]
+          - article [ref=e358]:
+            - generic [ref=e359]:
+              - 'img "Dulce Pasión: Ramo de 3 varas de lirios acompañado de lluvia." [ref=e360]'
+              - button "Guardar Dulce Pasión en favoritos" [ref=e361] [cursor=pointer]
+              - link "Pedir Dulce Pasión por WhatsApp" [ref=e364] [cursor=pointer]:
+                - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20el%20Dulce%20Pasi%C3%B3n%20(S%2F85).%20%C2%BFEst%C3%A1%20disponible%3F
+            - heading [level=3] [ref=e367]:
+              - link "Dulce Pasión" [ref=e368] [cursor=pointer]:
+                - /url: /catalogo/dulce-pasion
+            - paragraph [ref=e369]: Ramo de 3 varas de lirios acompañado de lluvia.
+            - paragraph [ref=e370]:
+              - generic [ref=e371]: S/85
+            - button "Agregar a la canasta" [ref=e373] [cursor=pointer]
+    - region [ref=e377]:
+      - generic [ref=e379]:
+        - generic [ref=e380]:
+          - paragraph [ref=e381]: Solo esta semana
+          - heading "Promociones flash" [level=2] [ref=e382]
+          - paragraph [ref=e383]: Detalles especiales a un precio que también enamora.
+          - group "Tiempo restante de las promociones" [ref=e384]:
+            - generic [ref=e385]:
+              - generic [ref=e386]: "01"
+              - text: días
+            - generic [ref=e387]:
+              - generic [ref=e388]: "00"
+              - text: horas
+            - generic [ref=e389]:
+              - generic [ref=e390]: "28"
+              - text: min
+          - link "Ver todas las promos" [ref=e391] [cursor=pointer]:
+            - /url: /catalogo
+          - paragraph [ref=e392]: "* Descuentos de ejemplo para la demo."
+        - region "Ofertas de la semana" [ref=e393]:
+          - article [ref=e394]:
+            - generic [ref=e395]:
+              - generic [ref=e396]: "-10%"
+              - 'img "Aura de Amor: Ramo de 6 rosas y claveles con finos follajes." [ref=e397]'
+              - button "Guardar Aura de Amor en favoritos" [ref=e398] [cursor=pointer]
+              - link "Pedir Aura de Amor por WhatsApp" [ref=e401] [cursor=pointer]:
+                - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20el%20Aura%20de%20Amor%20(S%2F27).%20%C2%BFEst%C3%A1%20disponible%3F
+            - heading [level=3] [ref=e404]:
+              - link "Aura de Amor" [ref=e405] [cursor=pointer]:
+                - /url: /catalogo/aura-de-amor
+            - paragraph [ref=e406]: Ramo de 6 rosas y claveles con finos follajes.
+            - paragraph [ref=e407]:
+              - generic [ref=e408]: S/27
+              - generic [ref=e409]:
+                - generic [ref=e410]: antes
+                - text: S/30
+            - button "Agregar a la canasta" [ref=e412] [cursor=pointer]
+          - article [ref=e416]:
+            - generic [ref=e417]:
+              - generic [ref=e418]: "-15%"
+              - 'img "Dulces Corazones: Ramo de 4 gerberas con finos follajes en papel coreano." [ref=e419]'
+              - button "Guardar Dulces Corazones en favoritos" [ref=e420] [cursor=pointer]
+              - link "Pedir Dulces Corazones por WhatsApp" [ref=e423] [cursor=pointer]:
+                - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20el%20Dulces%20Corazones%20(S%2F51).%20%C2%BFEst%C3%A1%20disponible%3F
+            - heading [level=3] [ref=e426]:
+              - link "Dulces Corazones" [ref=e427] [cursor=pointer]:
+                - /url: /catalogo/dulces-corazones
+            - paragraph [ref=e428]: Ramo de 4 gerberas con finos follajes en papel coreano.
+            - paragraph [ref=e429]:
+              - generic [ref=e430]: S/51
+              - generic [ref=e431]:
+                - generic [ref=e432]: antes
+                - text: S/60
+            - button "Agregar a la canasta" [ref=e434] [cursor=pointer]
+          - article [ref=e438]:
+            - generic [ref=e439]:
+              - generic [ref=e440]: "-25%"
+              - 'img "Esencia Zafiro: Arreglo de 12 rosas azules y astromelias. Promoción flash." [ref=e441]'
+              - button "Guardar Esencia Zafiro en favoritos" [ref=e442] [cursor=pointer]
+              - link "Pedir Esencia Zafiro por WhatsApp" [ref=e445] [cursor=pointer]:
+                - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20el%20Esencia%20Zafiro%20(S%2F71).%20%C2%BFEst%C3%A1%20disponible%3F
+            - heading [level=3] [ref=e448]:
+              - link "Esencia Zafiro" [ref=e449] [cursor=pointer]:
+                - /url: /catalogo/esencia-zafiro
+            - paragraph [ref=e450]: Arreglo de 12 rosas azules y astromelias. Promoción flash.
+            - paragraph [ref=e451]:
+              - generic [ref=e452]: S/71
+              - generic [ref=e453]:
+                - generic [ref=e454]: antes
+                - text: S/95
+            - button "Agregar a la canasta" [ref=e456] [cursor=pointer]
+          - article [ref=e460]:
+            - generic [ref=e461]:
+              - generic [ref=e462]: "-15%"
+              - 'img "Perla Rosada: Ramo de 7 tulipanes rosados y finos follajes." [ref=e463]'
+              - button "Guardar Perla Rosada en favoritos" [ref=e464] [cursor=pointer]
+              - link "Pedir Perla Rosada por WhatsApp" [ref=e467] [cursor=pointer]:
+                - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20el%20Perla%20Rosada%20(S%2F110).%20%C2%BFEst%C3%A1%20disponible%3F
+            - heading [level=3] [ref=e470]:
+              - link "Perla Rosada" [ref=e471] [cursor=pointer]:
+                - /url: /catalogo/perla-rosada
+            - paragraph [ref=e472]: Ramo de 7 tulipanes rosados y finos follajes.
+            - paragraph [ref=e473]:
+              - generic [ref=e474]: S/110
+              - generic [ref=e475]:
+                - generic [ref=e476]: antes
+                - text: S/130
+            - button "Agregar a la canasta" [ref=e478] [cursor=pointer]
+    - region [ref=e482]:
+      - generic [ref=e483]:
+        - generic [ref=e484]:
+          - generic [ref=e485]: Fácil y rápido
+          - heading "Así de simple es sorprender" [level=2] [ref=e486]
+        - list [ref=e488]:
+          - listitem [ref=e489]:
+            - heading "Elige tus flores" [level=3] [ref=e493]
+            - paragraph [ref=e494]: Explora el catálogo y agrégalas a tu canasta.
+          - listitem [ref=e495]:
+            - heading "Envía tu pedido" [level=3] [ref=e499]
+            - paragraph [ref=e500]: Con un clic nos llega tu pedido por WhatsApp.
+          - listitem [ref=e501]:
+            - heading "Lo llevamos con cariño" [level=3] [ref=e505]
+            - paragraph [ref=e506]: Lo preparamos a mano y lo entregamos donde nos digas.
+    - region [ref=e507]:
+      - generic [ref=e508]:
+        - img "Fachada de Florería V'Lirio con un ramo en primer plano" [ref=e510]
+        - generic [ref=e511]:
+          - generic [ref=e512]: te esperamos
+          - heading "Visítanos en Comas" [level=2] [ref=e513]
+          - list [ref=e514]:
+            - listitem [ref=e515]:
+              - generic [ref=e518]:
+                - generic [ref=e519]: Av. Gerardo Unger 2488, puerta 2
+                - generic [ref=e520]: Mercado Unicachi de Comas · Puestos 186, 188 y 189
+            - listitem [ref=e521]:
+              - generic [ref=e524]:
+                - link "933 099 986" [ref=e525] [cursor=pointer]:
+                  - /url: tel:+51933099986
+                - link "902 275 046" [ref=e526] [cursor=pointer]:
+                  - /url: tel:+51902275046
+                - link "974 048 878" [ref=e527] [cursor=pointer]:
+                  - /url: tel:+51974048878
+            - listitem [ref=e528]:
+              - generic [ref=e531]: Horario por confirmar
+            - listitem [ref=e532]:
+              - generic [ref=e535]: "Pagos: Yape · Plin · Transferencia"
+          - generic [ref=e536]:
+            - link "Instagram" [ref=e537] [cursor=pointer]:
+              - /url: https://www.instagram.com/
+            - link "Facebook" [ref=e540] [cursor=pointer]:
+              - /url: https://www.facebook.com/
+            - link "TikTok" [ref=e543] [cursor=pointer]:
+              - /url: https://www.tiktok.com/
+            - link "Escríbenos por WhatsApp" [ref=e546] [cursor=pointer]:
+              - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20informaci%C3%B3n%20sobre%20sus%20arreglos
+          - iframe [ref=e549]
+  - contentinfo [ref=e550]:
+    - generic [ref=e551]:
+      - generic [ref=e552]:
+        - generic [ref=e553]:
+          - generic [ref=e554]: V'LIRI
+          - paragraph [ref=e581]: Flores que dicen lo que el corazón siente.
+        - navigation [ref=e582]:
+          - heading "Catálogo" [level=2] [ref=e583]
+          - list [ref=e584]:
+            - listitem [ref=e585]:
+              - link "Ramos" [ref=e586] [cursor=pointer]:
+                - /url: /catalogo?categoria=ramos
+            - listitem [ref=e587]:
+              - link "Buchones" [ref=e588] [cursor=pointer]:
+                - /url: /catalogo?categoria=buchones
+            - listitem [ref=e589]:
+              - link "Arreglos" [ref=e590] [cursor=pointer]:
+                - /url: /catalogo?categoria=arreglos
+            - listitem [ref=e591]:
+              - link "Box" [ref=e592] [cursor=pointer]:
+                - /url: /catalogo?categoria=box
+            - listitem [ref=e593]:
+              - link "Tulipanes" [ref=e594] [cursor=pointer]:
+                - /url: /catalogo?categoria=tulipanes
+            - listitem [ref=e595]:
+              - link "Peluches y chocolates" [ref=e596] [cursor=pointer]:
+                - /url: /catalogo?categoria=extras
+        - navigation [ref=e597]:
+          - heading "Ocasiones" [level=2] [ref=e598]
+          - list [ref=e599]:
+            - listitem [ref=e600]:
+              - link "Amor" [ref=e601] [cursor=pointer]:
+                - /url: /catalogo?ocasion=amor
+            - listitem [ref=e602]:
+              - link "Aniversario" [ref=e603] [cursor=pointer]:
+                - /url: /catalogo?ocasion=aniversario
+            - listitem [ref=e604]:
+              - link "Cumpleaños" [ref=e605] [cursor=pointer]:
+                - /url: /catalogo?ocasion=cumpleanos
+            - listitem [ref=e606]:
+              - link "Graduación" [ref=e607] [cursor=pointer]:
+                - /url: /catalogo?ocasion=graduacion
+            - listitem [ref=e608]:
+              - link "Condolencias" [ref=e609] [cursor=pointer]:
+                - /url: /catalogo?ocasion=condolencias
+            - listitem [ref=e610]:
+              - link "Mejórate pronto" [ref=e611] [cursor=pointer]:
+                - /url: /catalogo?ocasion=mejorate-pronto
+            - listitem [ref=e612]:
+              - link "Nacimientos" [ref=e613] [cursor=pointer]:
+                - /url: /catalogo?ocasion=nacimientos
+        - generic [ref=e614]:
+          - heading "Contacto" [level=2] [ref=e615]
+          - list [ref=e616]:
+            - listitem [ref=e617]:
+              - link "Escríbenos por WhatsApp" [ref=e618] [cursor=pointer]:
+                - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20hacer%20un%20pedido
+            - listitem [ref=e619]:
+              - link "vliriofloreria5@gmail.com" [ref=e620] [cursor=pointer]:
+                - /url: mailto:vliriofloreria5@gmail.com
+            - listitem [ref=e621]: Av. Gerardo Unger 2488, puerta 2
+            - listitem [ref=e622]: Mercado Unicachi de Comas · Puestos 186, 188 y 189
+      - generic [ref=e623]:
+        - generic [ref=e624]: © 2026 Corporación Vlirio S.A.C.
+        - generic [ref=e625]: Hecho con ♥ en Lima
+  - link "Escríbenos por WhatsApp" [ref=e626] [cursor=pointer]:
+    - /url: https://wa.me/51967446580?text=Hola%20V'Lirio%20%F0%9F%8C%B7%2C%20quiero%20informaci%C3%B3n%20sobre%20sus%20arreglos
+  - status: ¿Te ayudamos a elegir? 🌷
