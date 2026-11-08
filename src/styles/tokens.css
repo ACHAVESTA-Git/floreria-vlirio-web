@@ -1,0 +1,47 @@
+:root {
+  /* Marca */
+  --vl-vino: #772a4c;
+  --vl-vino-oscuro: #5a1f3a;
+  --vl-frambuesa: #b4285a;
+  --vl-frambuesa-oscuro: #a12350;
+  --vl-coral: #cd3764;
+  /* Rosados */
+  --vl-rosa: #f79ba6;
+  --vl-durazno: #f5cfc4;
+  --vl-blush: #ffebeb;
+  --vl-crema: #fdf8f3;
+  --vl-blanco: #ffffff;
+  /* Texto */
+  --vl-tinta: #2e1a24;
+  --vl-tinta-suave: #6b5560;
+  /* Naturales */
+  --vl-follaje: #5e7d5a;
+  --vl-girasol: #f2b53a;
+  /* WhatsApp */
+  --vl-whatsapp: #25d366;
+  --vl-whatsapp-hover: #1fc05b;
+  --vl-whatsapp-oscuro: #1da851;
+  --vl-whatsapp-tinta: #073b1e;
+  /* Texto sobre vino */
+  --vl-sobre-vino: #f7e6ec;
+  --vl-sobre-vino-suave: #ffd7e2;
+  /* Tipografía */
+  --vl-font-script: 'Luxurious Script', cursive;
+  --vl-font-title: 'Nunito', system-ui, sans-serif;
+  --vl-font-body: 'Nunito', system-ui, sans-serif;
+  --vl-font-ui: 'Poppins', system-ui, sans-serif;
+  /* Forma */
+  --vl-radius: 24px;
+  --vl-radius-sm: 18px;
+  --vl-radius-pill: 999px;
+  --vl-shadow: 0 10px 30px -12px rgb(119 42 76 / 0.25);
+  --vl-shadow-lg: 0 24px 50px -18px rgb(119 42 76 / 0.35);
+  --vl-shadow-drawer: -20px 0 50px -20px rgb(119 42 76 / 0.4);
+  --vl-drop: drop-shadow(0 12px 12px rgb(119 42 76 / 0.2));
+  --vl-scrim: rgb(46 26 36 / 0.4);
+  --vl-header-glass: rgb(253 248 243 / 0.86);
+  --vl-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Medidas */
+  --vl-wrap: 1200px;
+  --vl-card-w: 272px; /* ancho estándar de ProductCard (legible en 375px) */
+}
