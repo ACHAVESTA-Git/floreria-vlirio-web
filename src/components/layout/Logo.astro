@@ -1,0 +1,99 @@
+---
+/**
+ * Logo de Florería V'Lirio recreado en SVG: 7 tulipanes en arco (el central es el más alto)
+ * + wordmark "Florería" (script) y "V'LIRI" con corazón (Nunito Black). Todo usa currentColor.
+ * En móvil (<900px) se oculta "Florería" y se mantienen tulipanes + V'LIRI♥.
+ */
+const TULIPANES = [
+  { x: 19, top: 34 },
+  { x: 46, top: 18 },
+  { x: 73, top: 6 },
+  { x: 100, top: 0 },
+  { x: 127, top: 6 },
+  { x: 154, top: 18 },
+  { x: 181, top: 34 },
+];
+const BULBO = 'M-22 0 C-28 -22 -24 -44 -15 -54 L-8 -38 L0 -60 L8 -38 L15 -54 C24 -44 28 -22 22 0 C14 10 -14 10 -22 0Z';
+const BRILLO = 'M0 -60 L8 -38 L15 -54 C22 -42 24 -22 18 -2 C12 4 4 6 0 6Z';
+---
+
+<span class="vl-logo">
+  <svg class="mark" viewBox="0 0 200 72" aria-hidden="true" focusable="false">
+    {
+      TULIPANES.map((t) => (
+        <g transform={`translate(${t.x} ${t.top + 30}) scale(.5)`}>
+          <path d={BULBO} />
+          <path class="hl" d={BRILLO} />
+        </g>
+      ))
+    }
+  </svg>
+  <span class="words">
+    <span class="f">Florería</span>
+    <span class="n">V'LIRI<svg class="heart" viewBox="0 0 24 22" aria-hidden="true" focusable="false"><use href="#i-heart" /></svg></span>
+  </span>
+</span>
+
+<style>
+  .vl-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: inherit;
+    line-height: 1;
+  }
+  .mark {
+    width: 56px;
+    height: 20px;
+    flex: none;
+    overflow: visible;
+  }
+  .mark path {
+    fill: currentColor;
+  }
+  .mark .hl {
+    opacity: 0.4;
+  }
+  .words {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .f {
+    font-family: var(--vl-font-script);
+    font-weight: 400;
+    font-size: 28px;
+    line-height: 1;
+    margin-bottom: -2px;
+  }
+  .n {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--vl-font-title);
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+  .heart {
+    width: 0.8em;
+    height: 0.72em;
+    margin-left: 2px;
+    fill: currentColor;
+  }
+  @media (max-width: 899px) {
+    .vl-logo {
+      gap: 8px;
+    }
+    .mark {
+      width: 48px;
+      height: 17px;
+    }
+    .f {
+      display: none;
+    }
+    .n {
+      font-size: 20px;
+    }
+  }
+</style>
