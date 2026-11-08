@@ -1,0 +1,93 @@
+---
+/** Botón "Mi canasta" del header. Abre el drawer con el evento 'vl:abrir-canasta'. */
+---
+
+<button type="button" class="basket-btn" id="basketBtn" aria-haspopup="dialog" aria-controls="drawer" aria-label="Mi canasta, 0 productos">
+  <span class="ic">
+    <svg class="basket" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><use href="#i-basket" /></svg>
+    <span class="heart" id="badge" aria-hidden="true">
+      <svg viewBox="0 0 24 22" focusable="false"><use href="#i-heart" /></svg>
+      <span id="count">0</span>
+    </span>
+  </span>
+  <span class="lbl">Mi canasta</span>
+</button>
+
+<script>
+  import { $canasta, getCount } from './basketStore';
+
+  const boton = document.getElementById('basketBtn');
+  const cuenta = document.getElementById('count');
+
+  if (boton && cuenta) {
+    // subscribe llama al listener de inmediato con el valor de localStorage.
+    $canasta.subscribe(() => {
+      const n = getCount();
+      cuenta.textContent = String(n);
+      boton.setAttribute('aria-label', `Mi canasta, ${n} producto${n === 1 ? '' : 's'}`);
+    });
+
+    boton.addEventListener('click', () => {
+      document.dispatchEvent(new CustomEvent('vl:abrir-canasta'));
+    });
+  }
+</script>
+
+<style>
+  .basket-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 46px;
+    padding: 0 14px 0 10px;
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-blanco);
+    box-shadow: var(--vl-shadow);
+    color: var(--vl-vino);
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 14px;
+    transition: background 0.3s;
+  }
+  .basket-btn:hover { background: var(--vl-blush); }
+  .ic { position: relative; width: 34px; height: 34px; display: grid; place-items: center; flex: none; }
+  .basket { width: 30px; height: 30px; transform-origin: 50% 85%; }
+  .basket-btn.sway .basket { animation: sway 0.4s var(--vl-ease); }
+  @keyframes sway {
+    0% { transform: rotate(0); }
+    30% { transform: rotate(-8deg); }
+    65% { transform: rotate(8deg); }
+    100% { transform: rotate(0); }
+  }
+  .heart {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    width: 24px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    color: var(--vl-frambuesa);
+  }
+  .heart svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .heart span {
+    position: relative;
+    margin-top: -2px;
+    color: var(--vl-blanco);
+    font-family: var(--vl-font-ui);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .heart.pulse { animation: pulse 0.5s var(--vl-ease); }
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.35); }
+    100% { transform: scale(1); }
+  }
+  .lbl { white-space: nowrap; }
+  @media (max-width: 899px) {
+    .lbl { display: none; }
+    .basket-btn { padding: 0 10px; }
+  }
+</style>
