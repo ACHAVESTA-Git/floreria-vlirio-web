@@ -1,0 +1,146 @@
+<section class="block how" aria-labelledby="como-pedir-titulo">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">Fácil y rápido</div>
+      <h2 class="title" id="como-pedir-titulo">Así de simple es sorprender</h2>
+    </div>
+
+    <div class="steps" data-how>
+      <svg class="line" viewBox="0 0 1000 4" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <defs>
+          <mask id="how-line-mask" maskUnits="userSpaceOnUse" x="0" y="-4" width="1000" height="12">
+            <path class="reveal" d="M0 2 H1000" pathLength="1" fill="none" style="stroke: var(--vl-blanco)" stroke-width="4" />
+          </mask>
+        </defs>
+        <path class="dots" d="M0 2 H1000" mask="url(#how-line-mask)" />
+      </svg>
+
+      <ol class="list">
+      <li class="step">
+        <div class="ic" aria-hidden="true"><svg viewBox="0 0 40 40" focusable="false"><use href="#i-basket" /></svg></div>
+        <h3>Elige tus flores</h3>
+        <p>Explora el catálogo y agrégalas a tu canasta.</p>
+      </li>
+      <li class="step">
+        <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#i-wa" /></svg></div>
+        <h3>Envía tu pedido</h3>
+        <p>Con un clic nos llega tu pedido por WhatsApp.</p>
+      </li>
+      <li class="step">
+        <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 22" focusable="false"><use href="#i-heart-o" /></svg></div>
+        <h3>Lo llevamos con cariño</h3>
+        <p>Lo preparamos a mano y lo entregamos donde nos digas.</p>
+      </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<script>
+  // La línea punteada se dibuja al entrar en pantalla. Sin JS o con reduced-motion se ve completa.
+  const steps = document.querySelector<HTMLElement>('[data-how]');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (steps && !reduce && 'IntersectionObserver' in window) {
+    steps.classList.add('js-line');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          steps.classList.add('drawn');
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.4 },
+    );
+    observer.observe(steps);
+  }
+</script>
+
+<style>
+  .how {
+    background: linear-gradient(180deg, var(--vl-crema), var(--vl-blush));
+  }
+  .head {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .steps {
+    position: relative;
+    margin-top: 20px;
+  }
+  .list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+    list-style: none;
+  }
+  /* Línea: 16% a 84% del ancho, a la altura de los íconos */
+  .steps .line {
+    position: absolute;
+    top: 44px;
+    left: 16%;
+    width: 68%;
+    height: 4px;
+    overflow: visible;
+  }
+  .steps .dots {
+    stroke: var(--vl-rosa);
+    stroke-width: 3;
+    stroke-dasharray: 8 10;
+    fill: none;
+  }
+  .steps .reveal {
+    transition: none;
+  }
+  .steps.js-line .reveal {
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1.8s var(--vl-ease);
+  }
+  .steps.js-line.drawn .reveal {
+    stroke-dashoffset: 0;
+  }
+
+  .step {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .ic {
+    width: 88px;
+    height: 88px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: var(--vl-blanco);
+    display: grid;
+    place-items: center;
+    box-shadow: var(--vl-shadow);
+    color: var(--vl-vino);
+  }
+  .ic svg {
+    width: 40px;
+    height: 40px;
+    color: var(--vl-vino);
+  }
+  .step h3 {
+    font-family: var(--vl-font-title);
+    font-weight: 800;
+    color: var(--vl-vino);
+    font-size: 20px;
+  }
+  .step p {
+    color: var(--vl-tinta-suave);
+    font-size: 15px;
+    max-width: 260px;
+    margin: 4px auto 0;
+  }
+
+  @media (max-width: 700px) {
+    .list {
+      grid-template-columns: 1fr;
+    }
+    .steps .line {
+      display: none;
+    }
+  }
+</style>

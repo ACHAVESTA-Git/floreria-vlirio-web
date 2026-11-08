@@ -1,0 +1,187 @@
+---
+import { Image } from 'astro:assets';
+import { SITE, waLink } from '../../config/site';
+import { getAsset } from '../../lib/images';
+
+const foto = getAsset('tienda-fachada');
+const WA = waLink("Hola V'Lirio 🌷, quiero información sobre sus arreglos");
+
+const redes = [
+  { nombre: 'Instagram', url: SITE.redes.instagram, icono: 'i-instagram' },
+  { nombre: 'Facebook', url: SITE.redes.facebook, icono: 'i-facebook' },
+  { nombre: 'TikTok', url: SITE.redes.tiktok, icono: 'i-tiktok' },
+] as const;
+
+/** Teléfono a enlace tel: (ej. "933 099 986" → "tel:+51933099986"). */
+const telHref = (t: string): string => `tel:+51${t.replace(/\s/g, '')}`;
+---
+
+<section class="block visit-sec" id="visitanos" aria-labelledby="visitanos-titulo">
+  <div class="wrap visit">
+    <div class="photo">
+      <Image
+        src={foto}
+        alt="Fachada de Florería V'Lirio con un ramo en primer plano"
+        widths={[480, 720]}
+        sizes="(max-width: 860px) 92vw, 540px"
+        format="webp"
+        loading="lazy"
+      />
+    </div>
+
+    <div class="info">
+      <span class="script kicker">te esperamos</span>
+      <h2 class="title" id="visitanos-titulo">Visítanos en Comas</h2>
+
+      <ul class="facts">
+        <li>
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-pin" /></svg>
+          <span>
+            {SITE.direccion.map((linea) => <span class="linea">{linea}</span>)}
+          </span>
+        </li>
+        <li>
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-wa" /></svg>
+          <span class="tels">
+            {SITE.telefonos.map((t) => <a href={telHref(t)}>{t}</a>)}
+          </span>
+        </li>
+        <li>
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-clock" /></svg>
+          <span>{SITE.horario}</span>
+        </li>
+        <li>
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-card" /></svg>
+          <span>Pagos: {SITE.pagos}</span>
+        </li>
+      </ul>
+
+      <div class="socials">
+        {
+          redes.map((r) => (
+            <a href={r.url} target="_blank" rel="noopener" aria-label={r.nombre}>
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href={`#${r.icono}`} /></svg>
+            </a>
+          ))
+        }
+        <a class="wa" href={WA} target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-wa" /></svg>
+        </a>
+      </div>
+
+      <iframe
+        class="map"
+        src={SITE.mapa}
+        title="Mapa de ubicación de Florería V'Lirio en el Mercado Unicachi de Comas"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+    </div>
+  </div>
+</section>
+
+<style>
+  .visit {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .photo {
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: var(--vl-shadow-lg);
+    aspect-ratio: 4 / 5;
+    max-height: 560px;
+  }
+  .photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .kicker {
+    display: block;
+    font-size: 36px;
+    line-height: 1;
+  }
+  .facts {
+    list-style: none;
+    display: grid;
+    gap: 14px;
+    margin: 22px 0;
+  }
+  .facts li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .ico {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    margin-top: 2px;
+    color: var(--vl-frambuesa);
+    fill: none;
+    stroke: currentColor;
+  }
+  .linea {
+    display: block;
+  }
+  .tels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+  }
+  .tels a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .socials {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .socials a {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 1.5px solid var(--vl-vino);
+    display: grid;
+    place-items: center;
+    color: var(--vl-vino);
+    transition:
+      background 0.3s var(--vl-ease),
+      color 0.3s var(--vl-ease);
+  }
+  .socials a:hover {
+    background: var(--vl-vino);
+    color: var(--vl-blanco);
+  }
+  .socials svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+  .socials .wa {
+    border-color: var(--vl-whatsapp-oscuro);
+    color: var(--vl-whatsapp-oscuro);
+  }
+  .socials .wa:hover {
+    background: var(--vl-whatsapp);
+    color: var(--vl-whatsapp-tinta);
+  }
+  .map {
+    display: block;
+    width: 100%;
+    height: 260px;
+    border: 0;
+    border-radius: var(--vl-radius-sm);
+    margin-top: 24px;
+    background: var(--vl-blush);
+  }
+  @media (max-width: 860px) {
+    .visit {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
