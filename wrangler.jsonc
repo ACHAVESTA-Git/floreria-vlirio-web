@@ -1,0 +1,8 @@
+{
+  // Configuración de Cloudflare Workers (sitio estático de Astro en ./dist).
+  "name": "floreria-vlirio-web",
+  "compatibility_date": "2026-11-01",
+  "assets": { "directory": "./dist" },
+  // Necesario para `wrangler preview` (URL de pruebas por rama). Puede ir vacío.
+  "previews": {}
+}
