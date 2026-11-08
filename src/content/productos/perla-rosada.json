@@ -15,5 +15,6 @@
   ],
   "imagen": "../../assets/productos/ramo-tulipanes-rosados-papel-azul.png",
   "flor": "tulipan",
-  "demo": true
+  "demo": true,
+  "imagenAmbiente": "../../assets/productos/cf-ramo-tulipanes-rosados-papel-azul.jpg"
 }

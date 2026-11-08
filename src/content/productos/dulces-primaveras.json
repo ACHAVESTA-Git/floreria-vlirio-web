@@ -14,5 +14,6 @@
   ],
   "imagen": "../../assets/productos/box-rosas-rosadas-feliz-cumpleanos.png",
   "flor": "rosa",
-  "demo": true
+  "demo": true,
+  "imagenAmbiente": "../../assets/productos/cf-box-rosas-rosadas-feliz-cumpleanos.jpg"
 }

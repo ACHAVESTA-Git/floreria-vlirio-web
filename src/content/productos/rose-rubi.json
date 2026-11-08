@@ -14,5 +14,6 @@
   ],
   "imagen": "../../assets/productos/box-corazon-girasoles-lirios-peluche-lotso.png",
   "flor": "girasol",
-  "demo": true
+  "demo": true,
+  "imagenAmbiente": "../../assets/productos/cf-box-corazon-girasoles-lirios-peluche-lotso.jpg"
 }
