@@ -1,0 +1,19 @@
+{
+  "nombre": "Perla Rosada",
+  "categoria": "tulipanes",
+  "ocasiones": [
+    "amor",
+    "cumpleanos",
+    "nacimientos"
+  ],
+  "descripcion": "Ramo de 7 tulipanes rosados y finos follajes.",
+  "precio": 130,
+  "precioOferta": 110,
+  "destacado": false,
+  "colores": [
+    "rosado"
+  ],
+  "imagen": "../../assets/productos/ramo-tulipanes-rosados-papel-azul.png",
+  "flor": "tulipan",
+  "demo": true
+}

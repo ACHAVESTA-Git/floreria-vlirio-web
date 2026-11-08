@@ -1,0 +1,16 @@
+{
+  "nombre": "Peluche",
+  "categoria": "extras",
+  "ocasiones": [
+    "amor",
+    "cumpleanos",
+    "nacimientos"
+  ],
+  "descripcion": "Peluche suave para acompañar tu arreglo (sujeto a stock).",
+  "precio": 35,
+  "destacado": false,
+  "colores": [],
+  "imagen": "../../assets/productos/arreglo-rosas-rojas-lirio-peluche-panda.png",
+  "flor": "rosa",
+  "demo": true
+}

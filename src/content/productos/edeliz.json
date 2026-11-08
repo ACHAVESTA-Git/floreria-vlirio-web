@@ -1,0 +1,17 @@
+{
+  "nombre": "Edeliz",
+  "categoria": "ramos",
+  "ocasiones": [
+    "amor",
+    "aniversario"
+  ],
+  "descripcion": "Ramo de una docena de rosas, claveles y finos follajes en papel coreano.",
+  "precio": 50,
+  "destacado": true,
+  "colores": [
+    "rojo"
+  ],
+  "imagen": "../../assets/productos/ramo-rosas-rojas-papel-rojo.png",
+  "flor": "rosa",
+  "demo": true
+}

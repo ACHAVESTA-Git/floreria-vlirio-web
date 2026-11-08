@@ -1,0 +1,19 @@
+{
+  "nombre": "Dulces Corazones",
+  "categoria": "ramos",
+  "ocasiones": [
+    "cumpleanos",
+    "mejorate-pronto"
+  ],
+  "descripcion": "Ramo de 4 gerberas con finos follajes en papel coreano.",
+  "precio": 60,
+  "precioOferta": 51,
+  "destacado": false,
+  "colores": [
+    "rosado",
+    "salmón"
+  ],
+  "imagen": "../../assets/productos/ramo-gerberas-rosadas-papel-salmon.png",
+  "flor": "rosa",
+  "demo": true
+}

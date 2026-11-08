@@ -1,0 +1,19 @@
+{
+  "nombre": "Ternura de Amor",
+  "categoria": "box",
+  "ocasiones": [
+    "amor",
+    "aniversario",
+    "nacimientos"
+  ],
+  "descripcion": "Box de 7 rosas con peluche y fino follaje.",
+  "precio": 85,
+  "destacado": true,
+  "colores": [
+    "rojo",
+    "rosado"
+  ],
+  "imagen": "../../assets/productos/arreglo-rosas-rojas-lirios-peluche-oso.png",
+  "flor": "rosa",
+  "demo": true
+}

@@ -1,0 +1,18 @@
+{
+  "nombre": "Dulce Pasión",
+  "categoria": "ramos",
+  "ocasiones": [
+    "amor",
+    "condolencias"
+  ],
+  "descripcion": "Ramo de 3 varas de lirios acompañado de lluvia.",
+  "precio": 85,
+  "destacado": true,
+  "colores": [
+    "rosado",
+    "blanco"
+  ],
+  "imagen": "../../assets/productos/ramo-rosas-rosadas-lirios-papel-blanco.png",
+  "flor": "rosa",
+  "demo": true
+}

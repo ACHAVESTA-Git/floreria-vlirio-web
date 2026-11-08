@@ -1,0 +1,18 @@
+{
+  "nombre": "Campo Amanecer",
+  "categoria": "tulipanes",
+  "ocasiones": [
+    "cumpleanos",
+    "mejorate-pronto"
+  ],
+  "descripcion": "Ramo de 5 tulipanes amarillos y naranjas con finos follajes.",
+  "precio": 80,
+  "destacado": true,
+  "colores": [
+    "amarillo",
+    "naranja"
+  ],
+  "imagen": "../../assets/productos/ramo-tulipanes-amarillos-papel-olivo.png",
+  "flor": "tulipan",
+  "demo": true
+}

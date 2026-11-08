@@ -1,0 +1,18 @@
+{
+  "nombre": "Rose Energy",
+  "categoria": "arreglos",
+  "ocasiones": [
+    "amor",
+    "aniversario"
+  ],
+  "descripcion": "Arreglo de 7 rosas rojas y 1 lirio rosado.",
+  "precio": 70,
+  "destacado": true,
+  "colores": [
+    "rojo",
+    "rosado"
+  ],
+  "imagen": "../../assets/productos/arreglo-rosas-rojas-lirio-peluche-panda.png",
+  "flor": "rosa",
+  "demo": true
+}

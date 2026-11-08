@@ -1,0 +1,15 @@
+{
+  "nombre": "Ferrero Rocher 4u",
+  "categoria": "extras",
+  "ocasiones": [
+    "amor",
+    "cumpleanos"
+  ],
+  "descripcion": "Cuatro chocolates Ferrero Rocher para acompañar tu detalle.",
+  "precio": 15,
+  "destacado": false,
+  "colores": [],
+  "imagen": "../../assets/productos/arreglo-rosas-rojas-globo-corazon-ferrero.png",
+  "flor": "rosa",
+  "demo": true
+}

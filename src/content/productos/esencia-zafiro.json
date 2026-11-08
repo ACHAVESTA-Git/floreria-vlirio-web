@@ -1,0 +1,18 @@
+{
+  "nombre": "Esencia Zafiro",
+  "categoria": "arreglos",
+  "ocasiones": [
+    "amor",
+    "aniversario"
+  ],
+  "descripcion": "Arreglo de 12 rosas azules y astromelias. Promoción flash.",
+  "precio": 95,
+  "precioOferta": 71,
+  "destacado": false,
+  "colores": [
+    "azul"
+  ],
+  "imagen": "../../assets/productos/ramo-rosas-azules-lirios-papel-azul.png",
+  "flor": "rosa",
+  "demo": true
+}

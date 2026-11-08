@@ -1,0 +1,17 @@
+{
+  "nombre": "Resplandor Dorado",
+  "categoria": "buchones",
+  "ocasiones": [
+    "cumpleanos",
+    "amor"
+  ],
+  "descripcion": "Buchón de 25 girasoles con listón y frase a elección.",
+  "precio": 200,
+  "destacado": true,
+  "colores": [
+    "amarillo"
+  ],
+  "imagen": "../../assets/productos/buchon-girasoles.png",
+  "flor": "girasol",
+  "demo": true
+}

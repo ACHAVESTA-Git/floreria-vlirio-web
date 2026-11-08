@@ -1,0 +1,18 @@
+{
+  "nombre": "Dulces Primaveras",
+  "categoria": "box",
+  "ocasiones": [
+    "cumpleanos",
+    "amor"
+  ],
+  "descripcion": "Box de 12 rosas con topping a elección y tarjeta.",
+  "precio": 60,
+  "destacado": true,
+  "colores": [
+    "rosado",
+    "fucsia"
+  ],
+  "imagen": "../../assets/productos/box-rosas-rosadas-feliz-cumpleanos.png",
+  "flor": "rosa",
+  "demo": true
+}

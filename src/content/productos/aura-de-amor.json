@@ -1,0 +1,18 @@
+{
+  "nombre": "Aura de Amor",
+  "categoria": "ramos",
+  "ocasiones": [
+    "amor",
+    "cumpleanos"
+  ],
+  "descripcion": "Ramo de 6 rosas y claveles con finos follajes.",
+  "precio": 30,
+  "precioOferta": 27,
+  "destacado": false,
+  "colores": [
+    "fucsia"
+  ],
+  "imagen": "../../assets/productos/ramo-rosas-fucsia-papel-lila.png",
+  "flor": "rosa",
+  "demo": true
+}

@@ -1,0 +1,18 @@
+{
+  "nombre": "Rose Rubí",
+  "categoria": "box",
+  "ocasiones": [
+    "amor",
+    "aniversario"
+  ],
+  "descripcion": "Base corazón con 12 rosas, 2 girasoles, lirios y peluche Lotso.",
+  "precio": 140,
+  "destacado": true,
+  "colores": [
+    "rojo",
+    "amarillo"
+  ],
+  "imagen": "../../assets/productos/box-corazon-girasoles-lirios-peluche-lotso.png",
+  "flor": "girasol",
+  "demo": true
+}
