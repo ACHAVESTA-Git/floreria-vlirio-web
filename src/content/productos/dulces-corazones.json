@@ -15,5 +15,6 @@
   ],
   "imagen": "../../assets/productos/ramo-gerberas-rosadas-papel-salmon.png",
   "flor": "rosa",
-  "demo": true
+  "demo": true,
+  "imagenAmbiente": "../../assets/productos/cf-ramo-gerberas-rosadas-papel-salmon.jpg"
 }

@@ -14,5 +14,6 @@
   ],
   "imagen": "../../assets/productos/ramo-tulipanes-amarillos-papel-olivo.png",
   "flor": "tulipan",
-  "demo": true
+  "demo": true,
+  "imagenAmbiente": "../../assets/productos/cf-ramo-tulipanes-amarillos-papel-olivo.jpg"
 }

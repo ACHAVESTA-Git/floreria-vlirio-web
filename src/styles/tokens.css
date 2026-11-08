@@ -17,6 +17,16 @@
   /* Naturales */
   --vl-follaje: #5e7d5a;
   --vl-girasol: #f2b53a;
+  /* Puntos de color de los productos (solo para mostrar el color disponible) */
+  --vl-color-rojo: #c0182f;
+  --vl-color-rosado: #f4a3b5;
+  --vl-color-fucsia: #d6196f;
+  --vl-color-salmon: #f7a58f;
+  --vl-color-naranja: #f08a24;
+  --vl-color-amarillo: #f7cf2a;
+  --vl-color-blanco: #fffdfb;
+  --vl-color-azul: #2f5fd0;
+  --vl-color-lila: #b58be0;
   /* WhatsApp */
   --vl-whatsapp: #25d366;
   --vl-whatsapp-hover: #1fc05b;

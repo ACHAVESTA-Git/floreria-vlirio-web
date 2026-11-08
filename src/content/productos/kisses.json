@@ -11,5 +11,6 @@
   "colores": [],
   "imagen": "../../assets/productos/arreglo-lirios-rosas-rojas-ferrero-hello-kitty.png",
   "flor": "rosa",
-  "demo": true
+  "demo": true,
+  "imagenAmbiente": "../../assets/productos/cf-arreglo-lirios-rosas-rojas-ferrero-hello-kitty.jpg"
 }

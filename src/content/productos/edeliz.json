@@ -13,5 +13,6 @@
   ],
   "imagen": "../../assets/productos/ramo-rosas-rojas-papel-rojo.png",
   "flor": "rosa",
-  "demo": true
+  "demo": true,
+  "imagenAmbiente": "../../assets/productos/cf-ramo-rosas-rojas-papel-rojo.jpg"
 }

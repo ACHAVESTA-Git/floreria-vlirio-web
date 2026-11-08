@@ -1,0 +1,57 @@
+---
+interface Props {
+  categoria: string;
+  categoriaNombre: string;
+  nombre: string;
+}
+
+const { categoria, categoriaNombre, nombre } = Astro.props;
+---
+
+<nav class="migas" aria-label="Ruta de navegación">
+  <ol>
+    <li><a href="/">Inicio</a></li>
+    <li><a href="/catalogo">Catálogo</a></li>
+    <li><a href={`/catalogo?categoria=${categoria}`}>{categoriaNombre}</a></li>
+    <li><span aria-current="page">{nombre}</span></li>
+  </ol>
+</nav>
+
+<style>
+  .migas ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 0;
+    list-style: none;
+    font-family: var(--vl-font-ui);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--vl-tinta-suave);
+  }
+  .migas li {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+  }
+  .migas li + li::before {
+    content: '/';
+    margin: 0 8px;
+    color: var(--vl-rosa);
+  }
+  .migas a {
+    padding: 6px 0;
+    color: var(--vl-vino);
+    font-weight: 600;
+    border-radius: 6px;
+  }
+  .migas a:hover {
+    color: var(--vl-frambuesa);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .migas [aria-current='page'] {
+    overflow-wrap: anywhere;
+    color: var(--vl-tinta);
+  }
+</style>

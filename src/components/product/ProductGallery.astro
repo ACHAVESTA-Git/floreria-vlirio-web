@@ -1,0 +1,146 @@
+---
+import { Image } from 'astro:assets';
+import type { Producto } from '../../lib/catalog';
+
+interface Props {
+  producto: Producto;
+}
+
+const { producto } = Astro.props;
+const { nombre, imagen, imagenAmbiente } = producto.data;
+const fotos = [
+  { src: imagen, alt: `Foto de ${nombre}`, miniAlt: `Ver foto de ${nombre} sin fondo`, ambiente: false },
+  ...(imagenAmbiente
+    ? [{ src: imagenAmbiente, alt: `Foto de ${nombre} con fondo`, miniAlt: `Ver foto de ${nombre} con fondo`, ambiente: true }]
+    : []),
+];
+---
+
+<div class="galeria" data-galeria>
+  <div class="principal" style={`view-transition-name: vt-img-${producto.id}`}>
+    {
+      fotos.map((foto, i) => (
+        <div class:list={['slide', foto.ambiente && 'ambiente']} data-slide hidden={i !== 0}>
+          <Image
+            src={foto.src}
+            widths={[480, 720, 960]}
+            sizes="(min-width: 1200px) 572px, (min-width: 860px) 50vw, 100vw"
+            alt={foto.alt}
+            quality={70}
+            loading={i === 0 ? 'eager' : 'lazy'}
+            fetchpriority={i === 0 ? 'high' : 'auto'}
+            decoding="async"
+          />
+        </div>
+      ))
+    }
+  </div>
+
+  {
+    fotos.length > 1 && (
+      <div class="miniaturas">
+        {fotos.map((foto, i) => (
+          <button
+            type="button"
+            class:list={['mini', foto.ambiente && 'ambiente']}
+            data-thumb={i}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+            aria-label={foto.miniAlt}
+          >
+            <Image src={foto.src} width={152} alt="" loading="lazy" decoding="async" />
+          </button>
+        ))}
+      </div>
+    )
+  }
+</div>
+
+<script>
+  function iniciarGaleria(galeria: HTMLElement): void {
+    const slides = Array.from(galeria.querySelectorAll<HTMLElement>('[data-slide]'));
+    const miniaturas = Array.from(galeria.querySelectorAll<HTMLButtonElement>('[data-thumb]'));
+    if (slides.length === 0 || miniaturas.length === 0) return;
+
+    const mostrar = (indice: number): void => {
+      slides.forEach((slide, i) => {
+        slide.hidden = i !== indice;
+      });
+      miniaturas.forEach((mini, i) => {
+        mini.setAttribute('aria-pressed', String(i === indice));
+      });
+    };
+
+    miniaturas.forEach((mini, i) => {
+      mini.addEventListener('click', () => mostrar(i));
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-galeria]').forEach(iniciarGaleria);
+</script>
+
+<style>
+  .galeria {
+    min-width: 0;
+  }
+  .principal {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--vl-radius);
+    background:
+      radial-gradient(circle at 50% 58%, var(--vl-blush) 0 52%, transparent 53%),
+      var(--vl-crema);
+    overflow: hidden;
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+  }
+  .slide[hidden] {
+    display: none;
+  }
+  .slide :global(img) {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+    filter: var(--vl-drop);
+  }
+  .slide.ambiente :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: none;
+  }
+
+  .miniaturas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .mini {
+    width: 76px;
+    height: 76px;
+    flex: none;
+    overflow: hidden;
+    border-radius: 16px;
+    border: 2px solid transparent;
+    background: var(--vl-blush);
+    transition: border-color 0.3s;
+  }
+  .mini:hover {
+    border-color: var(--vl-rosa);
+  }
+  .mini[aria-pressed='true'] {
+    border-color: var(--vl-frambuesa);
+  }
+  .mini :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .mini.ambiente :global(img) {
+    object-fit: cover;
+  }
+</style>

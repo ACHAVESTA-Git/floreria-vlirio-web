@@ -286,8 +286,9 @@
       const p = getCatalogo()[slug];
       if (!p) return;
 
+      const cantidad = Math.max(1, Math.min(99, Math.floor(Number(boton.dataset.qty)) || 1));
       marcarAgregado(boton);
-      addItem(slug);
+      addItem(slug, cantidad);
       flyToBasket(boton, p, () => {
         showToast(`${p.nombre} se agregó a tu canasta`, { label: 'Ver canasta', onClick: abrir });
       });
