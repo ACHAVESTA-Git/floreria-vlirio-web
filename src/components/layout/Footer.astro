@@ -1,0 +1,151 @@
+---
+/** Footer en vino: logo blanco, eslogan, enlaces de catálogo/ocasiones y contacto. */
+import Logo from './Logo.astro';
+import { SITE, CATEGORIAS, OCASIONES, waLink } from '../../config/site';
+
+const WA_HREF = waLink("Hola V'Lirio 🌷, quiero hacer un pedido");
+---
+
+<footer class="site-footer">
+  <div class="edge" aria-hidden="true">
+    <svg viewBox="0 0 1200 30" focusable="false">
+      {Array.from({ length: 24 }, (_, i) => (
+        <use href="#i-tulip" x={i * 50} y="0" width="40" height="30" />
+      ))}
+    </svg>
+  </div>
+
+  <div class="wrap">
+    <div class="cols">
+      <div class="marca">
+        <Logo />
+        <p class="eslogan">{SITE.eslogan}</p>
+      </div>
+
+      <nav class="col" aria-labelledby="footer-catalogo">
+        <h2 id="footer-catalogo">Catálogo</h2>
+        <ul>
+          {CATEGORIAS.map((c) => (
+            <li><a href={`/catalogo?categoria=${c.slug}`}>{c.nombre}</a></li>
+          ))}
+        </ul>
+      </nav>
+
+      <nav class="col" aria-labelledby="footer-ocasiones">
+        <h2 id="footer-ocasiones">Ocasiones</h2>
+        <ul>
+          {OCASIONES.map((o) => (
+            <li><a href={`/catalogo?ocasion=${o.slug}`}>{o.nombre}</a></li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="col">
+        <h2 id="footer-contacto">Contacto</h2>
+        <ul>
+          <li><a href={WA_HREF} target="_blank" rel="noopener">Escríbenos por WhatsApp</a></li>
+          <li><a href={`mailto:${SITE.correo}`}>{SITE.correo}</a></li>
+          {SITE.direccion.map((linea) => (
+            <li class="dir">{linea}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <span>© 2026 {SITE.razonSocial}</span>
+      <span>Hecho con <span aria-hidden="true">♥</span> en Lima</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    margin-top: 72px;
+    padding: 64px 0 28px;
+    background: var(--vl-vino);
+    color: var(--vl-sobre-vino);
+  }
+  /* Borde de tulipanes: recortado en un contenedor para no distorsionar ni generar scroll horizontal */
+  .edge {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -29px;
+    height: 30px;
+    overflow: hidden;
+    color: var(--vl-vino);
+    pointer-events: none;
+  }
+  .edge svg {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 1200px;
+    height: 30px;
+    max-width: none;
+    transform: translateX(-50%);
+  }
+  .cols {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr 1fr;
+    gap: 32px;
+  }
+  .marca {
+    color: var(--vl-blanco);
+  }
+  .eslogan {
+    margin-top: 14px;
+    font-size: 15px;
+    color: var(--vl-sobre-vino);
+    max-width: 30ch;
+  }
+  .col h2 {
+    font-family: var(--vl-font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--vl-blanco);
+    margin-bottom: 12px;
+  }
+  .col a {
+    display: inline-block;
+    padding: 6px 0;
+    font-size: 15px;
+    color: var(--vl-sobre-vino);
+    transition: color 0.3s;
+  }
+  .col a:hover {
+    color: var(--vl-blanco);
+    text-decoration: underline;
+  }
+  .site-footer :focus-visible {
+    outline-color: var(--vl-sobre-vino-suave);
+  }
+  .dir {
+    font-size: 15px;
+    padding: 6px 0;
+    color: var(--vl-sobre-vino);
+  }
+  .bottom {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid color-mix(in srgb, var(--vl-blanco) 20%, transparent);
+    font-size: 14px;
+    color: var(--vl-sobre-vino-suave);
+  }
+  @media (max-width: 800px) {
+    .cols {
+      grid-template-columns: 1fr 1fr;
+    }
+    .marca {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
