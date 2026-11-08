@@ -1,5 +1,9 @@
-/** Número de WhatsApp en un solo lugar. Demo = número de pruebas. Producción: '51933099986' */
-export const WHATSAPP_NUMBER = '51936688729';
+/**
+ * Número de WhatsApp en un solo lugar. Lo decide astro.config.mjs según la rama:
+ * main → número de la demo del cliente; dev y feature/* → número de pruebas.
+ * Al entregar, cambiar NUMERO_PRODUCCION en astro.config.mjs por el de la florería (51933099986).
+ */
+export const WHATSAPP_NUMBER: string = __WHATSAPP_NUMBER__;
 
 export const SITE = {
   nombre: "Florería V'Lirio",
