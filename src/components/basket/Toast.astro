@@ -1,0 +1,40 @@
+---
+/** Contenedor del toast. La lógica está en toast.ts (showToast). */
+---
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<style>
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    z-index: 95;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: calc(100% - 32px);
+    padding: 12px 18px;
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-vino);
+    color: var(--vl-blanco);
+    font-size: 14px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translate(-50%, 30px);
+    transition: opacity 0.4s var(--vl-ease), transform 0.4s var(--vl-ease), visibility 0.4s;
+  }
+  .toast.on {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate(-50%, 0);
+  }
+  .toast :global(button) {
+    color: var(--vl-sobre-vino-suave);
+    font-weight: 700;
+    text-decoration: underline;
+    white-space: nowrap;
+  }
+</style>
