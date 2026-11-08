@@ -1,0 +1,232 @@
+---
+import { Image } from 'astro:assets';
+import { CATEGORIAS, OCASIONES, soles } from '../../config/site';
+import { getAsset } from '../../lib/images';
+import { getProductos, precioFinal } from '../../lib/catalog';
+
+type OcasionSlug = (typeof OCASIONES)[number]['slug'];
+type IconoKey = 'corazon' | 'pastel' | 'birrete' | 'paloma' | 'sol' | 'biberon';
+
+/** Ícono lineal de cada ocasión (trazos simples, color = currentColor). */
+const ICONO_OCASION: Record<OcasionSlug, IconoKey> = {
+  amor: 'corazon',
+  aniversario: 'corazon',
+  cumpleanos: 'pastel',
+  graduacion: 'birrete',
+  condolencias: 'paloma',
+  'mejorate-pronto': 'sol',
+  nacimientos: 'biberon',
+};
+
+const TRAZOS: Record<IconoKey, string[]> = {
+  corazon: ['M12 20s-7-4.4-7-9.6A3.9 3.9 0 0 1 12 8a3.9 3.9 0 0 1 7 2.4C19 15.6 12 20 12 20z'],
+  pastel: ['M4 20h16', 'M5 20v-6h14v6', 'M5 17c2 0 2-1 3.5-1s1.5 1 3.5 1 2-1 3.5-1 1.5 1 3.5 1', 'M12 14v-3', 'M12 9c1.2-.8 1.2-2 0-3.5-1.2 1.5-1.2 2.7 0 3.5z'],
+  birrete: ['M2 9l10-5 10 5-10 5z', 'M6 11.2V16c0 1.2 2.7 3 6 3s6-1.8 6-3v-4.8', 'M22 9v5'],
+  paloma: ['M4 15c3.5.4 6-1.2 7.5-4.2L16 5l2 1.2-1.8 3.2c1.3 1.8 2.2 3.6 1.8 5.6-.6 3-3.6 4.8-7.2 4.8-2.7 0-5.1-1.3-7.3-3.4z', 'M14.6 8.4h.01'],
+  sol: ['M12 8a4 4 0 1 0 0 8 4 4 0 1 0 0-8z', 'M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6'],
+  biberon: ['M9 3.5h6', 'M9.5 3.5v2.5l-1 1.5V19a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2V7.5l-1-1.5V3.5', 'M9.5 10h5', 'M12 13.5v2.5'],
+};
+
+const productos = await getProductos();
+
+/** Solo las categorías con productos, con su precio más bajo (con oferta si la hay). */
+const categorias = CATEGORIAS.flatMap((c) => {
+  const delCat = productos.filter((p) => p.data.categoria === c.slug);
+  if (delCat.length === 0) return [];
+  const desde = Math.min(...delCat.map((p) => precioFinal(p.data)));
+  return [{ slug: c.slug, nombre: c.nombre, desde, img: getAsset(c.imagen) }];
+});
+---
+
+<section class="block" id="categorias" aria-labelledby="categorias-titulo">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Nuestro catálogo</div>
+        <h2 class="title" id="categorias-titulo">Encuentra el detalle perfecto</h2>
+      </div>
+      <p>Elige por tipo de arreglo o por la ocasión que quieres celebrar.</p>
+    </div>
+
+    <div class="cats">
+      {
+        categorias.map((c) => (
+          <a class="cat" href={`/catalogo?categoria=${c.slug}`}>
+            <span class="cat-img">
+              <Image
+                src={c.img}
+                alt={`Arreglo de ${c.nombre.toLowerCase()} de Florería V'Lirio`}
+                widths={[200, 400]}
+                sizes="(max-width: 640px) 62vw, (max-width: 1000px) 33vw, 180px"
+                format="webp"
+                loading="lazy"
+              />
+            </span>
+            <span class="cat-txt">
+              <b>{c.nombre}</b>
+              <small>Desde {soles(c.desde)}</small>
+            </span>
+            <span class="arrow" aria-hidden="true">
+              <svg width="16" height="16" focusable="false"><use href="#i-arrow" /></svg>
+            </span>
+          </a>
+        ))
+      }
+    </div>
+
+    <nav class="chips" id="ocasiones" aria-label="Buscar por ocasión">
+      {
+        OCASIONES.map((o) => (
+          <a class="chip" href={`/catalogo?ocasion=${o.slug}`}>
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              {TRAZOS[ICONO_OCASION[o.slug]].map((d) => (
+                <path d={d} />
+              ))}
+            </svg>
+            {o.nombre}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</section>
+
+<style>
+  /* ---------- Tarjetas de categoría ---------- */
+  .cats {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 18px;
+  }
+  .cat {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--vl-radius);
+    background: linear-gradient(170deg, var(--vl-blush), var(--vl-durazno));
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    box-shadow: var(--vl-shadow);
+    transition:
+      transform 0.45s var(--vl-ease),
+      box-shadow 0.45s var(--vl-ease);
+    margin-top: 34px;
+    color: var(--vl-tinta);
+  }
+  .cat:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--vl-shadow-lg);
+  }
+  .cat-img {
+    position: absolute;
+    top: -30px;
+    left: 7%;
+    right: 7%;
+    height: 74%;
+    transition: transform 0.5s var(--vl-ease);
+  }
+  .cat-img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: var(--vl-drop);
+  }
+  .cat:hover .cat-img {
+    transform: translateY(-8px) rotate(2deg);
+  }
+  .cat-txt {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-right: 40px;
+  }
+  .cat-txt b {
+    font-family: var(--vl-font-title);
+    font-weight: 900;
+    color: var(--vl-vino);
+    font-size: 20px;
+    line-height: 1.1;
+  }
+  .cat-txt small {
+    font-family: var(--vl-font-ui);
+    font-size: 13px;
+    color: var(--vl-tinta-suave);
+  }
+  .arrow {
+    position: absolute;
+    right: 14px;
+    bottom: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--vl-blanco);
+    display: grid;
+    place-items: center;
+    color: var(--vl-vino);
+    transition: transform 0.35s var(--vl-ease);
+  }
+  .cat:hover .arrow {
+    transform: translateX(4px);
+  }
+
+  /* ---------- Chips de ocasión ---------- */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 34px;
+    justify-content: center;
+  }
+  .chip {
+    font-family: var(--vl-font-ui);
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid var(--vl-vino);
+    color: var(--vl-vino);
+    padding: 9px 18px;
+    border-radius: var(--vl-radius-pill);
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    background: transparent;
+    transition:
+      background 0.3s var(--vl-ease),
+      color 0.3s var(--vl-ease);
+  }
+  .chip:hover {
+    background: var(--vl-vino);
+    color: var(--vl-blanco);
+  }
+  .ico {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1000px) {
+    .cats {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 640px) {
+    .cats {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 0 4px 16px;
+      gap: 14px;
+      scrollbar-width: none;
+    }
+    .cat {
+      flex: 0 0 62%;
+      scroll-snap-align: start;
+    }
+  }
+</style>
