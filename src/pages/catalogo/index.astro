@@ -1,23 +1,452 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProductCard from '../../components/product/ProductCard.astro';
+import { CATEGORIAS, OCASIONES } from '../../config/site';
+import { getAsset } from '../../lib/images';
+import { getProductos, getDestacados, precioFinal } from '../../lib/catalog';
+
+type Producto = Awaited<ReturnType<typeof getProductos>>[number];
+
+const productos = await getProductos();
+const destacados = await getDestacados();
+
+const tieneOferta = (p: Producto): boolean =>
+  p.data.precioOferta !== undefined && p.data.precioOferta < p.data.precio;
+const porNombre = (a: Producto, b: Producto): number =>
+  a.data.nombre.localeCompare(b.data.nombre, 'es');
+
+// Relevancia: destacados, luego los que tienen oferta, luego el resto por nombre.
+const idsDestacados = new Set(destacados.map((p) => p.id));
+const ofertas = productos.filter((p) => !idsDestacados.has(p.id) && tieneOferta(p)).sort(porNombre);
+const resto = productos.filter((p) => !idsDestacados.has(p.id) && !tieneOferta(p)).sort(porNombre);
+const enOrden: Producto[] = [...destacados, ...ofertas, ...resto];
+const relevancia = new Map(enOrden.map((p, i) => [p.id, i]));
+
+// Solo las categorías que tienen productos.
+const categorias = CATEGORIAS.filter((c) => productos.some((p) => p.data.categoria === c.slug));
+const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
 ---
 
-<BaseLayout title="Catálogo" description="Catálogo de Florería V'Lirio: ramos, buchones, arreglos, box y tulipanes en Lima.">
-  <section class="stub wrap">
-    <h1 class="title">Catálogo</h1>
-    <p class="texto">Próximamente: filtros por categoría y ocasión</p>
-    <a class="btn btn-ghost" href="/">Volver al inicio</a>
+<BaseLayout title="Catálogo" description="Catálogo de Florería V'Lirio: ramos, buchones, arreglos, box, tulipanes, peluches y chocolates en Lima. Filtra por tipo y ocasión y pide por WhatsApp.">
+  <section class="hdr" aria-labelledby="cat-title">
+    <div class="wrap hdr-inner">
+      <div class="hdr-txt">
+        <div class="eyebrow">Nuestro catálogo</div>
+        <h1 id="cat-title" class="title">Catálogo</h1>
+        <p id="cat-sub" class="sub">Elige tu detalle favorito y pídelo por WhatsApp.</p>
+      </div>
+      <div class="hdr-img">
+        <Image
+          src={imgTodos}
+          widths={[240, 360]}
+          sizes="(max-width: 760px) 132px, 260px"
+          format="webp"
+          alt="Ramo de gerberas rosas con papel fucsia de Florería V'Lirio"
+          loading="eager"
+          data-hdr-cat="todos"
+          data-nombre="Catálogo"
+        />
+        {
+          categorias.map((c) => (
+            <Image
+              src={getAsset(c.imagen)}
+              widths={[240, 360]}
+              sizes="(max-width: 760px) 132px, 260px"
+              format="webp"
+              alt={`Arreglo de ${c.nombre.toLowerCase()} de Florería V'Lirio`}
+              hidden
+              data-hdr-cat={c.slug}
+              data-nombre={c.nombre}
+              style={`view-transition-name: vt-cat-${c.slug}`}
+            />
+          ))
+        }
+      </div>
+    </div>
   </section>
+
+  <script is:inline>
+    (function () {
+      var cat = new URLSearchParams(location.search).get('categoria');
+      var imgs = Array.prototype.slice.call(document.querySelectorAll('[data-hdr-cat]'));
+      var activa = null;
+      imgs.forEach(function (el) {
+        if (el.getAttribute('data-hdr-cat') === cat) activa = el;
+      });
+      if (!activa) return;
+      imgs.forEach(function (el) {
+        if (el === activa) el.removeAttribute('hidden');
+        else el.setAttribute('hidden', '');
+      });
+      var titulo = document.getElementById('cat-title');
+      var nombre = activa.getAttribute('data-nombre');
+      if (titulo && nombre) titulo.textContent = nombre;
+    })();
+  </script>
+
+  <section class="listado">
+    <div id="filters" class="filters">
+      <div class="wrap">
+        <div class="tabs" role="group" aria-label="Tipo de arreglo">
+          <button type="button" class="tab" data-filter-cat="todos" aria-pressed="true">Todos</button>
+          {
+            categorias.map((c) => (
+              <button type="button" class="tab" data-filter-cat={c.slug} aria-pressed="false">{c.nombre}</button>
+            ))
+          }
+        </div>
+
+        <div class="chips-f" role="group" aria-label="Ocasión">
+          {
+            OCASIONES.map((o) => (
+              <button type="button" class="chip-f" data-filter-oca={o.slug} aria-pressed="false">{o.nombre}</button>
+            ))
+          }
+        </div>
+
+        <div class="controles">
+          <div class="orden">
+            <label for="sort">Ordenar por</label>
+            <select id="sort">
+              <option value="relevancia">Más pedidos</option>
+              <option value="menor">Menor precio</option>
+              <option value="mayor">Mayor precio</option>
+            </select>
+          </div>
+
+          <div class="rango" role="group" aria-label="Rango de precio">
+            <div class="campo">
+              <label class="sr-only" for="min">Precio mínimo</label>
+              <span class="pref" aria-hidden="true">S/</span>
+              <input id="min" type="number" inputmode="numeric" min="0" placeholder="Mín" />
+            </div>
+            <div class="campo">
+              <label class="sr-only" for="max">Precio máximo</label>
+              <span class="pref" aria-hidden="true">S/</span>
+              <input id="max" type="number" inputmode="numeric" min="0" placeholder="Máx" />
+            </div>
+          </div>
+
+          <div class="acc">
+            <button type="button" id="clear" class="btn btn-ghost clear">Limpiar filtros</button>
+            <p id="results-count" class="count" role="status" aria-live="polite">{productos.length} productos</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <h2 class="sr-only">Productos del catálogo</h2>
+      <ul id="grid" class="grid">
+        {
+          enOrden.map((p) => (
+            <li
+              class="cell"
+              data-cell
+              data-cat={p.data.categoria}
+              data-oca={p.data.ocasiones.join(' ')}
+              data-precio={precioFinal(p.data)}
+              data-rel={relevancia.get(p.id)}
+            >
+              <ProductCard producto={p} />
+            </li>
+          ))
+        }
+      </ul>
+
+      <div id="empty" class="empty" hidden>
+        <svg class="empty-ico" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+          <use href="#i-basket" />
+        </svg>
+        <p class="empty-txt">No encontramos flores con esos filtros</p>
+        <button type="button" id="empty-clear" class="btn btn-primary">Quitar filtros</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import { initCatalog } from '../../components/catalog/catalogFilters';
+    initCatalog();
+  </script>
 </BaseLayout>
 
 <style>
-  .stub {
-    padding-top: 140px;
+  /* ---------- Encabezado ---------- */
+  .hdr {
+    padding-top: 130px;
+    padding-bottom: 32px;
+    background: linear-gradient(180deg, var(--vl-blush), var(--vl-crema));
+  }
+  .hdr-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+  }
+  .hdr-txt {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .sub {
+    max-width: 44ch;
+    color: var(--vl-tinta-suave);
+    font-size: 17px;
+  }
+  .hdr-img {
+    position: relative;
+    width: 132px;
+  }
+  .hdr-img :global(img) {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    filter: var(--vl-drop);
+  }
+  .hdr-img :global([hidden]) {
+    display: none;
+  }
+
+  /* ---------- Barra de filtros (sticky) ---------- */
+  .listado {
     padding-bottom: 96px;
   }
-  .texto {
-    margin: 12px 0 28px;
+  .filters {
+    position: relative; /* en móvil la barra ocupa ~200px: solo es sticky desde 900px */
+    z-index: 40;
+    padding: 14px 0 12px;
+    background: var(--vl-header-glass);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--vl-durazno);
+    box-shadow: var(--vl-shadow);
+  }
+
+  @media (min-width: 900px) {
+    .filters {
+      position: sticky;
+      top: 64px;
+    }
+  }
+
+  /* Filas scrollables en móvil: sin barra visible y con snap */
+  .tabs,
+  .chips-f {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    margin-inline: -16px;
+    padding: 4px 16px;
+    scroll-padding-inline: 16px;
+  }
+  .tabs::-webkit-scrollbar,
+  .chips-f::-webkit-scrollbar {
+    display: none;
+  }
+  .chips-f {
+    margin-top: 10px;
+  }
+
+  .tab,
+  .chip-f {
+    flex: none;
+    scroll-snap-align: start;
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1;
+    white-space: nowrap;
+    padding: 10px 16px;
+    border: 1px solid var(--vl-vino);
+    border-radius: var(--vl-radius-pill);
+    background: transparent;
+    color: var(--vl-vino);
+    transition:
+      background 0.3s var(--vl-ease),
+      color 0.3s var(--vl-ease);
+  }
+  .chip-f {
+    font-weight: 500;
+    padding: 8px 14px;
+  }
+  .tab:hover,
+  .chip-f:hover {
+    background: var(--vl-blush);
+  }
+  .tab[aria-pressed='true'],
+  .chip-f[aria-pressed='true'] {
+    background: var(--vl-vino);
+    color: var(--vl-blanco);
+  }
+
+  /* Controles: en móvil, orden + precio en la primera fila y acciones en la segunda */
+  .controles {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+    margin-top: 12px;
+  }
+  .orden {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 100%; /* en móvil el orden ocupa su propia fila */
+    min-width: 0;
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 14px;
     color: var(--vl-tinta-suave);
-    font-size: 18px;
+  }
+  .orden select,
+  .campo input {
+    height: 40px;
+    border: 1px solid var(--vl-vino);
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-blanco);
+    color: var(--vl-tinta);
+    font-family: var(--vl-font-ui);
+    font-size: 14px;
+  }
+  .orden select {
+    flex: 1;
+    min-width: 0;
+    padding: 0 12px;
+  }
+  .rango {
+    display: flex;
+    gap: 6px;
+    flex: 1 1 100%; /* y el rango de precio la suya, para que Mín/Máx se lean completos */
+    min-width: 0;
+  }
+  .campo {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .campo input {
+    width: 100%;
+    padding: 0 12px 0 36px;
+  }
+  .pref {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--vl-tinta-suave);
+    pointer-events: none;
+  }
+  .acc {
+    flex: 1 1 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+  }
+  .clear {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+  .count {
+    font-family: var(--vl-font-ui);
+    font-size: 14px;
+    color: var(--vl-tinta-suave);
+  }
+
+  /* ---------- Grilla ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, var(--vl-card-w));
+    justify-content: center;
+    gap: 24px;
+    padding-top: 32px;
+    scroll-margin-top: 220px;
+  }
+  .cell {
+    min-width: 0;
+  }
+  .cell[hidden] {
+    display: none;
+  }
+
+  /* ---------- Estado vacío ---------- */
+  .empty {
+    display: grid;
+    justify-items: center;
+    gap: 16px;
+    padding: 56px 16px 24px;
+    text-align: center;
+  }
+  .empty[hidden] {
+    display: none;
+  }
+  .empty-ico {
+    width: 96px;
+    height: 96px;
+    color: var(--vl-vino);
+  }
+  .empty-txt {
+    font-family: var(--vl-font-title);
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--vl-vino);
+  }
+
+  /* ---------- Tablet y escritorio ---------- */
+  @media (min-width: 760px) {
+    .hdr-img {
+      width: 260px;
+    }
+    .tabs,
+    .chips-f {
+      flex-wrap: wrap;
+      overflow: visible;
+      margin-inline: 0;
+      padding: 0;
+    }
+    .chips-f {
+      margin-top: 12px;
+    }
+    .controles {
+      flex-wrap: nowrap;
+      margin-top: 14px;
+    }
+    .orden,
+    .rango {
+      flex: 0 0 auto;
+    }
+    .orden {
+      width: 270px;
+    }
+    .rango {
+      width: 240px;
+    }
+    .acc {
+      flex: 1 1 auto;
+      justify-content: flex-end;
+    }
+    .grid {
+      scroll-margin-top: 170px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tabs,
+    .chips-f {
+      scroll-behavior: auto;
+    }
+    .tab,
+    .chip-f {
+      transition: none;
+    }
   }
 </style>

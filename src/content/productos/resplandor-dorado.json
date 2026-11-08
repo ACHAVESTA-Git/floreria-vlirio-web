@@ -13,5 +13,6 @@
   ],
   "imagen": "../../assets/productos/buchon-girasoles.png",
   "flor": "girasol",
-  "demo": true
+  "demo": true,
+  "imagenAmbiente": "../../assets/productos/cf-buchon-girasoles.jpg"
 }

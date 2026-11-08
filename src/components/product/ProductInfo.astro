@@ -1,0 +1,181 @@
+---
+import type { Producto } from '../../lib/catalog';
+import { OCASIONES, soles } from '../../config/site';
+
+interface Props {
+  producto: Producto;
+  categoriaNombre: string;
+}
+
+const { producto, categoriaNombre } = Astro.props;
+const { nombre, descripcion, precio, precioOferta, colores, ocasiones } = producto.data;
+
+// Solo hay oferta si el precio de oferta es menor al normal.
+const oferta = precioOferta !== undefined && precioOferta < precio ? precioOferta : undefined;
+const actual = oferta ?? precio;
+const descuento = oferta !== undefined ? Math.round((1 - oferta / precio) * 100) : 0;
+
+/** Tokens de color existentes en tokens.css (--vl-color-<nombre>). */
+const TOKENS_COLOR = ['rojo', 'rosado', 'fucsia', 'salmon', 'naranja', 'amarillo', 'blanco', 'azul', 'lila'];
+
+/** Minúsculas y sin tildes: 'salmón' → 'salmon'. */
+const normalizar = (texto: string): string =>
+  texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+
+const capitalizar = (texto: string): string => texto.charAt(0).toUpperCase() + texto.slice(1);
+
+const coloresInfo = colores.map((c) => {
+  const token = normalizar(c);
+  return {
+    nombre: c,
+    fondo: TOKENS_COLOR.includes(token) ? `var(--vl-color-${token})` : 'var(--vl-rosa)',
+  };
+});
+
+const ocasionesInfo = ocasiones.flatMap((slug) => OCASIONES.filter((o) => o.slug === slug));
+---
+
+<div class="info-producto">
+  <p class="eyebrow">{categoriaNombre}</p>
+  <h1 class="title">{nombre}</h1>
+  <p class="desc">{descripcion}</p>
+
+  <p class="precio">
+    <span class="actual"><span class="sr-only">Precio: </span>{soles(actual)}</span>
+    {
+      oferta !== undefined && (
+        <>
+          <s><span class="sr-only">antes </span>{soles(precio)}</s>
+          <span class="badge">-{descuento}%</span>
+        </>
+      )
+    }
+  </p>
+
+  {
+    coloresInfo.length > 0 && (
+      <div class="bloque">
+        <ul class="puntos">
+          {coloresInfo.map((c) => (
+            <li class="punto" style={`background: ${c.fondo}`} title={capitalizar(c.nombre)}>
+              <span class="sr-only">{capitalizar(c.nombre)}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="colores-texto">Colores: {coloresInfo.map((c) => capitalizar(c.nombre)).join(', ')}</p>
+      </div>
+    )
+  }
+
+  {
+    ocasionesInfo.length > 0 && (
+      <div class="bloque">
+        <p class="etiqueta">Ideal para</p>
+        <ul class="chips">
+          {ocasionesInfo.map((o) => (
+            <li>
+              <a class="chip" href={`/catalogo?ocasion=${o.slug}`}>{o.nombre}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .info-producto {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+  .title {
+    font-size: clamp(30px, 4vw, 42px);
+  }
+  .desc {
+    max-width: 46ch;
+    color: var(--vl-tinta-suave);
+    font-size: 17px;
+  }
+
+  .precio {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    color: var(--vl-frambuesa);
+  }
+  .actual {
+    font-size: 36px;
+    line-height: 1.1;
+  }
+  .precio s {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--vl-tinta-suave);
+  }
+  .badge {
+    padding: 4px 12px;
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-frambuesa);
+    color: var(--vl-blanco);
+    font-size: 14px;
+  }
+
+  .bloque {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .etiqueta {
+    font-family: var(--vl-font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--vl-tinta);
+  }
+
+  .puntos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .punto {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--vl-blanco);
+    box-shadow: 0 0 0 1px var(--vl-rosa);
+  }
+  .colores-texto {
+    font-size: 15px;
+    color: var(--vl-tinta-suave);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 8px 16px;
+    border-radius: var(--vl-radius-pill);
+    border: 1.5px solid var(--vl-vino);
+    background: var(--vl-blanco);
+    color: var(--vl-vino);
+    font-family: var(--vl-font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.3s, color 0.3s;
+  }
+  .chip:hover {
+    background: var(--vl-vino);
+    color: var(--vl-blanco);
+  }
+</style>

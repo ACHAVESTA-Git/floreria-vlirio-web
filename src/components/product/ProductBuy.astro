@@ -1,0 +1,152 @@
+---
+import type { Producto } from '../../lib/catalog';
+import { precioFinal } from '../../lib/catalog';
+import { SITE, soles, waLink } from '../../config/site';
+
+interface Props {
+  producto: Producto;
+}
+
+const { producto } = Astro.props;
+const { nombre } = producto.data;
+const unitario = precioFinal(producto.data);
+
+const mensajeWa = (cantidad: number): string =>
+  `Hola V'Lirio 🌷, quiero pedir:\n• ${cantidad} × ${nombre} — ${soles(unitario * cantidad)}\nTotal: ${soles(unitario * cantidad)}`;
+---
+
+<div class="compra" data-compra data-id={producto.id} data-nombre={nombre} data-precio={unitario}>
+  <div class="fila">
+    <div class="cantidad" role="group" aria-label="Cantidad">
+      <button type="button" class="ajuste" data-menos aria-label="Quitar uno">−</button>
+      <span class="valor" data-valor aria-live="polite">1</span>
+      <button type="button" class="ajuste" data-mas aria-label="Agregar uno">+</button>
+    </div>
+
+    <button type="button" class="btn btn-primary agregar" data-add={producto.id} data-qty="1">
+      <svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><use href="#i-basket" /></svg>
+      <span>Agregar a la canasta</span>
+    </button>
+  </div>
+
+  <a
+    class="btn btn-wa pedir"
+    data-wa
+    href={waLink(mensajeWa(1))}
+    target="_blank"
+    rel="noopener"
+  >
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-wa" /></svg>
+    Pedir ahora por WhatsApp
+  </a>
+
+  <p class="confianza">Lo preparamos a mano el mismo día · Pagos: {SITE.pagos}</p>
+</div>
+
+<script>
+  import { soles, waLink } from '../../config/site';
+
+  const MIN = 1;
+  const MAX = 20;
+
+  function iniciarCompra(compra: HTMLElement): void {
+    const valor = compra.querySelector<HTMLElement>('[data-valor]');
+    const menos = compra.querySelector<HTMLButtonElement>('[data-menos]');
+    const mas = compra.querySelector<HTMLButtonElement>('[data-mas]');
+    const agregar = compra.querySelector<HTMLButtonElement>('[data-add]');
+    const wa = compra.querySelector<HTMLAnchorElement>('[data-wa]');
+    if (!valor || !menos || !mas || !agregar || !wa) return;
+
+    const nombre = compra.dataset.nombre ?? '';
+    const unitario = Number(compra.dataset.precio);
+    if (!Number.isFinite(unitario)) return;
+
+    let cantidad = 1;
+
+    const pintar = (): void => {
+      valor.textContent = String(cantidad);
+      agregar.dataset.qty = String(cantidad);
+      menos.disabled = cantidad <= MIN;
+      mas.disabled = cantidad >= MAX;
+      const total = soles(unitario * cantidad);
+      const mensaje = `Hola V'Lirio 🌷, quiero pedir:\n• ${cantidad} × ${nombre} — ${total}\nTotal: ${total}`;
+      wa.href = waLink(mensaje);
+    };
+
+    menos.addEventListener('click', () => {
+      cantidad = Math.max(MIN, cantidad - 1);
+      pintar();
+    });
+    mas.addEventListener('click', () => {
+      cantidad = Math.min(MAX, cantidad + 1);
+      pintar();
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-compra]').forEach(iniciarCompra);
+</script>
+
+<style>
+  .compra {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-top: 8px;
+  }
+  .fila {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+  .cantidad {
+    display: inline-flex;
+    align-items: center;
+    height: 52px;
+    padding: 0 6px;
+    border-radius: var(--vl-radius-pill);
+    border: 1.5px solid var(--vl-rosa);
+    background: var(--vl-blanco);
+  }
+  .ajuste {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-family: var(--vl-font-ui);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--vl-vino);
+    transition: background 0.2s;
+  }
+  .ajuste:hover:not(:disabled) {
+    background: var(--vl-blush);
+  }
+  .ajuste:disabled {
+    color: var(--vl-rosa);
+    cursor: not-allowed;
+  }
+  .valor {
+    min-width: 40px;
+    text-align: center;
+    font-family: var(--vl-font-ui);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--vl-tinta);
+  }
+
+  .agregar {
+    flex: 1 1 220px;
+    justify-content: center;
+    min-height: 52px;
+  }
+  .pedir {
+    justify-content: center;
+    min-height: 52px;
+  }
+  .confianza {
+    font-size: 14px;
+    color: var(--vl-tinta-suave);
+  }
+</style>

@@ -60,6 +60,7 @@ const categorias = CATEGORIAS.flatMap((c) => {
                 sizes="(max-width: 640px) 62vw, (max-width: 1000px) 33vw, 180px"
                 format="webp"
                 loading="lazy"
+                style={`view-transition-name: vt-cat-${c.slug}`}
               />
             </span>
             <span class="cat-txt">

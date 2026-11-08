@@ -36,7 +36,12 @@ section.block { padding: 96px 0; }
 .section-head { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 36px; flex-wrap: wrap; }
 .section-head p { color: var(--vl-tinta-suave); max-width: 520px; }
 .section-head .script { font-size: 34px; line-height: 1; }
+/* View Transitions nativas entre páginas (catálogo → detalle). Sin JS extra. */
+@view-transition { navigation: auto; }
+.site-header { view-transition-name: site-header; }
+::view-transition-group(*) { animation-duration: 0.45s; animation-timing-function: var(--vl-ease); }
 @media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
 }
