@@ -1,0 +1,154 @@
+---
+import { RANGOS_PRECIO, type LimitesPrecio } from '../../lib/catalogFacets';
+
+/** Precio: rangos de un toque (móvil y tablet) y slider de dos puntos (escritorio). */
+interface Props {
+  precio: LimitesPrecio;
+}
+const { precio } = Astro.props;
+/** Paso de los dos range del slider, en soles. */
+const PASO_SLIDER = 5;
+---
+
+<!-- Móvil y tablet: rangos de un toque -->
+<div class="rangos" role="group" aria-label="Rango de precio">
+  {
+    RANGOS_PRECIO.map((r) => (
+      <button type="button" class="rango-chip" data-rango-min={r.min ?? ''} data-rango-max={r.max ?? ''} aria-pressed="false">
+        {r.nombre}
+      </button>
+    ))
+  }
+</div>
+
+<!-- Escritorio: slider de dos puntos -->
+<div class="slider" id="slider" data-min={precio.min} data-max={precio.max} style={`--a: 0%; --b: 100%`}>
+  <div class="track" aria-hidden="true"><span class="fill"></span></div>
+  <label class="sr-only" for="pmin">Precio mínimo</label>
+  <input id="pmin" type="range" min={precio.min} max={precio.max} step={PASO_SLIDER} value={precio.min} />
+  <label class="sr-only" for="pmax">Precio máximo</label>
+  <input id="pmax" type="range" min={precio.min} max={precio.max} step={PASO_SLIDER} value={precio.max} />
+  <p class="slider-val" id="slider-val" aria-hidden="true">S/{precio.min} – S/{precio.max}</p>
+</div>
+
+<style>
+  .rangos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 16px;
+  }
+  .rango-chip {
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--vl-vino);
+    border-radius: var(--vl-radius-pill);
+    font-family: var(--vl-font-ui);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--vl-vino);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 0.18s ease,
+      color 0.18s ease;
+  }
+  .rango-chip[aria-pressed='true'] {
+    background: var(--vl-vino);
+    color: var(--vl-blanco);
+  }
+  @media (hover: hover) {
+    .rango-chip[aria-pressed='false']:hover {
+      background: var(--vl-blush);
+    }
+  }
+
+  /* Dos range superpuestos sobre una pista */
+  .slider {
+    display: none;
+    position: relative;
+    padding: 14px 9px 16px; /* 9px = medio punto: la columna con scroll recortaba los extremos */
+  }
+  .track {
+    position: relative;
+    height: 4px;
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-durazno);
+  }
+  .fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--a);
+    right: calc(100% - var(--b));
+    border-radius: inherit;
+    background: var(--vl-vino);
+  }
+  .slider input {
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 100%;
+    height: 22px;
+    margin: 0;
+    background: none;
+    pointer-events: none; /* solo los puntos reciben el mouse, así los dos se pueden arrastrar */
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .slider input::-webkit-slider-runnable-track {
+    background: none;
+  }
+  .slider input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 3px solid var(--vl-blanco);
+    background: var(--vl-vino);
+    box-shadow: var(--vl-shadow);
+    pointer-events: auto;
+    cursor: grab;
+  }
+  .slider input::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 3px solid var(--vl-blanco);
+    background: var(--vl-vino);
+    box-shadow: var(--vl-shadow);
+    pointer-events: auto;
+    cursor: grab;
+  }
+  .slider input:focus-visible::-webkit-slider-thumb {
+    outline: 3px solid var(--vl-frambuesa);
+    outline-offset: 2px;
+  }
+  .slider input:focus-visible::-moz-range-thumb {
+    outline: 3px solid var(--vl-frambuesa);
+    outline-offset: 2px;
+  }
+  .slider-val {
+    margin-top: 14px;
+    text-align: right;
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--vl-tinta);
+  }
+
+  @media (min-width: 1024px) {
+    .rangos {
+      display: none;
+    }
+    .slider {
+      display: block;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rango-chip {
+      transition: none;
+    }
+  }
+</style>

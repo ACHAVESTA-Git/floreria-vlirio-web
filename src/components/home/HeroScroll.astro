@@ -1,37 +1,7 @@
 ---
-import { Image } from 'astro:assets';
-import { getAsset } from '../../lib/images';
+import HeroTulips from './HeroTulips.astro';
+import HeroPhotos from './HeroPhotos.astro';
 import { waLink } from '../../config/site';
-
-/** Jardín de 7 tulipanes en arco (como el logo). Mismas medidas que el boceto. */
-const TULIPANES = [
-  { x: 110, h: 170 },
-  { x: 210, h: 230 },
-  { x: 310, h: 280 },
-  { x: 410, h: 330 },
-  { x: 510, h: 280 },
-  { x: 610, h: 230 },
-  { x: 710, h: 170 },
-].map((t, i) => {
-  const side = i % 2 ? -1 : 1;
-  const h = t.h;
-  return {
-    ...t,
-    leaf: `M0 ${-h * 0.32} C ${side * 34} ${-h * 0.42}, ${side * 44} ${-h * 0.62}, ${side * 40} ${-h * 0.72} C ${side * 20} ${-h * 0.62}, ${side * 6} ${-h * 0.5}, 0 ${-h * 0.36}Z`,
-  };
-});
-
-const BULBO = 'M-22 0 C-28 -22 -24 -44 -15 -54 L-8 -38 L0 -60 L8 -38 L15 -54 C24 -44 28 -22 22 0 C14 10 -14 10 -22 0Z';
-const BULBO_HL = 'M0 -60 L8 -38 L15 -54 C22 -42 24 -22 18 -2 C12 4 4 6 0 6Z';
-
-/** Paneo de fotos. Las cuatro primeras son las de móvil (la 4 y la 5 se ocultan con CSS). */
-const FOTOS = [
-  { id: 'ramo-gerberas-rosas-papel-fucsia', alt: 'Ramo de gerberas y rosas envuelto en papel fucsia', clase: 'hp1' },
-  { id: 'buchon-girasoles', alt: 'Buchón de girasoles', clase: 'hp2' },
-  { id: 'box-rosas-rosadas-feliz-cumpleanos', alt: 'Box de rosas rosadas con topper de feliz cumpleaños', clase: 'hp3' },
-  { id: 'ramo-rosas-fucsia-papel-lila', alt: 'Ramo de rosas fucsia envuelto en papel lila', clase: 'hp4' },
-  { id: 'box-corazon-girasoles-lirios-peluche-lotso', alt: 'Box en forma de corazón con girasoles, lirios y peluche Lotso', clase: 'hp5' },
-].map((f) => ({ ...f, img: getAsset(f.id) }));
 
 /** Pétalos decorativos: [left %, top %, rotación, escala]. Posiciones fijas para que el render sea estable. */
 const PETALOS: [number, number, number, number][] = [
@@ -56,22 +26,7 @@ const CTA_WA = waLink("Hola V'Lirio 🌷, quiero hacer un pedido");
       <div class="script">bienvenido a V'Lirio</div>
     </div>
 
-    <svg class="garden" id="garden" viewBox="0 0 820 440" aria-hidden="true" focusable="false">
-      {
-        TULIPANES.map((t) => (
-          <g class="tulip" transform={`translate(${t.x},440)`} data-h={t.h}>
-            <rect class="stem" x="-2" y={-t.h} width="4" height={t.h} rx="2" />
-            <path class="leaf" d={t.leaf} />
-            <g transform={`translate(0,${-t.h})`}>
-              <g class="bulb" style={`--h:${t.h}`}>
-                <path d={BULBO} />
-                <path class="hl" d={BULBO_HL} />
-              </g>
-            </g>
-          </g>
-        ))
-      }
-    </svg>
+    <HeroTulips />
 
     {
       PETALOS.map(([x, y, r, s]) => (
@@ -95,21 +50,7 @@ const CTA_WA = waLink("Hola V'Lirio 🌷, quiero hacer un pedido");
       </div>
     </div>
 
-    {
-      FOTOS.map((f, i) => (
-        <div class={`hero-photo ${f.clase}`}>
-          <Image
-            src={f.img}
-            alt={f.alt}
-            widths={[240, 480]}
-            sizes="(max-width: 700px) 40vw, 230px"
-            format="webp"
-            loading={i === 0 ? 'eager' : 'lazy'}
-            fetchpriority={i === 0 ? 'high' : 'auto'}
-          />
-        </div>
-      ))
-    }
+    <HeroPhotos />
 
     <div class="scroll-hint" id="scrollHint" aria-hidden="true"><i></i>Desliza para descubrir</div>
   </div>
@@ -123,6 +64,12 @@ const CTA_WA = waLink("Hola V'Lirio 🌷, quiero hacer un pedido");
     </style>
   </noscript>
 </section>
+
+<script>
+  import { initHeroScroll } from './heroScroll';
+
+  initHeroScroll();
+</script>
 
 <style>
   /* ---------- Sección y stage ---------- */
@@ -138,39 +85,6 @@ const CTA_WA = waLink("Hola V'Lirio 🌷, quiero hacer un pedido");
     overflow: hidden;
     display: grid;
     place-items: center;
-  }
-
-  /* ---------- Jardín de tulipanes (estado inicial solo con CSS) ---------- */
-  .garden {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin-inline: auto;
-    width: min(820px, 120vw);
-    height: auto;
-  }
-  .garden .stem {
-    fill: var(--vl-follaje);
-    transform: scaleY(0.35);
-    transform-origin: 0 0;
-  }
-  .garden .leaf {
-    fill: var(--vl-follaje);
-    opacity: 0;
-    transform: scale(0.3);
-    transform-origin: 0 0;
-  }
-  .garden .bulb {
-    transform: translateY(calc(var(--h) * 0.65px)) scale(0.55);
-    transform-origin: 0 0;
-  }
-  .garden .bulb path {
-    fill: var(--vl-vino);
-  }
-  .garden .bulb path.hl {
-    fill: var(--vl-frambuesa);
-    opacity: 0.55;
   }
 
   /* ---------- Pétalos ---------- */
@@ -225,43 +139,6 @@ const CTA_WA = waLink("Hola V'Lirio 🌷, quiero hacer un pedido");
     justify-content: center;
     flex-wrap: wrap;
     margin-top: 28px;
-  }
-
-  /* ---------- Fotos del paneo ---------- */
-  .hero-photo {
-    position: absolute;
-    z-index: 2;
-    width: min(clamp(100px, 14vw, 230px), 30vh);
-    filter: var(--vl-drop);
-  }
-  .hero-photo :global(img) {
-    width: 100%;
-    height: auto;
-  }
-  .hp1 {
-    left: 2%;
-    top: 14%;
-  }
-  .hp2 {
-    left: 7%;
-    bottom: 3%;
-    width: min(clamp(110px, 16vw, 260px), 34vh);
-  }
-  .hp3 {
-    right: 2%;
-    top: 12%;
-  }
-  .hp4 {
-    right: 6%;
-    bottom: 3%;
-    width: min(clamp(110px, 16vw, 260px), 34vh);
-  }
-  .hp5 {
-    left: 0;
-    right: 0;
-    bottom: -8%;
-    margin-inline: auto;
-    width: min(clamp(100px, 12vw, 180px), 24vh);
   }
 
   /* ---------- Pista de scroll ---------- */
@@ -326,28 +203,15 @@ const CTA_WA = waLink("Hola V'Lirio 🌷, quiero hacer un pedido");
     letter-spacing: 0.06em;
   }
 
-  /* ---------- Móvil: pin más corto y 3 fotos ---------- */
+  /* ---------- Móvil: pin más corto ---------- */
   @media (max-width: 700px) {
     .hero {
       height: 230vh;
     }
-    .hp1,
-    .hp3 {
-      top: 12%;
-    }
-    .hp2 {
-      bottom: 6%;
-    }
-    .hp4,
-    .hp5 {
-      display: none;
-    }
   }
 
   /* ---------- Estado estático (reduced-motion o sin GSAP) ---------- */
-  /* Antes de que GSAP esté listo, el mensaje, los CTAs y las fotos permanecen ocultos
-     (evita el parpadeo y mantiene el LCP en el texto de bienvenida). */
-  .hero:not(.static) .hero-photo,
+  /* Antes de que GSAP esté listo, el mensaje y los CTAs permanecen ocultos (evita el parpadeo). */
   .hero:not(.static) .message .l,
   .hero:not(.static) .hero-cta {
     opacity: 0;
@@ -371,115 +235,9 @@ const CTA_WA = waLink("Hola V'Lirio 🌷, quiero hacer un pedido");
     flex: 0 0 100%;
     margin-top: 0;
   }
-  .hero.static .hero-photo {
-    position: relative;
-    inset: auto;
-    margin: 0;
-    transform: none;
-    width: min(220px, 42vw);
-  }
-  .hero.static .garden {
-    opacity: 0.15;
-  }
-  .hero.static .garden .stem,
-  .hero.static .garden .bulb {
-    transform: none;
-  }
-  .hero.static .garden .leaf {
-    transform: none;
-    opacity: 0.85;
-  }
   .hero.static .hero-intro,
   .hero.static .scroll-hint,
   .hero.static .petal {
     display: none;
   }
 </style>
-
-<script>
-  import { initSmoothScroll, type Gsap, type SmoothScrollRefs } from '../../lib/smoothScroll';
-
-  const section = document.querySelector<HTMLElement>('#inicio.hero');
-
-  if (section) {
-    const hero = section;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      hero.classList.add('static');
-    } else {
-      const run = (): void => {
-        void boot(hero);
-      };
-      if (typeof window.requestIdleCallback === 'function') {
-        window.requestIdleCallback(run, { timeout: 1500 });
-      } else {
-        window.setTimeout(run, 300);
-      }
-    }
-  }
-
-  async function boot(section: HTMLElement): Promise<void> {
-    const refs: SmoothScrollRefs | null = await initSmoothScroll();
-    if (!refs) {
-      section.classList.add('static');
-      return;
-    }
-    buildTimeline(section, refs.gsap);
-  }
-
-  function buildTimeline(section: HTMLElement, gsap: Gsap): void {
-    const q = <T extends Element>(sel: string): T[] => Array.from(section.querySelectorAll<T>(sel));
-
-    const garden = section.querySelector<SVGSVGElement>('#garden');
-    const intro = section.querySelector<HTMLElement>('#heroIntro');
-    const hint = section.querySelector<HTMLElement>('#scrollHint');
-    const cta = section.querySelector<HTMLElement>('#heroCta');
-    if (!garden || !intro || !hint || !cta) return;
-
-    const stems = q<SVGRectElement>('.garden .stem');
-    const leaves = q<SVGPathElement>('.garden .leaf');
-    const bulbs = q<SVGGElement>('.garden .bulb');
-    const lines = q<HTMLElement>('.msg-h .l');
-    const photos = q<HTMLElement>('.hero-photo');
-    const hp5 = section.querySelector<HTMLElement>('.hp5');
-    const petals = q<HTMLElement>('.petal');
-
-    // A partir de aquí el JS está listo: se aplica el estado oculto y se anima.
-    section.classList.add('js-ready');
-
-    // Estado inicial (igual al CSS, para que GSAP parta de ahí sin salto)
-    gsap.set(stems, { scaleY: 0.35, transformOrigin: '50% 100%' });
-    gsap.set(leaves, { scale: 0.3, opacity: 0, transformOrigin: '50% 100%' });
-    bulbs.forEach((b) => {
-      const h = Number(b.closest('.tulip')?.getAttribute('data-h') ?? 0);
-      gsap.set(b, { y: h * 0.65, scale: 0.55, transformOrigin: '50% 100%' });
-    });
-    gsap.set(lines, { opacity: 0, y: 40, filter: 'blur(10px)' });
-    gsap.set(cta, { opacity: 0, y: 20 });
-    photos.forEach((p, i) => {
-      gsap.set(p, { opacity: 0, x: (i % 2 ? 1 : -1) * 320, y: 60, rotate: (i % 2 ? 1 : -1) * 12 });
-    });
-    if (hp5) gsap.set(hp5, { x: 0, y: 260 });
-
-    // Entrada suave al cargar
-    gsap.from(garden, { y: 60, opacity: 0, duration: 1.2, ease: 'power2.out' });
-    gsap.from(Array.from(intro.children), { y: 20, opacity: 0, duration: 1, stagger: 0.15, ease: 'power2.out', delay: 0.2 });
-
-    // Progreso del scroll: 0-35% tallos, 35-65% mensaje, 65-100% fotos y CTAs
-    const tl = gsap.timeline({
-      defaults: { ease: 'power2.out' },
-      scrollTrigger: { trigger: section, start: 'top top', end: 'bottom bottom', scrub: 1 },
-    });
-    tl.to(hint, { opacity: 0, duration: 0.5 }, 0)
-      .to(intro, { opacity: 0, y: -40, duration: 1.2 }, 0.3)
-      .to(stems, { scaleY: 1, duration: 3, stagger: { each: 0.12, from: 'center' } }, 0)
-      .to(bulbs, { y: 0, scale: 1, rotate: (i: number) => (i - 3) * 3, duration: 3, stagger: { each: 0.12, from: 'center' } }, 0)
-      .to(leaves, { scale: 1, opacity: 0.85, duration: 2.4, stagger: { each: 0.12, from: 'center' } }, 0.6)
-      .to(petals, { y: () => -120 - Math.random() * 200, x: () => Math.random() * 120 - 60, rotate: '+=180', duration: 6, stagger: 0.05 }, 0)
-      .to(garden, { opacity: 0.12, y: 80, scale: 0.92, transformOrigin: '50% 100%', duration: 1.6 }, 3.6)
-      .to(lines, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.4, stagger: 0.7 }, 3.8)
-      .to(photos, { opacity: 1, x: 0, y: 0, rotate: (i: number) => [-6, 4, 6, -4, 0][i] ?? 0, duration: 2.2, stagger: 0.25, ease: 'power3.out' }, 6.6)
-      .to(cta, { opacity: 1, y: 0, duration: 1 }, 7.6)
-      .to(petals, { opacity: 0, duration: 1 }, 8)
-      .to({}, { duration: 1 });
-  }
-</script>

@@ -30,6 +30,8 @@
   --vl-color-blanco: #fffdfb;
   --vl-color-azul: #2f5fd0;
   --vl-color-lila: #b58be0;
+  /* Borde interior de la muestra de color: sin él, el blanco y el amarillo se pierden sobre el panel */
+  --vl-borde-muestra: rgb(46 26 36 / 0.15);
   /* WhatsApp */
   --vl-whatsapp: #25d366;
   --vl-whatsapp-hover: #1fc05b;

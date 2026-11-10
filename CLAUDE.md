@@ -8,6 +8,7 @@
 | `docs/01-requerimientos-cliente.md` | Lo que pide el cliente, alcance de la demo y lo que queda fuera |
 | `docs/02-catalogo-e-imagenes.md` | Productos y precios del catálogo e índice de las imágenes renombradas |
 | `docs/03-diseno-ux-animaciones.md` | Estructura del home, componentes, animaciones y canasta |
+| `docs/04-guia-de-codigo.md` | Tamaños máximos, estructura de archivos, utilidades compartidas y checklist antes de commit |
 | `PROMPT-INICIAL.md` | Prompt para arrancar la Fase 1 del desarrollo |
 | `boceto/index.html` | Boceto navegable del home (referencia visual aprobada en conversación) |
 
@@ -138,7 +139,7 @@ src/
 
 ## 4. Reglas para los agentes
 
-1. **Lee los cuatro docs antes de tocar código.** Si algo choca con este archivo, este manda.
+1. **Lee los docs antes de tocar código** (y `docs/04-guia-de-codigo.md` siempre que escribas o refactorices código). Si algo choca con este archivo, este manda.
 2. **Usa siempre los tokens** de color y tipografía. No uses hex sueltos en los componentes.
 3. **Mobile first**: la mayoría de los clientes llega desde el celular por WhatsApp o Instagram. Prueba en 375px.
 4. **Accesibilidad:** contraste AA, `alt` descriptivo en cada flor, foco visible, el drawer de la canasta con `role="dialog"` y Escape para cerrar. **Todas las animaciones respetan `prefers-reduced-motion`.**

@@ -1,6 +1,7 @@
 import type { gsap as GsapCore } from 'gsap';
 import type { ScrollTrigger as ScrollTriggerPlugin } from 'gsap/ScrollTrigger';
 import type Lenis from 'lenis';
+import { prefersReducedMotion } from './dom';
 
 export type Gsap = typeof GsapCore;
 export type ScrollTriggerType = typeof ScrollTriggerPlugin;
@@ -16,6 +17,13 @@ export interface SmoothScrollRefs {
 const HEADER_OFFSET = -84;
 
 let pending: Promise<SmoothScrollRefs | null> | null = null;
+/** Instancia de Lenis ya creada. Se guarda aquí para que los paneles la paren sin cargarla. */
+let lenisActivo: Lenis | null = null;
+
+/** La instancia de Lenis si ya se creó; null si no hay (reduced motion, sin carga o aún cargando). */
+export function getLenis(): Lenis | null {
+  return lenisActivo;
+}
 
 /**
  * Carga GSAP + ScrollTrigger y Lenis una sola vez y los sincroniza.
@@ -28,7 +36,7 @@ export function initSmoothScroll(): Promise<SmoothScrollRefs | null> {
 
 async function start(): Promise<SmoothScrollRefs | null> {
   if (typeof window === 'undefined') return null;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+  if (prefersReducedMotion()) return null;
 
   const core = await loadCore().catch((): null => null);
   if (!core) return null;
@@ -43,6 +51,7 @@ async function start(): Promise<SmoothScrollRefs | null> {
     gsap.ticker.lagSmoothing(0);
     bindAnchors(instance);
     lenis = instance;
+    lenisActivo = instance;
   } catch {
     lenis = null;
   }

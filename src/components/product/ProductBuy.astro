@@ -1,7 +1,8 @@
 ---
 import type { Producto } from '../../lib/catalog';
 import { precioFinal } from '../../lib/catalog';
-import { SITE, soles, waLink } from '../../config/site';
+import { SITE } from '../../config/site';
+import { enlacePedido } from '../../lib/pedido';
 
 interface Props {
   producto: Producto;
@@ -10,9 +11,6 @@ interface Props {
 const { producto } = Astro.props;
 const { nombre } = producto.data;
 const unitario = precioFinal(producto.data);
-
-const mensajeWa = (cantidad: number): string =>
-  `Hola V'Lirio 🌷, quiero pedir:\n• ${cantidad} × ${nombre} — ${soles(unitario * cantidad)}\nTotal: ${soles(unitario * cantidad)}`;
 ---
 
 <div class="compra" data-compra data-id={producto.id} data-nombre={nombre} data-precio={unitario}>
@@ -32,7 +30,7 @@ const mensajeWa = (cantidad: number): string =>
   <a
     class="btn btn-wa pedir"
     data-wa
-    href={waLink(mensajeWa(1))}
+    href={enlacePedido(nombre, 1, unitario)}
     target="_blank"
     rel="noopener"
   >
@@ -44,46 +42,9 @@ const mensajeWa = (cantidad: number): string =>
 </div>
 
 <script>
-  import { soles, waLink } from '../../config/site';
+  import { initProductBuy } from './productBuy';
 
-  const MIN = 1;
-  const MAX = 20;
-
-  function iniciarCompra(compra: HTMLElement): void {
-    const valor = compra.querySelector<HTMLElement>('[data-valor]');
-    const menos = compra.querySelector<HTMLButtonElement>('[data-menos]');
-    const mas = compra.querySelector<HTMLButtonElement>('[data-mas]');
-    const agregar = compra.querySelector<HTMLButtonElement>('[data-add]');
-    const wa = compra.querySelector<HTMLAnchorElement>('[data-wa]');
-    if (!valor || !menos || !mas || !agregar || !wa) return;
-
-    const nombre = compra.dataset.nombre ?? '';
-    const unitario = Number(compra.dataset.precio);
-    if (!Number.isFinite(unitario)) return;
-
-    let cantidad = 1;
-
-    const pintar = (): void => {
-      valor.textContent = String(cantidad);
-      agregar.dataset.qty = String(cantidad);
-      menos.disabled = cantidad <= MIN;
-      mas.disabled = cantidad >= MAX;
-      const total = soles(unitario * cantidad);
-      const mensaje = `Hola V'Lirio 🌷, quiero pedir:\n• ${cantidad} × ${nombre} — ${total}\nTotal: ${total}`;
-      wa.href = waLink(mensaje);
-    };
-
-    menos.addEventListener('click', () => {
-      cantidad = Math.max(MIN, cantidad - 1);
-      pintar();
-    });
-    mas.addEventListener('click', () => {
-      cantidad = Math.min(MAX, cantidad + 1);
-      pintar();
-    });
-  }
-
-  document.querySelectorAll<HTMLElement>('[data-compra]').forEach(iniciarCompra);
+  initProductBuy();
 </script>
 
 <style>

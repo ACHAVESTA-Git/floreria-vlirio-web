@@ -1,0 +1,211 @@
+---
+import FilterAccordion from './FilterAccordion.astro';
+import FilterOptions from './FilterOptions.astro';
+import PriceFilter from './PriceFilter.astro';
+import type { Faceta, LimitesPrecio } from '../../lib/catalogFacets';
+
+/** Panel de filtros: bottom sheet en móvil y tablet, barra lateral fija desde 1024px. */
+interface Props {
+  /** Productos sin filtrar (para el botón "Ver N productos"). */
+  total: number;
+  ocasiones: Faceta[];
+  colores: Faceta[];
+  precio: LimitesPrecio;
+}
+const { total, ocasiones, colores, precio } = Astro.props;
+---
+
+<!-- Filtros: panel inferior en móvil y tablet; barra lateral fija desde 1024px -->
+<aside id="sheet" class="sheet" aria-label="Filtros">
+  <div id="sheet-scrim" class="sheet-scrim"></div>
+  <!-- role="dialog" y aria-modal los pone filterSheet.ts solo mientras está abierto: en escritorio no es un diálogo -->
+  <div id="sheet-panel" class="sheet-panel" aria-labelledby="sheet-title">
+    <div class="sp-head">
+      <h2 id="sheet-title" class="sp-title">Filtros</h2>
+      <button type="button" id="clear" class="clear" hidden>Limpiar</button>
+      <button type="button" id="sheet-close" class="sp-x" aria-label="Cerrar filtros">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+      </button>
+    </div>
+
+    <div class="sp-body" data-lenis-prevent>
+      <FilterAccordion titulo="Ocasión" acc="oca" open>
+        <FilterOptions tipo="ocasion" grupo="Ocasión" items={ocasiones} />
+      </FilterAccordion>
+
+      <FilterAccordion titulo="Color" acc="color">
+        <FilterOptions tipo="color" grupo="Color" items={colores} />
+      </FilterAccordion>
+
+      <FilterAccordion titulo="Precio" acc="precio" open>
+        <PriceFilter precio={precio} />
+      </FilterAccordion>
+    </div>
+
+    <div class="sp-foot">
+      <button type="button" id="sheet-apply" class="btn btn-primary sp-apply">Ver {total} productos</button>
+    </div>
+  </div>
+</aside>
+
+<style>
+  /* ---------- Panel de filtros (bottom sheet hasta 1023px) ---------- */
+  .sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    visibility: hidden;
+    transition: visibility 0s linear 0.35s;
+  }
+  .sheet.on {
+    visibility: visible;
+    transition: none;
+  }
+  .sheet-scrim {
+    position: absolute;
+    inset: 0;
+    background: var(--vl-scrim);
+    opacity: 0;
+    transition: opacity 0.35s;
+  }
+  .sheet.on .sheet-scrim {
+    opacity: 1;
+  }
+  /* El botón flotante de WhatsApp (z 60) quedaría encima del panel: se oculta mientras está abierto */
+  :global(body:has(.sheet.on) .wa-float),
+  :global(body:has(.sheet.on) .wa-tip) {
+    visibility: hidden;
+  }
+  .sheet-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    max-height: 86vh;
+    max-height: 86dvh;
+    border-radius: 24px 24px 0 0;
+    background: var(--vl-crema);
+    box-shadow: var(--vl-shadow-lg);
+    transform: translateY(100%);
+    transition: transform 0.35s var(--vl-ease);
+  }
+  .sheet.on .sheet-panel {
+    transform: none;
+  }
+  .sp-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px 8px;
+  }
+  .sp-title {
+    margin-right: auto;
+    font-family: var(--vl-font-title);
+    font-weight: 900;
+    font-size: 20px;
+    color: var(--vl-vino);
+  }
+  .clear {
+    min-height: 44px;
+    padding: 0 6px;
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--vl-frambuesa);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .clear[hidden] {
+    display: none;
+  }
+  .sp-x {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--vl-blanco);
+    box-shadow: var(--vl-shadow);
+    color: var(--vl-vino);
+  }
+  .sp-body {
+    padding: 0 20px 12px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .sp-foot {
+    padding: 12px 20px calc(16px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--vl-durazno);
+    background: var(--vl-crema);
+  }
+  .sp-apply {
+    width: 100%;
+    min-height: 52px;
+    justify-content: center;
+  }
+
+  /* Desde 760px: el panel no ocupa toda la pantalla */
+  @media (min-width: 760px) {
+    .sheet-panel {
+      left: 50%;
+      right: auto;
+      width: min(560px, 100%);
+      translate: -50% 0;
+    }
+  }
+
+  /* Desde 1024px: barra lateral fija, sin fondo de diálogo ni botones de cierre */
+  @media (min-width: 1024px) {
+    .sheet {
+      position: sticky;
+      top: 88px;
+      z-index: auto;
+      visibility: visible;
+      transition: none;
+      max-height: calc(100vh - 104px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      padding-top: 8px;
+    }
+    .sheet-scrim,
+    .sp-x,
+    .sp-foot {
+      display: none;
+    }
+    .sheet-panel {
+      position: static;
+      left: auto;
+      width: auto;
+      max-height: none;
+      translate: none;
+      transform: none;
+      transition: none;
+      border-radius: 0;
+      background: none;
+      box-shadow: none;
+    }
+    .sp-head {
+      padding: 0 0 4px;
+      border-bottom: 1px solid var(--vl-durazno);
+    }
+    .sp-title {
+      font-size: 18px;
+    }
+    .sp-body {
+      padding: 0;
+      overflow: visible;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sheet,
+    .sheet.on,
+    .sheet-scrim,
+    .sheet-panel {
+      transition: none;
+    }
+  }
+</style>

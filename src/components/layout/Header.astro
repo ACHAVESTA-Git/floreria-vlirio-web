@@ -41,7 +41,7 @@ const enlaces = [
   </div>
 </header>
 
-<div class="menu-movil" id="menu-movil" hidden data-menu>
+<div class="menu-movil" id="menu-movil" hidden data-menu data-lenis-prevent>
   <nav aria-label="Menú móvil">
     <ul>
       {enlaces.map((e) => (
@@ -232,69 +232,17 @@ const enlaces = [
 </style>
 
 <script>
-  const header = document.getElementById('site-header');
-  const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
-  const menu = document.querySelector<HTMLElement>('[data-menu]');
-  const icono = document.querySelector<SVGUseElement>('[data-burger-icon]');
-  const enlacesMenu: HTMLElement[] = menu ? Array.from(menu.querySelectorAll<HTMLElement>('a')) : [];
-  const mq = window.matchMedia('(min-width: 900px)');
+  import { must } from '../../lib/dom';
+  import { initMobileMenu } from './mobileMenu';
 
-  function abrir(): void {
-    if (!burger || !menu) return;
-    menu.hidden = false;
-    burger.setAttribute('aria-expanded', 'true');
-    burger.setAttribute('aria-label', 'Cerrar menú');
-    icono?.setAttribute('href', '#i-close');
-    document.documentElement.style.overflow = 'hidden';
-    enlacesMenu[0]?.focus();
-  }
+  const COMPACTO_DESDE_PX = 80;
+  const header = must('#site-header');
 
-  function cerrar(devolverFoco = true): void {
-    if (!burger || !menu || menu.hidden) return;
-    menu.hidden = true;
-    burger.setAttribute('aria-expanded', 'false');
-    burger.setAttribute('aria-label', 'Abrir menú');
-    icono?.setAttribute('href', '#i-menu');
-    document.documentElement.style.overflow = '';
-    if (devolverFoco) burger.focus();
-  }
+  initMobileMenu();
 
-  burger?.addEventListener('click', () => {
-    if (menu?.hidden) abrir();
-    else cerrar();
-  });
-
-  // Clic en un enlace del menú: cierra sin devolver el foco (la página navega o abre WhatsApp)
-  menu?.addEventListener('click', (e) => {
-    if ((e.target as HTMLElement).closest('a')) cerrar(false);
-  });
-
-  // Escape cierra y devuelve el foco al botón; Tab queda dentro del menú mientras está abierto
-  document.addEventListener('keydown', (e: KeyboardEvent) => {
-    if (!menu || menu.hidden) return;
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      cerrar();
-      return;
-    }
-    if (e.key !== 'Tab' || !burger) return;
-    const lista: HTMLElement[] = [burger, ...enlacesMenu];
-    const i = lista.indexOf(document.activeElement as HTMLElement);
-    let siguiente: number;
-    if (e.shiftKey) siguiente = i <= 0 ? lista.length - 1 : i - 1;
-    else siguiente = i === -1 || i === lista.length - 1 ? 0 : i + 1;
-    e.preventDefault();
-    lista[siguiente]?.focus();
-  });
-
-  // Pasar a escritorio con el menú abierto: cerrar sin mover el foco
-  mq.addEventListener('change', (e) => {
-    if (e.matches) cerrar(false);
-  });
-
-  const onScroll = (): void => {
-    header?.classList.toggle('compact', window.scrollY > 80);
+  const actualizarCompacto = (): void => {
+    header.classList.toggle('compact', window.scrollY > COMPACTO_DESDE_PX);
   };
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  window.addEventListener('scroll', actualizarCompacto, { passive: true });
+  actualizarCompacto();
 </script>

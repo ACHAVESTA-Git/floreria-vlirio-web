@@ -1,0 +1,98 @@
+---
+import { Image } from 'astro:assets';
+import { getAsset } from '../../lib/images';
+
+/** Paneo de fotos del hero. Las cuatro primeras son las de móvil (la 4 y la 5 se ocultan con CSS). */
+const FOTOS = [
+  { id: 'ramo-gerberas-rosas-papel-fucsia', alt: 'Ramo de gerberas y rosas envuelto en papel fucsia', clase: 'hp1' },
+  { id: 'buchon-girasoles', alt: 'Buchón de girasoles', clase: 'hp2' },
+  { id: 'box-rosas-rosadas-feliz-cumpleanos', alt: 'Box de rosas rosadas con topper de feliz cumpleaños', clase: 'hp3' },
+  { id: 'ramo-rosas-fucsia-papel-lila', alt: 'Ramo de rosas fucsia envuelto en papel lila', clase: 'hp4' },
+  { id: 'box-corazon-girasoles-lirios-peluche-lotso', alt: 'Box en forma de corazón con girasoles, lirios y peluche Lotso', clase: 'hp5' },
+].map((f) => ({ ...f, img: getAsset(f.id) }));
+---
+
+{
+  FOTOS.map((f, i) => (
+    <div class={`hero-photo ${f.clase}`}>
+      <Image
+        src={f.img}
+        alt={f.alt}
+        widths={[240, 480]}
+        sizes="(max-width: 700px) 40vw, 230px"
+        format="webp"
+        loading={i === 0 ? 'eager' : 'lazy'}
+        fetchpriority={i === 0 ? 'high' : 'auto'}
+      />
+    </div>
+  ))
+}
+
+<style>
+  /* ---------- Fotos del paneo ---------- */
+  .hero-photo {
+    position: absolute;
+    z-index: 2;
+    width: min(clamp(100px, 14vw, 230px), 30vh);
+    filter: var(--vl-drop);
+  }
+  .hero-photo :global(img) {
+    width: 100%;
+    height: auto;
+  }
+  .hp1 {
+    left: 2%;
+    top: 14%;
+  }
+  .hp2 {
+    left: 7%;
+    bottom: 3%;
+    width: min(clamp(110px, 16vw, 260px), 34vh);
+  }
+  .hp3 {
+    right: 2%;
+    top: 12%;
+  }
+  .hp4 {
+    right: 6%;
+    bottom: 3%;
+    width: min(clamp(110px, 16vw, 260px), 34vh);
+  }
+  .hp5 {
+    left: 0;
+    right: 0;
+    bottom: -8%;
+    margin-inline: auto;
+    width: min(clamp(100px, 12vw, 180px), 24vh);
+  }
+
+  /* Antes de que GSAP esté listo, las fotos quedan ocultas (evita el parpadeo y mantiene el LCP en el texto).
+     El hero recibe .js-ready / .static desde heroScroll.ts. */
+  :global(.hero:not(.static)) .hero-photo {
+    opacity: 0;
+  }
+
+  /* ---------- Móvil: 3 fotos ---------- */
+  @media (max-width: 700px) {
+    .hp1,
+    .hp3 {
+      top: 12%;
+    }
+    .hp2 {
+      bottom: 6%;
+    }
+    .hp4,
+    .hp5 {
+      display: none;
+    }
+  }
+
+  /* ---------- Modo estático: las fotos vuelven al flujo y forman una cuadrícula ---------- */
+  :global(.hero.static) .hero-photo {
+    position: relative;
+    inset: auto;
+    margin: 0;
+    transform: none;
+    width: min(220px, 42vw);
+  }
+</style>
