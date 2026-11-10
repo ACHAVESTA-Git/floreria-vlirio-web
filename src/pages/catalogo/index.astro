@@ -2,60 +2,26 @@
 import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/product/ProductCard.astro';
-import { CATEGORIAS, OCASIONES } from '../../config/site';
 import { getAsset } from '../../lib/images';
-import { getProductos, getDestacados, precioFinal } from '../../lib/catalog';
-
-type Producto = Awaited<ReturnType<typeof getProductos>>[number];
+import { getProductos, getDestacados } from '../../lib/catalog';
+import {
+  categoriasConProductos,
+  celdasCatalogo,
+  facetasColor,
+  facetasOcasion,
+  limitesPrecio,
+  RANGOS_PRECIO,
+} from '../../lib/catalogFacets';
 
 const productos = await getProductos();
 const destacados = await getDestacados();
-
-const tieneOferta = (p: Producto): boolean =>
-  p.data.precioOferta !== undefined && p.data.precioOferta < p.data.precio;
-const porNombre = (a: Producto, b: Producto): number =>
-  a.data.nombre.localeCompare(b.data.nombre, 'es');
-
-// Relevancia: destacados, luego los que tienen oferta, luego el resto por nombre.
-const idsDestacados = new Set(destacados.map((p) => p.id));
-const ofertas = productos.filter((p) => !idsDestacados.has(p.id) && tieneOferta(p)).sort(porNombre);
-const resto = productos.filter((p) => !idsDestacados.has(p.id) && !tieneOferta(p)).sort(porNombre);
-const enOrden: Producto[] = [...destacados, ...ofertas, ...resto];
-const relevancia = new Map(enOrden.map((p, i) => [p.id, i]));
-
-// Solo las categorías que tienen productos.
-const categorias = CATEGORIAS.filter((c) => productos.some((p) => p.data.categoria === c.slug));
+const categorias = categoriasConProductos(productos);
+const celdas = celdasCatalogo(productos, destacados);
+const ocasiones = facetasOcasion(productos);
+const colores = facetasColor(productos);
+const precio = limitesPrecio(productos);
 // Distinta de la de Ramos: si no, "Todos" y "Ramos" se veían iguales.
 const imgTodos = getAsset('ramo-rosas-rosadas-lirios-papel-blanco');
-
-/** Minúsculas y sin tildes: 'Salmón' → 'salmon' (igual que en ProductInfo). */
-const normalizar = (t: string): string =>
-  t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-const capitalizar = (t: string): string => t.charAt(0).toUpperCase() + t.slice(1);
-
-// Cuántos productos hay por ocasión y por color (se muestra junto a cada opción).
-const porOcasion = new Map(OCASIONES.map((o) => [o.slug, productos.filter((p) => p.data.ocasiones.includes(o.slug)).length]));
-const ocasiones = OCASIONES.filter((o) => (porOcasion.get(o.slug) ?? 0) > 0);
-
-/** Tokens existentes en tokens.css (--vl-color-<nombre>). */
-const TOKENS_COLOR = ['rojo', 'rosado', 'fucsia', 'salmon', 'naranja', 'amarillo', 'blanco', 'azul', 'lila'];
-const coloresDe = (p: Producto): string[] => [...new Set(p.data.colores.map(normalizar))];
-const colores = TOKENS_COLOR.map((slug) => ({
-  slug,
-  nombre: capitalizar(slug === 'salmon' ? 'salmón' : slug),
-  n: productos.filter((p) => coloresDe(p).includes(slug)).length,
-})).filter((c) => c.n > 0);
-
-// Precio: límites del slider (múltiplos de 10) y rangos rápidos para móvil.
-const precios = productos.map((p) => precioFinal(p.data));
-const precioMin = Math.floor(Math.min(...precios) / 10) * 10;
-const precioMax = Math.ceil(Math.max(...precios) / 10) * 10;
-const RANGOS: { min: number | null; max: number | null; nombre: string }[] = [
-  { min: null, max: 50, nombre: 'Hasta S/50' },
-  { min: 50, max: 100, nombre: 'S/50 – S/100' },
-  { min: 100, max: 150, nombre: 'S/100 – S/150' },
-  { min: 150, max: null, nombre: 'Más de S/150' },
-];
 ---
 
 <BaseLayout title="Catálogo" description="Catálogo de Florería V'Lirio: ramos, buchones, arreglos, box, tulipanes, peluches y chocolates en Lima. Filtra por tipo y ocasión y pide por WhatsApp.">
@@ -149,7 +115,7 @@ const RANGOS: { min: number | null; max: number | null; nombre: string }[] = [
                         <svg width="12" height="12" viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /></svg>
                       </span>
                       <span class="opt-t">{o.nombre}</span>
-                      <span class="opt-n" aria-label={`${porOcasion.get(o.slug)} productos`}>{porOcasion.get(o.slug)}</span>
+                      <span class="opt-n" aria-label={`${o.n} productos`}>{o.n}</span>
                     </button>
                   ))
                 }
@@ -185,7 +151,7 @@ const RANGOS: { min: number | null; max: number | null; nombre: string }[] = [
               <!-- Móvil y tablet: rangos de un toque -->
               <div class="rangos" role="group" aria-label="Rango de precio">
                 {
-                  RANGOS.map((r) => (
+                  RANGOS_PRECIO.map((r) => (
                     <button
                       type="button"
                       class="rango-chip"
@@ -200,13 +166,13 @@ const RANGOS: { min: number | null; max: number | null; nombre: string }[] = [
               </div>
 
               <!-- Escritorio: slider de dos puntos -->
-              <div class="slider" id="slider" data-min={precioMin} data-max={precioMax} style={`--a: 0%; --b: 100%`}>
+              <div class="slider" id="slider" data-min={precio.min} data-max={precio.max} style={`--a: 0%; --b: 100%`}>
                 <div class="track" aria-hidden="true"><span class="fill"></span></div>
                 <label class="sr-only" for="pmin">Precio mínimo</label>
-                <input id="pmin" type="range" min={precioMin} max={precioMax} step="5" value={precioMin} />
+                <input id="pmin" type="range" min={precio.min} max={precio.max} step="5" value={precio.min} />
                 <label class="sr-only" for="pmax">Precio máximo</label>
-                <input id="pmax" type="range" min={precioMin} max={precioMax} step="5" value={precioMax} />
-                <p class="slider-val" id="slider-val" aria-hidden="true">S/{precioMin} – S/{precioMax}</p>
+                <input id="pmax" type="range" min={precio.min} max={precio.max} step="5" value={precio.max} />
+                <p class="slider-val" id="slider-val" aria-hidden="true">S/{precio.min} – S/{precio.max}</p>
               </div>
             </details>
           </div>
@@ -240,17 +206,17 @@ const RANGOS: { min: number | null; max: number | null; nombre: string }[] = [
         <h2 class="sr-only">Productos del catálogo</h2>
         <ul id="grid" class="grid">
           {
-            enOrden.map((p) => (
+            celdas.map((c) => (
               <li
                 class="cell"
                 data-cell
-                data-cat={p.data.categoria}
-                data-oca={p.data.ocasiones.join(' ')}
-                data-color={coloresDe(p).join(' ')}
-                data-precio={precioFinal(p.data)}
-                data-rel={relevancia.get(p.id)}
+                data-cat={c.categoria}
+                data-oca={c.ocasiones}
+                data-color={c.colores}
+                data-precio={c.precio}
+                data-rel={c.rel}
               >
-                <ProductCard producto={p} variant="compact" />
+                <ProductCard producto={c.producto} variant="compact" />
               </li>
             ))
           }
