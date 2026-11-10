@@ -1,0 +1,78 @@
+---
+/**
+ * Contenedor de las filas de la canasta. Las filas las crea basketRender.ts;
+ * por eso sus estilos usan :global() para los hijos dinámicos.
+ */
+---
+
+<ul class="items" id="items" hidden></ul>
+
+<style>
+  .items { display: flex; flex-direction: column; gap: 12px; }
+  .items[hidden] { display: none; }
+  .items :global(.item) {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: var(--vl-radius-sm);
+    background: var(--vl-blanco);
+    box-shadow: var(--vl-shadow);
+  }
+  .items :global(img) {
+    width: 64px;
+    height: 64px;
+    padding: 4px;
+    object-fit: contain;
+    border-radius: 14px;
+    background: var(--vl-blush);
+  }
+  .items :global(.info) { min-width: 0; }
+  .items :global(.info b) {
+    display: block;
+    font-family: var(--vl-font-title);
+    font-weight: 800;
+    font-size: 15px;
+    line-height: 1.2;
+    color: var(--vl-vino);
+    overflow-wrap: anywhere;
+  }
+  .items :global(.info small) {
+    display: block;
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--vl-frambuesa);
+  }
+  .items :global(.quitar) {
+    margin-top: 4px;
+    padding: 2px 0;
+    font-size: 13px;
+    color: var(--vl-tinta-suave);
+    text-decoration: underline;
+  }
+  .items :global(.qty) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--vl-font-ui);
+  }
+  .items :global(.qty button) {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--vl-rosa);
+    border-radius: 50%;
+    background: var(--vl-blanco);
+    color: var(--vl-vino);
+    font-size: 17px;
+    line-height: 1;
+  }
+  .items :global(.qty span) {
+    min-width: 22px;
+    text-align: center;
+    font-weight: 600;
+  }
+</style>

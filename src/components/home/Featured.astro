@@ -33,19 +33,10 @@ const destacados = await getDestacados();
 </section>
 
 <script>
-  const rail = document.getElementById('railDestacados');
+  import { initRail } from './rail';
 
-  document.querySelectorAll<HTMLButtonElement>('.featured .flecha').forEach((boton) => {
-    boton.addEventListener('click', () => {
-      if (!rail) return;
-      const dir = Number(boton.dataset.dir) || 1;
-      const tarjeta = rail.querySelector<HTMLElement>('.card');
-      const gap = parseFloat(getComputedStyle(rail).columnGap) || 20;
-      const paso = tarjeta ? tarjeta.offsetWidth + gap : 300;
-      const reducir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      rail.scrollBy({ left: dir * paso, behavior: reducir ? 'auto' : 'smooth' });
-    });
-  });
+  const seccion = document.getElementById('destacados');
+  if (seccion) initRail(seccion);
 </script>
 
 <style>

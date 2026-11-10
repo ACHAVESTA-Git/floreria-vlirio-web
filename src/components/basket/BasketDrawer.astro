@@ -1,8 +1,10 @@
 ---
 /**
- * Drawer "Mi canasta" + capa de vuelo de las flores + listener global de [data-add].
- * Se monta una vez en BaseLayout.
+ * Drawer "Mi canasta" (marcado y estilos). El comportamiento vive en basketDrawer.ts;
+ * la lista y el pie son BasketItems y BasketFooter. Se monta una vez en BaseLayout.
  */
+import BasketItems from './BasketItems.astro';
+import BasketFooter from './BasketFooter.astro';
 ---
 
 <div class="scrim" id="scrim" aria-hidden="true"></div>
@@ -27,7 +29,7 @@
       <a class="btn btn-primary" href="/catalogo">Ver el catálogo</a>
     </div>
 
-    <ul class="items" id="items" hidden></ul>
+    <BasketItems />
 
     <section class="upsell" id="upsell" aria-labelledby="upsellTitulo" hidden>
       <h3 id="upsellTitulo">¿Le agregas un detalle?</h3>
@@ -35,278 +37,14 @@
     </section>
   </div>
 
-  <footer class="pie">
-    <label for="cardMsg">Mensaje para la tarjeta (opcional)</label>
-    <textarea id="cardMsg" maxlength="300" placeholder="Escribe aquí tu dedicatoria"></textarea>
-    <div class="total">
-      <span>Total</span>
-      <span id="total">S/0</span>
-    </div>
-    <a class="btn btn-wa pedir" id="checkout" target="_blank" rel="noopener">Pedir por WhatsApp</a>
-  </footer>
+  <BasketFooter />
 </aside>
 
 <div class="fly-layer" id="flyLayer" aria-hidden="true"></div>
 
 <script>
-  import { $canasta, $cardMessage, addItem, buildWhatsAppMessage, cantidadDe, getCatalogo, getTotal, precioUnitario, setQty } from './basketStore';
-  import { flyToBasket } from './flyToBasket';
-  import { showToast } from './toast';
-  import { soles, waLink } from '../../config/site';
-  import type { CatalogEntry } from '../../lib/catalog';
-
-  const FOCUSABLE = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
-  function byId<T extends HTMLElement>(id: string): T {
-    const el = document.getElementById(id);
-    if (!el) throw new Error(`Falta #${id} en BasketDrawer`);
-    return el as T;
-  }
-
-  function iniciar(): void {
-    const drawer = byId<HTMLElement>('drawer');
-    const scrim = byId<HTMLElement>('scrim');
-    const closeBtn = byId<HTMLButtonElement>('closeDrawer');
-    const itemsEl = byId<HTMLUListElement>('items');
-    const vacio = byId<HTMLElement>('vacio');
-    const upsellEl = byId<HTMLElement>('upsell');
-    const upsellOpts = byId<HTMLElement>('upsellOpts');
-    const totalEl = byId<HTMLElement>('total');
-    const checkout = byId<HTMLAnchorElement>('checkout');
-    const cardMsg = byId<HTMLTextAreaElement>('cardMsg');
-
-    let abierto = false;
-
-    /* ---------- Render ---------- */
-
-    function crearBotonAccion(slug: string, accion: 'menos' | 'mas', nombre: string): HTMLButtonElement {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.textContent = accion === 'menos' ? '−' : '+';
-      b.dataset.slug = slug;
-      b.dataset.accion = accion;
-      b.dataset.key = `${slug}:${accion}`;
-      b.setAttribute('aria-label', accion === 'menos' ? `Quitar uno de ${nombre}` : `Agregar uno más de ${nombre}`);
-      return b;
-    }
-
-    function crearItem(slug: string, qty: number, p: CatalogEntry): HTMLLIElement {
-      const li = document.createElement('li');
-      li.className = 'item';
-
-      const img = document.createElement('img');
-      img.src = p.img;
-      img.alt = p.nombre;
-      img.width = 64;
-      img.height = 64;
-      img.loading = 'lazy';
-      img.decoding = 'async';
-
-      const info = document.createElement('div');
-      info.className = 'info';
-      const nombre = document.createElement('b');
-      nombre.textContent = p.nombre;
-      const precio = document.createElement('small');
-      precio.textContent = `${soles(precioUnitario(p))} c/u`;
-      const quitar = document.createElement('button');
-      quitar.type = 'button';
-      quitar.className = 'quitar';
-      quitar.textContent = 'Quitar';
-      quitar.dataset.slug = slug;
-      quitar.dataset.accion = 'quitar';
-      quitar.dataset.key = `${slug}:quitar`;
-      quitar.setAttribute('aria-label', `Quitar ${p.nombre} de la canasta`);
-      info.append(nombre, precio, quitar);
-
-      const control = document.createElement('div');
-      control.className = 'qty';
-      const cantidad = document.createElement('span');
-      cantidad.textContent = String(qty);
-      control.append(crearBotonAccion(slug, 'menos', p.nombre), cantidad, crearBotonAccion(slug, 'mas', p.nombre));
-
-      li.append(img, info, control);
-      return li;
-    }
-
-    function renderItems(): void {
-      const catalogo = getCatalogo();
-      const nodos: HTMLLIElement[] = [];
-      for (const [slug, qty] of Object.entries($canasta.get())) {
-        const p = catalogo[slug];
-        if (p) nodos.push(crearItem(slug, qty, p));
-      }
-      itemsEl.replaceChildren(...nodos);
-      itemsEl.hidden = nodos.length === 0;
-      vacio.hidden = nodos.length > 0;
-    }
-
-    function renderTotales(): void {
-      const catalogo = getCatalogo();
-      const vacia = Object.keys($canasta.get()).length === 0;
-      totalEl.textContent = soles(getTotal(catalogo));
-      if (vacia) {
-        checkout.removeAttribute('href');
-        checkout.setAttribute('aria-disabled', 'true');
-        checkout.classList.add('off');
-      } else {
-        checkout.href = waLink(buildWhatsAppMessage(catalogo));
-        checkout.removeAttribute('aria-disabled');
-        checkout.classList.remove('off');
-      }
-    }
-
-    function renderUpsell(): void {
-      const extras = Object.entries(getCatalogo())
-        .filter(([, p]) => p.categoria === 'extras')
-        .slice(0, 3);
-      upsellOpts.replaceChildren(
-        ...extras.map(([slug, p]) => {
-          const b = document.createElement('button');
-          b.type = 'button';
-          b.dataset.add = slug;
-          const span = document.createElement('span');
-          span.textContent = `+ ${p.nombre} · ${soles(precioUnitario(p))}`;
-          b.append(span);
-          return b;
-        }),
-      );
-      upsellEl.hidden = extras.length === 0;
-    }
-
-    /* ---------- Abrir / cerrar ---------- */
-
-    function enfocarPorClave(clave: string): void {
-      const el = itemsEl.querySelector<HTMLElement>(`[data-key="${clave}"]`);
-      (el ?? itemsEl.querySelector<HTMLElement>('button') ?? closeBtn).focus();
-    }
-
-    function abrir(): void {
-      if (abierto) return;
-      abierto = true;
-      renderUpsell();
-      drawer.removeAttribute('inert');
-      drawer.classList.add('on');
-      drawer.setAttribute('aria-hidden', 'false');
-      scrim.classList.add('on');
-      document.body.style.overflow = 'hidden';
-      closeBtn.focus();
-    }
-
-    function cerrar(): void {
-      if (!abierto) return;
-      abierto = false;
-      // Primero devolver el foco fuera del drawer; luego se vuelve inerte.
-      document.getElementById('basketBtn')?.focus();
-      drawer.setAttribute('inert', '');
-      drawer.classList.remove('on');
-      drawer.setAttribute('aria-hidden', 'true');
-      scrim.classList.remove('on');
-      document.body.style.overflow = '';
-    }
-
-    /* ---------- Eventos ---------- */
-
-    itemsEl.addEventListener('click', (e) => {
-      if (!(e.target instanceof Element)) return;
-      const boton = e.target.closest<HTMLButtonElement>('button[data-accion]');
-      if (!boton) return;
-      const slug = boton.dataset.slug;
-      const accion = boton.dataset.accion;
-      if (!slug || !accion) return;
-
-      if (accion === 'quitar') setQty(slug, 0);
-      else setQty(slug, cantidadDe(slug) + (accion === 'mas' ? 1 : -1));
-      // El render es síncrono: enfocar el control equivalente tras reconstruir la lista.
-      enfocarPorClave(`${slug}:${accion}`);
-    });
-
-    cardMsg.addEventListener('input', () => {
-      $cardMessage.set(cardMsg.value);
-    });
-
-    closeBtn.addEventListener('click', cerrar);
-    scrim.addEventListener('click', cerrar);
-    document.addEventListener('vl:abrir-canasta', abrir);
-
-    document.addEventListener('keydown', (e) => {
-      if (!abierto) return;
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        cerrar();
-        return;
-      }
-      if (e.key !== 'Tab') return;
-
-      const foco = [...drawer.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((el) => el.getClientRects().length > 0);
-      const primero = foco[0];
-      const ultimo = foco[foco.length - 1];
-      if (!primero || !ultimo) {
-        e.preventDefault();
-        closeBtn.focus();
-        return;
-      }
-      const activo = document.activeElement;
-      const dentro = activo instanceof Node && drawer.contains(activo);
-      if (e.shiftKey && (activo === primero || !dentro)) {
-        e.preventDefault();
-        ultimo.focus();
-      } else if (!e.shiftKey && (activo === ultimo || !dentro)) {
-        e.preventDefault();
-        primero.focus();
-      }
-    });
-
-    // Feedback "✓ Agregado" durante 1.3 s en el botón que se pulsó.
-    const temporizadores = new WeakMap<HTMLElement, number>();
-    function marcarAgregado(boton: HTMLElement): void {
-      boton.classList.add('done');
-      const span = boton.querySelector('span');
-      if (!span) return;
-      span.dataset.original ??= span.textContent ?? '';
-      span.textContent = '✓ Agregado';
-      const previo = temporizadores.get(boton);
-      if (previo !== undefined) window.clearTimeout(previo);
-      temporizadores.set(
-        boton,
-        window.setTimeout(() => {
-          span.textContent = span.dataset.original ?? '';
-          boton.classList.remove('done');
-          temporizadores.delete(boton);
-        }, 1300),
-      );
-    }
-
-    // Listener global: cualquier [data-add="<slug>"] agrega ese producto.
-    document.addEventListener('click', (e) => {
-      if (!(e.target instanceof Element)) return;
-      const boton = e.target.closest<HTMLElement>('[data-add]');
-      if (!boton) return;
-      const slug = boton.dataset.add;
-      if (!slug) return;
-      const p = getCatalogo()[slug];
-      if (!p) return;
-
-      const cantidad = Math.max(1, Math.min(99, Math.floor(Number(boton.dataset.qty)) || 1));
-      marcarAgregado(boton);
-      addItem(slug, cantidad);
-      flyToBasket(boton, p, () => {
-        showToast(`${p.nombre} se agregó a tu canasta`, { label: 'Ver canasta', onClick: abrir });
-      });
-    });
-
-    /* ---------- Suscripciones ---------- */
-
-    $canasta.subscribe(() => {
-      renderItems();
-      renderTotales();
-    });
-    $cardMessage.subscribe(() => {
-      if (cardMsg.value !== $cardMessage.get()) cardMsg.value = $cardMessage.get();
-      renderTotales();
-    });
-  }
-
-  iniciar();
+  import { initBasketDrawer } from './basketDrawer';
+  initBasketDrawer();
 </script>
 
 <style>
@@ -336,7 +74,9 @@
     visibility: hidden;
     transition: transform 0.45s var(--vl-ease), visibility 0.45s;
   }
-  .drawer.on { transform: none; visibility: visible; }
+  /* Al abrir, visible al instante (visibility 0s): con la transición, el drawer seguía "hidden"
+     en el primer frame y el navegador no dejaba poner el foco en el botón de cerrar. */
+  .drawer.on { transform: none; visibility: visible; transition: transform 0.45s var(--vl-ease), visibility 0s; }
 
   .dh {
     display: flex;
@@ -421,110 +161,6 @@
     background: var(--vl-follaje);
     color: var(--vl-blanco);
   }
-
-  .items { display: flex; flex-direction: column; gap: 12px; }
-  .items[hidden] { display: none; }
-  .items :global(.item) {
-    display: grid;
-    grid-template-columns: 64px minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 12px;
-    padding: 10px;
-    border-radius: var(--vl-radius-sm);
-    background: var(--vl-blanco);
-    box-shadow: var(--vl-shadow);
-  }
-  .items :global(img) {
-    width: 64px;
-    height: 64px;
-    padding: 4px;
-    object-fit: contain;
-    border-radius: 14px;
-    background: var(--vl-blush);
-  }
-  .items :global(.info) { min-width: 0; }
-  .items :global(.info b) {
-    display: block;
-    font-family: var(--vl-font-title);
-    font-weight: 800;
-    font-size: 15px;
-    line-height: 1.2;
-    color: var(--vl-vino);
-    overflow-wrap: anywhere;
-  }
-  .items :global(.info small) {
-    display: block;
-    font-family: var(--vl-font-ui);
-    font-weight: 600;
-    font-size: 13px;
-    color: var(--vl-frambuesa);
-  }
-  .items :global(.quitar) {
-    margin-top: 4px;
-    padding: 2px 0;
-    font-size: 13px;
-    color: var(--vl-tinta-suave);
-    text-decoration: underline;
-  }
-  .items :global(.qty) {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-family: var(--vl-font-ui);
-  }
-  .items :global(.qty button) {
-    display: grid;
-    place-items: center;
-    width: 36px;
-    height: 36px;
-    border: 1px solid var(--vl-rosa);
-    border-radius: 50%;
-    background: var(--vl-blanco);
-    color: var(--vl-vino);
-    font-size: 17px;
-    line-height: 1;
-  }
-  .items :global(.qty span) {
-    min-width: 22px;
-    text-align: center;
-    font-weight: 600;
-  }
-
-  .pie {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 16px 22px 22px;
-    border-top: 1px solid var(--vl-durazno);
-    background: var(--vl-blanco);
-  }
-  .pie label {
-    font-size: 14px;
-    color: var(--vl-tinta-suave);
-  }
-  .pie textarea {
-    width: 100%;
-    height: 62px;
-    padding: 10px 12px;
-    border: 1px solid var(--vl-durazno);
-    border-radius: 14px;
-    background: var(--vl-crema);
-    color: var(--vl-tinta);
-    font: inherit;
-    font-size: 16px;
-    resize: none;
-  }
-  .total {
-    display: flex;
-    justify-content: space-between;
-    font-family: var(--vl-font-ui);
-    font-weight: 600;
-    font-size: 18px;
-    color: var(--vl-vino);
-  }
-  .pedir { width: 100%; justify-content: center; }
-  .pedir.off,
-  .pedir[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
 
   .fly-layer {
     position: fixed;

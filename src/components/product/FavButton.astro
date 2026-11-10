@@ -1,0 +1,53 @@
+---
+// Botón de favorito (corazón) de la tarjeta. Su estado lo pinta favorites.ts.
+interface Props {
+  slug: string;
+  nombre: string;
+}
+
+const { slug, nombre } = Astro.props;
+---
+
+<button
+  type="button"
+  class="fav"
+  data-fav={slug}
+  data-nombre={nombre}
+  aria-pressed="false"
+  aria-label={`Guardar ${nombre} en favoritos`}
+>
+  <svg class="f-vacio" width="18" height="17" viewBox="0 0 24 22" aria-hidden="true" focusable="false"><use href="#i-heart-o" /></svg>
+  <svg class="f-lleno" width="18" height="17" viewBox="0 0 24 22" aria-hidden="true" focusable="false"><use href="#i-heart" /></svg>
+</button>
+
+<style>
+  .fav {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--vl-blanco);
+    box-shadow: var(--vl-shadow);
+    color: var(--vl-frambuesa);
+  }
+  .fav svg { width: 18px; height: 17px; }
+  .fav .f-lleno { display: none; }
+  .fav[aria-pressed="true"] .f-lleno { display: block; }
+  .fav[aria-pressed="true"] .f-vacio { display: none; }
+
+  /* Tarjeta compacta (grilla del catálogo, solo móvil): el corazón es más chico.
+     Se alcanza desde aquí para no partir el estilo del botón en dos archivos. */
+  @media (max-width: 759px) {
+    :global(.card.compact) .fav {
+      top: 8px;
+      right: 8px;
+      width: 40px;
+      height: 40px;
+    }
+  }
+</style>

@@ -56,9 +56,11 @@ const fotos = [
 </div>
 
 <script>
+  import { all } from '../../lib/dom';
+
   function iniciarGaleria(galeria: HTMLElement): void {
-    const slides = Array.from(galeria.querySelectorAll<HTMLElement>('[data-slide]'));
-    const miniaturas = Array.from(galeria.querySelectorAll<HTMLButtonElement>('[data-thumb]'));
+    const slides = all<HTMLElement>('[data-slide]', galeria);
+    const miniaturas = all<HTMLButtonElement>('[data-thumb]', galeria);
     if (slides.length === 0 || miniaturas.length === 0) return;
 
     const mostrar = (indice: number): void => {
@@ -75,7 +77,7 @@ const fotos = [
     });
   }
 
-  document.querySelectorAll<HTMLElement>('[data-galeria]').forEach(iniciarGaleria);
+  all<HTMLElement>('[data-galeria]').forEach(iniciarGaleria);
 </script>
 
 <style>

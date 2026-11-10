@@ -1,0 +1,142 @@
+---
+import { Image } from 'astro:assets';
+import { getAsset } from '../../lib/images';
+import type { CategoriaCatalogo } from '../../lib/catalogFacets';
+
+/** Fila de categorías con foto: "Todos" más una por cada categoría con productos. */
+interface Props {
+  categorias: CategoriaCatalogo[];
+}
+const { categorias } = Astro.props;
+// Distinta de la de Ramos: si no, "Todos" y "Ramos" se veían iguales.
+const imgTodos = getAsset('ramo-rosas-rosadas-lirios-papel-blanco');
+---
+
+<div class="cats" role="group" aria-label="Tipo de arreglo">
+  <button type="button" class="cat" data-filter-cat="todos" data-nombre="Catálogo" aria-pressed="true">
+    <span class="cat-img">
+      <Image
+        src={imgTodos}
+        widths={[128, 192]}
+        sizes="84px"
+        format="webp"
+        alt=""
+        loading="eager"
+        decoding="async"
+      />
+    </span>
+    <span class="cat-name">Todos</span>
+  </button>
+  {
+    categorias.map((c) => (
+      <button type="button" class="cat" data-filter-cat={c.slug} data-nombre={c.nombre} aria-pressed="false">
+        <span class="cat-img">
+          <Image
+            src={getAsset(c.imagen)}
+            widths={[128, 192]}
+            sizes="84px"
+            format="webp"
+            alt=""
+            loading="lazy"
+            decoding="async"
+            style={`view-transition-name: vt-cat-${c.slug}`}
+          />
+        </span>
+        <span class="cat-name">{c.nombre}</span>
+      </button>
+    ))
+  }
+</div>
+
+<style>
+  /* Fila de categorías con foto (reemplaza las pastillas). Móvil: scroll horizontal sin barra */
+  .cats {
+    display: flex;
+    gap: 12px;
+    min-width: 0;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    margin-inline: -16px;
+    padding: 2px 16px 0;
+    scroll-padding-inline: 16px; /* sin esto el snap pegaba "Todos" al borde y cortaba su anillo */
+  }
+  .cats::-webkit-scrollbar {
+    display: none;
+  }
+  .cat {
+    flex: none;
+    width: 80px;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.2;
+    text-align: center;
+    color: var(--vl-tinta);
+    border-radius: 12px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .cat-img {
+    display: block;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--vl-blanco);
+    box-shadow: var(--vl-shadow);
+    transition: box-shadow 0.25s var(--vl-ease);
+  }
+  /* La imagen viene de <Image />, un componente aparte: por eso :global */
+  .cat-img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .cat[aria-pressed='true'] .cat-img {
+    box-shadow:
+      0 0 0 3px var(--vl-crema),
+      0 0 0 5px var(--vl-vino);
+  }
+  .cat[aria-pressed='true'] .cat-name {
+    color: var(--vl-vino);
+  }
+  .cat-name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Desde 760px: círculos más grandes y se acomodan en varias filas en vez de deslizar */
+  @media (min-width: 760px) {
+    .cats {
+      flex-wrap: wrap;
+      overflow: visible;
+      margin-inline: 0;
+      padding: 4px 0;
+      gap: 18px 22px;
+    }
+    .cat {
+      width: 96px;
+      font-size: 14px;
+      gap: 8px;
+    }
+    .cat-img {
+      width: 84px;
+      height: 84px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cat-img {
+      transition: none;
+    }
+  }
+</style>
