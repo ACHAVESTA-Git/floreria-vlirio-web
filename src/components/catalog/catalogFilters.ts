@@ -78,7 +78,6 @@ export function initCatalog(): void {
 
   const catBtns = all<HTMLButtonElement>('[data-filter-cat]');
   const chips = all<HTMLButtonElement>('[data-filter-oca]');
-  const headers = all<HTMLElement>('[data-hdr-cat]');
   const cells = all<HTMLElement>('[data-cell]', grid);
   const sort = must<HTMLSelectElement>('#sort');
   const minInput = must<HTMLInputElement>('#min');
@@ -87,8 +86,11 @@ export function initCatalog(): void {
   const emptyClearBtn = must<HTMLButtonElement>('#empty-clear');
   const empty = must<HTMLElement>('#empty');
   const count = must<HTMLElement>('#results-count');
-  const title = must<HTMLElement>('#cat-title');
+  const nombreCat = must<HTMLElement>('#cat-name');
+  const contadorCat = must<HTMLElement>('#cat-count');
   const sub = must<HTMLElement>('#cat-sub');
+  const filtrosN = must<HTMLElement>('#filtros-n');
+  const aplicarBtn = must<HTMLButtonElement>('#sheet-apply');
 
   const categoriasValidas = new Set<string>([TODOS, ...catBtns.map((b) => b.dataset.filterCat ?? '')]);
   const ocasionesValidas = chips.map((c) => c.dataset.filterOca ?? '').filter(Boolean);
@@ -174,19 +176,24 @@ export function initCatalog(): void {
     setInput(maxInput, e.max);
 
     const visibles = cells.filter((c) => !c.hidden).length;
-    count.textContent =
+    const etiqueta =
       visibles === 0 ? 'Sin resultados' : visibles === 1 ? '1 producto' : `${visibles} productos`;
+    count.textContent = etiqueta;
     empty.hidden = visibles > 0;
     clearBtn.hidden = !hayFiltros(e);
 
-    // Imagen de encabezado: la de la categoría o, si no tiene, la de 'todos'
-    const propia = headers.find((h) => h.dataset.hdrCat === e.categoria);
-    const activo = propia ?? headers.find((h) => h.dataset.hdrCat === TODOS);
-    for (const h of headers) h.hidden = h !== activo;
+    // Contador del título (mismo valor que #results-count) y del botón "Ver N" del panel móvil
+    contadorCat.textContent = `· ${visibles} ${visibles === 1 ? 'detalle' : 'detalles'}`;
+    aplicarBtn.textContent = visibles === 0 ? 'Ver sin resultados' : `Ver ${etiqueta.toLowerCase()}`;
 
-    const nombre =
-      e.categoria === TODOS ? TITULO_BASE : (propia?.dataset.nombre ?? nombreCategoria(e.categoria));
-    title.textContent = nombre;
+    // Badge del botón "Filtrar y ordenar": ocasiones + precio + orden distinto de relevancia
+    const activos =
+      e.ocasiones.size + (e.min !== null || e.max !== null ? 1 : 0) + (e.orden !== 'relevancia' ? 1 : 0);
+    filtrosN.textContent = String(activos);
+    filtrosN.hidden = activos === 0;
+
+    const nombre = e.categoria === TODOS ? TITULO_BASE : nombreCategoria(e.categoria);
+    nombreCat.textContent = nombre;
     document.title = `${nombre}${SUFIJO_TITULO}`;
     sub.textContent =
       e.categoria === TODOS

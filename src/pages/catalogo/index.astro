@@ -32,34 +32,42 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
   <section class="hdr" aria-labelledby="cat-title">
     <div class="wrap hdr-inner">
       <div class="hdr-txt">
-        <div class="eyebrow">Nuestro catálogo</div>
-        <h1 id="cat-title" class="title">Catálogo</h1>
+        <h1 id="cat-title" class="title"><span id="cat-name">Catálogo</span> <span id="cat-count" class="cat-count">· {productos.length} detalles</span></h1>
         <p id="cat-sub" class="sub">Elige tu detalle favorito y pídelo por WhatsApp.</p>
       </div>
-      <div class="hdr-img">
-        <Image
-          src={imgTodos}
-          widths={[240, 360]}
-          sizes="(max-width: 760px) 132px, 260px"
-          format="webp"
-          alt="Ramo de gerberas rosas con papel fucsia de Florería V'Lirio"
-          loading="eager"
-          data-hdr-cat="todos"
-          data-nombre="Catálogo"
-        />
+
+      <div class="cats" role="group" aria-label="Tipo de arreglo">
+        <button type="button" class="cat" data-filter-cat="todos" data-nombre="Catálogo" aria-pressed="true">
+          <span class="cat-img">
+            <Image
+              src={imgTodos}
+              widths={[128, 192]}
+              sizes="84px"
+              format="webp"
+              alt=""
+              loading="eager"
+              decoding="async"
+            />
+          </span>
+          <span class="cat-name">Todos</span>
+        </button>
         {
           categorias.map((c) => (
-            <Image
-              src={getAsset(c.imagen)}
-              widths={[240, 360]}
-              sizes="(max-width: 760px) 132px, 260px"
-              format="webp"
-              alt={`Arreglo de ${c.nombre.toLowerCase()} de Florería V'Lirio`}
-              hidden
-              data-hdr-cat={c.slug}
-              data-nombre={c.nombre}
-              style={`view-transition-name: vt-cat-${c.slug}`}
-            />
+            <button type="button" class="cat" data-filter-cat={c.slug} data-nombre={c.nombre} aria-pressed="false">
+              <span class="cat-img">
+                <Image
+                  src={getAsset(c.imagen)}
+                  widths={[128, 192]}
+                  sizes="84px"
+                  format="webp"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  style={`view-transition-name: vt-cat-${c.slug}`}
+                />
+              </span>
+              <span class="cat-name">{c.nombre}</span>
+            </button>
           ))
         }
       </div>
@@ -69,18 +77,14 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
   <script is:inline>
     (function () {
       var cat = new URLSearchParams(location.search).get('categoria');
-      var imgs = Array.prototype.slice.call(document.querySelectorAll('[data-hdr-cat]'));
+      var botones = Array.prototype.slice.call(document.querySelectorAll('[data-filter-cat]'));
       var activa = null;
-      imgs.forEach(function (el) {
-        if (el.getAttribute('data-hdr-cat') === cat) activa = el;
+      botones.forEach(function (b) {
+        if (b.getAttribute('data-filter-cat') === cat) activa = b;
       });
       if (!activa) return;
-      imgs.forEach(function (el) {
-        if (el === activa) el.removeAttribute('hidden');
-        else el.setAttribute('hidden', '');
-      });
-      var titulo = document.getElementById('cat-title');
       var nombre = activa.getAttribute('data-nombre');
+      var titulo = document.getElementById('cat-name');
       if (titulo && nombre) titulo.textContent = nombre;
     })();
   </script>
@@ -88,47 +92,63 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
   <section class="listado">
     <div id="filters" class="filters">
       <div class="wrap barra">
-        <div class="tabs" role="group" aria-label="Tipo de arreglo">
-          <button type="button" class="tab" data-filter-cat="todos" aria-pressed="true">Todos</button>
-          {
-            categorias.map((c) => (
-              <button type="button" class="tab" data-filter-cat={c.slug} aria-pressed="false">{c.nombre}</button>
-            ))
-          }
-        </div>
+        <button type="button" id="open-filters" class="filtrar" aria-haspopup="dialog" aria-controls="sheet-panel" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M7 12h10M10 17h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+          <span>Filtrar y ordenar</span>
+          <span id="filtros-n" class="fbadge" hidden>0</span>
+        </button>
 
-        <div class="chips-f" role="group" aria-label="Ocasión">
-          {
-            OCASIONES.map((o) => (
-              <button type="button" class="chip-f" data-filter-oca={o.slug} aria-pressed="false">{o.nombre}</button>
-            ))
-          }
-        </div>
-
-        <div class="orden">
-          <label for="sort">Ordenar por</label>
-          <select id="sort">
-            <option value="relevancia">Más pedidos</option>
-            <option value="menor">Menor precio</option>
-            <option value="mayor">Mayor precio</option>
-          </select>
-        </div>
-
-        <div class="rango" role="group" aria-label="Rango de precio">
-          <div class="campo">
-            <label class="sr-only" for="min">Precio mínimo</label>
-            <span class="pref" aria-hidden="true">S/</span>
-            <input id="min" type="number" inputmode="numeric" min="0" placeholder="Mín" />
-          </div>
-          <div class="campo">
-            <label class="sr-only" for="max">Precio máximo</label>
-            <span class="pref" aria-hidden="true">S/</span>
-            <input id="max" type="number" inputmode="numeric" min="0" placeholder="Máx" />
-          </div>
-        </div>
-
-        <button type="button" id="clear" class="btn btn-ghost clear" hidden>Limpiar filtros</button>
         <p id="results-count" class="count" role="status" aria-live="polite">{productos.length} productos</p>
+
+        <!-- Móvil: bottom sheet. Desde 760px es display: contents y los controles quedan en línea. -->
+        <div id="sheet" class="sheet">
+          <div id="sheet-scrim" class="sheet-scrim"></div>
+          <div id="sheet-panel" class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+            <div class="sp-head">
+              <h2 id="sheet-title" class="sp-title">Filtrar y ordenar</h2>
+              <button type="button" id="sheet-close" class="sp-x" aria-label="Cerrar filtros">
+                <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+              </button>
+            </div>
+
+            <div class="sp-body">
+              <div class="chips-f" role="group" aria-label="Ocasión">
+                {
+                  OCASIONES.map((o) => (
+                    <button type="button" class="chip-f" data-filter-oca={o.slug} aria-pressed="false">{o.nombre}</button>
+                  ))
+                }
+              </div>
+
+              <div class="orden">
+                <label for="sort">Ordenar por</label>
+                <select id="sort">
+                  <option value="relevancia">Más pedidos</option>
+                  <option value="menor">Menor precio</option>
+                  <option value="mayor">Mayor precio</option>
+                </select>
+              </div>
+
+              <div class="rango" role="group" aria-label="Rango de precio">
+                <div class="campo">
+                  <label class="sr-only" for="min">Precio mínimo</label>
+                  <span class="pref" aria-hidden="true">S/</span>
+                  <input id="min" type="number" inputmode="numeric" min="0" placeholder="Mín" />
+                </div>
+                <div class="campo">
+                  <label class="sr-only" for="max">Precio máximo</label>
+                  <span class="pref" aria-hidden="true">S/</span>
+                  <input id="max" type="number" inputmode="numeric" min="0" placeholder="Máx" />
+                </div>
+              </div>
+            </div>
+
+            <div class="sp-foot">
+              <button type="button" id="sheet-apply" class="btn btn-primary sp-apply">Ver {productos.length} productos</button>
+              <button type="button" id="clear" class="btn btn-ghost clear" hidden>Limpiar filtros</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -145,7 +165,7 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
               data-precio={precioFinal(p.data)}
               data-rel={relevancia.get(p.id)}
             >
-              <ProductCard producto={p} />
+              <ProductCard producto={p} variant="compact" />
             </li>
           ))
         }
@@ -163,114 +183,194 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
 
   <script>
     import { initCatalog } from '../../components/catalog/catalogFilters';
+    import { initFilterSheet } from '../../components/catalog/filterSheet';
     initCatalog();
+    initFilterSheet();
   </script>
 </BaseLayout>
 
 <style>
-  /* ---------- Encabezado ---------- */
+  /* ---------- Encabezado: 84px del header fijo + 16px ---------- */
   .hdr {
-    padding-top: 130px;
-    padding-bottom: 32px;
+    padding-top: 100px;
+    padding-bottom: 8px;
     background: linear-gradient(180deg, var(--vl-blush), var(--vl-crema));
   }
   .hdr-inner {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 16px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
   }
   .hdr-txt {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     min-width: 0;
   }
+  .cat-count {
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--vl-tinta-suave);
+    white-space: nowrap;
+  }
   .sub {
+    display: none; /* en móvil el contador basta; en escritorio se muestra */
     max-width: 44ch;
     color: var(--vl-tinta-suave);
     font-size: 17px;
   }
-  .hdr-img {
-    position: relative;
-    width: 132px;
-  }
-  .hdr-img :global(img) {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-    filter: var(--vl-drop);
-  }
-  .hdr-img :global([hidden]) {
-    display: none;
-  }
 
-  /* ---------- Barra de filtros ---------- */
-  .listado {
-    padding-bottom: 96px;
-  }
-  .filters {
-    position: relative;
-    z-index: 40;
-    padding: 12px 0;
-    background: var(--vl-crema); /* opaca: las tarjetas no se transparentan bajo los chips */
-    border-bottom: 1px solid var(--vl-durazno);
-  }
-
-  /* Rejilla plana: en móvil todo apilado; la barra solo es sticky desde 900px */
-  .barra {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      'tabs tabs'
-      'chips chips'
-      'orden orden'
-      'rango rango'
-      'clear count';
-    align-items: center;
-    gap: 10px 12px;
-  }
-  .tabs { grid-area: tabs; }
-  .chips-f { grid-area: chips; }
-  .orden { grid-area: orden; }
-  .rango { grid-area: rango; }
-  .clear { grid-area: clear; justify-self: start; }
-  .count { grid-area: count; justify-self: end; }
-
-  /* Filas de una sola línea con scroll horizontal (sin barra visible) */
-  .tabs,
-  .chips-f {
+  /* Fila de categorías con foto (reemplaza las pastillas). Móvil: scroll horizontal sin barra */
+  .cats {
     display: flex;
-    flex-wrap: nowrap;
-    gap: 8px;
+    gap: 12px;
     min-width: 0;
     overflow-x: auto;
     scroll-snap-type: x proximity;
     scrollbar-width: none;
     margin-inline: -16px;
-    padding: 2px 16px;
+    padding: 2px 16px 0;
   }
-  .tabs::-webkit-scrollbar,
-  .chips-f::-webkit-scrollbar {
+  .cats::-webkit-scrollbar {
+    display: none;
+  }
+  .cat {
+    flex: none;
+    width: 80px;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.2;
+    text-align: center;
+    color: var(--vl-tinta);
+    border-radius: 12px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .cat-img {
+    display: block;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--vl-blanco);
+    box-shadow: var(--vl-shadow);
+    transition: box-shadow 0.25s var(--vl-ease);
+  }
+  .cat-img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .cat[aria-pressed='true'] .cat-img {
+    box-shadow:
+      0 0 0 3px var(--vl-crema),
+      0 0 0 5px var(--vl-vino);
+  }
+  .cat[aria-pressed='true'] .cat-name {
+    color: var(--vl-vino);
+  }
+  .cat-name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ---------- Barra de filtros ---------- */
+  .listado {
+    padding-bottom: 72px;
+  }
+  .filters {
+    position: relative;
+    z-index: 40;
+    padding: 10px 0;
+    background: var(--vl-crema); /* opaca: las tarjetas no se transparentan bajo la barra */
+    border-bottom: 1px solid var(--vl-durazno);
+  }
+
+  /* Móvil: barra sticky bajo el header (64px cuando está compacto) */
+  .barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .count {
+    margin-left: auto;
+    font-family: var(--vl-font-ui);
+    font-size: 14px;
+    color: var(--vl-tinta-suave);
+    white-space: nowrap;
+  }
+  .filtrar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1.5px solid var(--vl-vino);
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-blanco);
+    color: var(--vl-vino);
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 15px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.18s ease;
+  }
+  .filtrar svg {
+    flex: none;
+  }
+  @media (hover: hover) {
+    .filtrar:hover {
+      background: var(--vl-blush);
+    }
+  }
+  .fbadge {
+    display: grid;
+    place-items: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-frambuesa);
+    color: var(--vl-blanco);
+    font-size: 12px;
+    line-height: 1;
+  }
+  .fbadge[hidden] {
     display: none;
   }
 
-  .tab,
+  /* Chips de ocasión: en móvil viven dentro del panel y se ajustan en varias filas */
+  .chips-f {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
+  }
   .chip-f {
     flex: none;
-    scroll-snap-align: start;
     font-family: var(--vl-font-ui);
-    font-weight: 600;
+    font-weight: 500;
     font-size: 14px;
     line-height: 1;
     white-space: nowrap;
     min-height: 40px;
-    padding: 0 16px;
+    padding: 0 14px;
     border: 1px solid var(--vl-vino);
     border-radius: var(--vl-radius-pill);
     background: transparent;
     color: var(--vl-vino);
-    /* evita el zoom por doble toque y el resaltado gris al pulsar chips seguidos */
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
@@ -278,19 +378,12 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
       background-color 0.18s ease,
       color 0.18s ease;
   }
-  .chip-f {
-    font-weight: 500;
-    min-height: 36px;
-    padding: 0 14px;
-  }
-  .tab[aria-pressed='true'],
   .chip-f[aria-pressed='true'] {
     background: var(--vl-vino);
     color: var(--vl-blanco);
   }
   /* El hover solo existe con mouse: en táctil se quedaba "pegado" tras tocar */
   @media (hover: hover) {
-    .tab[aria-pressed='false']:hover,
     .chip-f[aria-pressed='false']:hover {
       background: var(--vl-blush);
     }
@@ -309,7 +402,7 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
   }
   .orden select,
   .campo input {
-    height: 40px;
+    height: 44px;
     border: 1px solid var(--vl-vino);
     border-radius: var(--vl-radius-pill);
     background: var(--vl-blanco);
@@ -354,21 +447,106 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
   .clear[hidden] {
     display: none; /* .btn define display y pisaba el atributo hidden */
   }
-  .count {
-    font-family: var(--vl-font-ui);
-    font-size: 14px;
-    color: var(--vl-tinta-suave);
-    white-space: nowrap;
+
+  /* ---------- Panel "Filtrar y ordenar" (bottom sheet en móvil) ---------- */
+  .sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    visibility: hidden;
+    transition: visibility 0s linear 0.35s;
+  }
+  .sheet.on {
+    visibility: visible;
+    transition: none;
+  }
+  .sheet-scrim {
+    position: absolute;
+    inset: 0;
+    background: var(--vl-scrim);
+    opacity: 0;
+    transition: opacity 0.35s;
+  }
+  .sheet.on .sheet-scrim {
+    opacity: 1;
+  }
+  /* El botón flotante de WhatsApp (z 60) quedaría encima del panel: se oculta mientras está abierto */
+  :global(body:has(.sheet.on) .wa-float),
+  :global(body:has(.sheet.on) .wa-tip) {
+    visibility: hidden;
+  }
+  .sheet-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    max-height: 86vh;
+    max-height: 86dvh;
+    border-radius: 24px 24px 0 0;
+    background: var(--vl-crema);
+    box-shadow: var(--vl-shadow-lg);
+    transform: translateY(100%);
+    transition: transform 0.35s var(--vl-ease);
+  }
+  .sheet.on .sheet-panel {
+    transform: none;
+  }
+  .sp-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 6px;
+  }
+  .sp-title {
+    font-family: var(--vl-font-title);
+    font-weight: 900;
+    font-size: 20px;
+    color: var(--vl-vino);
+  }
+  .sp-x {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--vl-blanco);
+    box-shadow: var(--vl-shadow);
+    color: var(--vl-vino);
+  }
+  .sp-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 10px 20px 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .sp-foot {
+    display: grid;
+    gap: 10px;
+    padding: 12px 20px calc(16px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--vl-durazno);
+    background: var(--vl-crema);
+  }
+  .sp-apply {
+    width: 100%;
+    min-height: 52px;
+    justify-content: center;
+  }
+  .sp-foot .clear {
+    justify-self: stretch;
+    justify-content: center;
+    min-height: 44px;
   }
 
   /* ---------- Grilla ---------- */
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, var(--vl-card-w));
-    justify-content: center;
-    gap: 24px;
-    padding-top: 32px;
-    scroll-margin-top: 220px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding-top: 16px;
   }
   .cell {
     min-width: 0;
@@ -400,38 +578,97 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
     color: var(--vl-vino);
   }
 
-  /* ---------- Tablet ---------- */
+  /* ---------- Desde 760px: encabezado completo, filtros en línea ---------- */
   @media (min-width: 760px) {
-    .hdr-img {
-      width: 260px;
+    .hdr {
+      padding-bottom: 24px;
     }
-    .barra {
-      grid-template-columns: auto minmax(0, 1fr);
-      grid-template-areas:
-        'tabs tabs'
-        'chips chips'
-        'orden rango'
-        'clear count';
+    .hdr-inner {
+      gap: 20px;
     }
-    .tabs,
-    .chips-f {
+    .sub {
+      display: block;
+    }
+    .cats {
       flex-wrap: wrap;
       overflow: visible;
       margin-inline: 0;
-      padding-inline: 0;
+      padding: 4px 0;
+      gap: 18px 22px;
+    }
+    .cat {
+      width: 96px;
+      font-size: 14px;
+      gap: 8px;
+    }
+    .cat-img {
+      width: 84px;
+      height: 84px;
+    }
+
+    .filters {
+      padding: 12px 0;
+    }
+    .filtrar {
+      display: none;
+    }
+    .sheet {
+      position: static;
+      display: contents;
+      visibility: visible;
+      transition: none;
+    }
+    .sheet-scrim,
+    .sp-head,
+    .sp-apply {
+      display: none;
+    }
+    .sheet-panel,
+    .sp-body,
+    .sp-foot {
+      display: contents;
+    }
+
+    .barra {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas:
+        'chips chips'
+        'orden rango'
+        'clear count';
+      align-items: center;
+      gap: 10px 12px;
+    }
+    .chips-f {
+      grid-area: chips;
     }
     .orden {
+      grid-area: orden;
       width: 280px;
     }
     .rango {
+      grid-area: rango;
       width: 240px;
     }
+    .clear {
+      grid-area: clear;
+      justify-self: start;
+    }
+    .count {
+      grid-area: count;
+      justify-self: end;
+      margin-left: 0;
+    }
+
     .grid {
-      scroll-margin-top: 170px;
+      grid-template-columns: repeat(auto-fill, var(--vl-card-w));
+      justify-content: center;
+      gap: 24px;
+      padding-top: 32px;
     }
   }
 
-  /* ---------- Escritorio ancho (>=1240px, el contenedor llega a 1200px): compacta en 2 filas y fija al hacer scroll ---------- */
+  /* ---------- Escritorio ancho (>=1240px): filtros compactos en 2 filas y fijos al hacer scroll ---------- */
   @media (min-width: 1240px) {
     .filters {
       position: sticky;
@@ -442,7 +679,7 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
     .barra {
       grid-template-columns: minmax(0, 1fr) auto auto;
       grid-template-areas:
-        'tabs orden count'
+        'chips orden count'
         'chips rango clear';
       gap: 6px 14px;
     }
@@ -455,11 +692,6 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
     .campo {
       flex: none;
       width: 96px;
-    }
-    .tab {
-      min-height: 34px;
-      padding: 0 14px;
-      font-size: 13.5px;
     }
     .chip-f {
       min-height: 30px;
@@ -482,18 +714,26 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
     .count {
       font-size: 13.5px;
     }
-    .grid {
-      scroll-margin-top: 150px;
+  }
+
+  /* Móvil: la barra queda fija bajo el header al hacer scroll (la categoría ya está en el encabezado) */
+  @media (max-width: 759px) {
+    .filters {
+      position: sticky;
+      top: 64px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .tabs,
-    .chips-f {
-      scroll-behavior: auto;
+    .sheet,
+    .sheet.on,
+    .sheet-scrim,
+    .sheet-panel {
+      transition: none;
     }
-    .tab,
-    .chip-f {
+    .chip-f,
+    .filtrar,
+    .cat-img {
       transition: none;
     }
   }
