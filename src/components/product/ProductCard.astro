@@ -5,9 +5,12 @@ import { soles, waLink } from '../../config/site';
 
 interface Props {
   producto: Producto;
+  /** "compact": tarjeta de la grilla del catálogo (en móvil oculta la descripción y el texto del botón). */
+  variant?: 'default' | 'compact';
 }
 
-const { producto } = Astro.props;
+const { producto, variant = 'default' } = Astro.props;
+const compact = variant === 'compact';
 const { nombre, descripcion, precio, precioOferta, imagen } = producto.data;
 
 // Solo hay oferta si el precio de oferta es menor al normal.
@@ -18,7 +21,7 @@ const alt = `${nombre}: ${descripcion}`;
 const mensajeWa = `Hola V'Lirio 🌷, quiero el ${nombre} (${soles(actual)}). ¿Está disponible?`;
 ---
 
-<article class="card" data-producto={producto.id}>
+<article class:list={['card', { compact }]} data-producto={producto.id}>
   <div class="ph">
     {oferta !== undefined && <span class="badge">-{descuento}%</span>}
     <Image
@@ -53,7 +56,7 @@ const mensajeWa = `Hola V'Lirio 🌷, quiero el ${nombre} (${soles(actual)}). ¿
     {oferta !== undefined && <s><span class="sr-only">antes </span>{soles(precio)}</s>}
   </p>
   <div class="row">
-    <button type="button" class="add" data-add={producto.id}>
+    <button type="button" class="add" data-add={producto.id} aria-label={compact ? `Agregar ${nombre} a la canasta` : undefined}>
       <svg width="18" height="18" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><use href="#i-basket" /></svg>
       <span>Agregar a la canasta</span>
     </button>
@@ -273,4 +276,67 @@ const mensajeWa = `Hola V'Lirio 🌷, quiero el ${nombre} (${soles(actual)}). ¿
   .add:hover { background: var(--vl-frambuesa-oscuro); }
   .add:active { transform: scale(0.95); }
   .add.done { background: var(--vl-follaje); }
+
+  /* Variante compacta (grilla del catálogo, solo móvil). La home no la usa. */
+  @media (max-width: 759px) {
+    .card.compact {
+      width: 100%;
+      flex: none;
+      gap: 4px;
+      padding: 8px;
+      border-radius: var(--vl-radius-sm);
+    }
+    .card.compact .ph {
+      margin-bottom: 4px;
+      border-radius: 14px;
+    }
+    .card.compact .badge {
+      top: 8px;
+      left: 8px;
+      padding: 3px 8px;
+      font-size: 12px;
+    }
+    .card.compact .fav,
+    .card.compact .wa-mini {
+      width: 40px;
+      height: 40px;
+    }
+    .card.compact .fav {
+      top: 8px;
+      right: 8px;
+    }
+    .card.compact .wa-mini {
+      right: 8px;
+      bottom: 8px;
+    }
+    .card.compact .name {
+      min-height: 2.4em;
+      font-size: 15px;
+    }
+    .card.compact .desc {
+      display: none;
+    }
+    .card.compact .price {
+      margin-top: 0;
+      font-size: 17px;
+    }
+    .card.compact .price s {
+      font-size: 12px;
+    }
+    .card.compact .row {
+      padding-top: 2px;
+    }
+    .card.compact .add {
+      height: 40px;
+      padding: 0;
+    }
+    .card.compact .add span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+  }
 </style>
