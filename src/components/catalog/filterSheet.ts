@@ -21,11 +21,24 @@ export function initFilterSheet(): void {
   const scrim = must<HTMLElement>('sheet-scrim');
   const aplicarBtn = must<HTMLButtonElement>('sheet-apply');
 
+  const panel = must<HTMLElement>('sheet-panel');
   let abierto = false;
+
+  /** Solo es un diálogo mientras está abierto (en escritorio los controles van en línea). */
+  function marcarDialogo(on: boolean): void {
+    if (on) {
+      panel.setAttribute('role', 'dialog');
+      panel.setAttribute('aria-modal', 'true');
+    } else {
+      panel.removeAttribute('role');
+      panel.removeAttribute('aria-modal');
+    }
+  }
 
   function abrir(): void {
     if (abierto) return;
     abierto = true;
+    marcarDialogo(true);
     sheet.classList.add('on');
     abrirBtn.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
@@ -35,6 +48,7 @@ export function initFilterSheet(): void {
   function cerrar(): void {
     if (!abierto) return;
     abierto = false;
+    marcarDialogo(false);
     sheet.classList.remove('on');
     abrirBtn.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
@@ -79,6 +93,7 @@ export function initFilterSheet(): void {
   window.matchMedia('(min-width: 760px)').addEventListener('change', (e) => {
     if (!e.matches || !abierto) return;
     abierto = false;
+    marcarDialogo(false);
     sheet.classList.remove('on');
     abrirBtn.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';

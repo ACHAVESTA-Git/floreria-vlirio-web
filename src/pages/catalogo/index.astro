@@ -25,7 +25,8 @@ const relevancia = new Map(enOrden.map((p, i) => [p.id, i]));
 
 // Solo las categorías que tienen productos.
 const categorias = CATEGORIAS.filter((c) => productos.some((p) => p.data.categoria === c.slug));
-const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
+// Distinta de la de Ramos: si no, "Todos" y "Ramos" se veían iguales.
+const imgTodos = getAsset('ramo-rosas-rosadas-lirios-papel-blanco');
 ---
 
 <BaseLayout title="Catálogo" description="Catálogo de Florería V'Lirio: ramos, buchones, arreglos, box, tulipanes, peluches y chocolates en Lima. Filtra por tipo y ocasión y pide por WhatsApp.">
@@ -103,7 +104,8 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
         <!-- Móvil: bottom sheet. Desde 760px es display: contents y los controles quedan en línea. -->
         <div id="sheet" class="sheet">
           <div id="sheet-scrim" class="sheet-scrim"></div>
-          <div id="sheet-panel" class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+          <!-- role="dialog" y aria-modal los pone filterSheet.ts solo mientras está abierto: en escritorio no es un diálogo -->
+          <div id="sheet-panel" class="sheet-panel" aria-labelledby="sheet-title">
             <div class="sp-head">
               <h2 id="sheet-title" class="sp-title">Filtrar y ordenar</h2>
               <button type="button" id="sheet-close" class="sp-x" aria-label="Cerrar filtros">
@@ -231,6 +233,7 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
     scrollbar-width: none;
     margin-inline: -16px;
     padding: 2px 16px 0;
+    scroll-padding-inline: 16px; /* sin esto el snap pegaba "Todos" al borde y cortaba su anillo */
   }
   .cats::-webkit-scrollbar {
     display: none;
