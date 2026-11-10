@@ -1,8 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ProductCard from '../../components/product/ProductCard.astro';
 import CatalogHeader from '../../components/catalog/CatalogHeader.astro';
 import FilterPanel from '../../components/catalog/FilterPanel.astro';
+import CatalogToolbar from '../../components/catalog/CatalogToolbar.astro';
+import CatalogGrid from '../../components/catalog/CatalogGrid.astro';
+import CatalogEmpty from '../../components/catalog/CatalogEmpty.astro';
 import { getProductos, getDestacados } from '../../lib/catalog';
 import {
   categoriasConProductos,
@@ -10,7 +12,6 @@ import {
   facetasColor,
   facetasOcasion,
   limitesPrecio,
-  RANGOS_PRECIO,
 } from '../../lib/catalogFacets';
 
 const productos = await getProductos();
@@ -30,51 +31,11 @@ const precio = limitesPrecio(productos);
       <FilterPanel total={productos.length} ocasiones={ocasiones} colores={colores} precio={precio} />
 
       <div class="main">
-        <div id="filters" class="toolbar">
-          <button type="button" id="open-filters" class="filtrar" aria-haspopup="dialog" aria-controls="sheet-panel" aria-expanded="false">
-            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M7 12h10M10 17h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
-            <span>Filtros</span>
-            <span id="filtros-n" class="fbadge" hidden>0</span>
-          </button>
-
-          <p id="results-count" class="sr-only" role="status" aria-live="polite">{productos.length} productos</p>
-
-          <div class="orden">
-            <label for="sort">Ordenar<span class="orden-por"> por</span></label>
-            <select id="sort">
-              <option value="relevancia">Más pedidos</option>
-              <option value="menor">Menor precio</option>
-              <option value="mayor">Mayor precio</option>
-            </select>
-          </div>
-        </div>
+        <CatalogToolbar total={productos.length} />
 
         <h2 class="sr-only">Productos del catálogo</h2>
-        <ul id="grid" class="grid">
-          {
-            celdas.map((c) => (
-              <li
-                class="cell"
-                data-cell
-                data-cat={c.categoria}
-                data-oca={c.ocasiones}
-                data-color={c.colores}
-                data-precio={c.precio}
-                data-rel={c.rel}
-              >
-                <ProductCard producto={c.producto} variant="compact" />
-              </li>
-            ))
-          }
-        </ul>
-
-        <div id="empty" class="empty" hidden>
-          <svg class="empty-ico" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
-            <use href="#i-basket" />
-          </svg>
-          <p class="empty-txt">No encontramos flores con esos filtros</p>
-          <button type="button" id="empty-clear" class="btn btn-primary">Quitar filtros</button>
-        </div>
+        <CatalogGrid celdas={celdas} />
+        <CatalogEmpty />
       </div>
     </div>
   </section>
@@ -88,7 +49,6 @@ const precio = limitesPrecio(productos);
 </BaseLayout>
 
 <style>
-  /* ---------- Listado: columna de filtros + productos ---------- */
   .listado {
     padding-bottom: 72px;
   }
@@ -99,171 +59,12 @@ const precio = limitesPrecio(productos);
     min-width: 0;
   }
 
-  /* Barra sobre la grilla: botón Filtros (móvil/tablet) y orden. Fija bajo el header compacto (64px) */
-  .toolbar {
-    position: sticky;
-    top: 64px;
-    z-index: 40;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-inline: -16px;
-    padding: 10px 16px;
-    background: var(--vl-crema); /* opaca: las tarjetas no se transparentan bajo la barra */
-    border-bottom: 1px solid var(--vl-durazno);
-  }
-  .filtrar {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 0 16px;
-    border: 1.5px solid var(--vl-vino);
-    border-radius: var(--vl-radius-pill);
-    background: var(--vl-blanco);
-    color: var(--vl-vino);
-    font-family: var(--vl-font-ui);
-    font-weight: 600;
-    font-size: 15px;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    transition: background-color 0.18s ease;
-  }
-  .filtrar svg {
-    flex: none;
-  }
-  @media (hover: hover) {
-    .filtrar:hover {
-      background: var(--vl-blush);
-    }
-  }
-  .fbadge {
-    display: grid;
-    place-items: center;
-    min-width: 22px;
-    height: 22px;
-    padding: 0 6px;
-    border-radius: var(--vl-radius-pill);
-    background: var(--vl-frambuesa);
-    color: var(--vl-blanco);
-    font-size: 12px;
-    line-height: 1;
-  }
-  .fbadge[hidden] {
-    display: none;
-  }
-
-  .orden {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-    font-family: var(--vl-font-ui);
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--vl-tinta-suave);
-  }
-  .orden-por {
-    display: none;
-  }
-  .orden select {
-    height: 44px;
-    min-width: 0;
-    padding: 0 12px;
-    border: 1px solid var(--vl-vino);
-    border-radius: var(--vl-radius-pill);
-    background: var(--vl-blanco);
-    color: var(--vl-tinta);
-    font-family: var(--vl-font-ui);
-    font-size: 14px;
-  }
-
-  /* ---------- Grilla ---------- */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    padding-top: 16px;
-  }
-  .cell {
-    min-width: 0;
-  }
-  .cell[hidden] {
-    display: none;
-  }
-
-  /* ---------- Estado vacío ---------- */
-  .empty {
-    display: grid;
-    justify-items: center;
-    gap: 16px;
-    padding: 56px 16px 24px;
-    text-align: center;
-  }
-  .empty[hidden] {
-    display: none;
-  }
-  .empty-ico {
-    width: 96px;
-    height: 96px;
-    color: var(--vl-vino);
-  }
-  .empty-txt {
-    font-family: var(--vl-font-title);
-    font-weight: 800;
-    font-size: 20px;
-    color: var(--vl-vino);
-  }
-
-  /* ---------- Desde 760px: encabezado completo y grilla de tarjetas estándar ---------- */
-  @media (min-width: 760px) {
-    .orden-por {
-      display: inline;
-    }
-    .grid {
-      grid-template-columns: repeat(auto-fill, var(--vl-card-w));
-      justify-content: center;
-      gap: 24px;
-      padding-top: 24px;
-    }
-  }
-
-  /* ---------- Desde 1024px: barra lateral fija con acordeones ---------- */
   @media (min-width: 1024px) {
     .layout {
       display: grid;
       grid-template-columns: 220px minmax(0, 1fr);
       gap: 32px;
       align-items: start;
-    }
-    .filtrar {
-      display: none;
-    }
-    /* La barra superior ya no necesita el botón: solo el orden, a la derecha */
-    .toolbar {
-      position: static;
-      justify-content: flex-end;
-      margin-inline: 0;
-      padding: 8px 0 12px;
-    }
-    .orden select {
-      height: 40px;
-    }
-    /* Tarjetas fluidas: llenan el ancho que deja la barra lateral (3 columnas desde 1024px) */
-    .grid {
-      grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
-      gap: 20px;
-      padding-top: 20px;
-    }
-    .grid :global(.card) {
-      width: 100%;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .filtrar {
-      transition: none;
     }
   }
 </style>

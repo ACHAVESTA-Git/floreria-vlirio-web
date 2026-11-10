@@ -1,0 +1,138 @@
+---
+/** Barra sobre la grilla: botón Filtros (móvil y tablet), resultados para lectores de pantalla y orden. */
+interface Props {
+  /** Productos sin filtrar: texto inicial del contador antes de que cargue el JS. */
+  total: number;
+}
+const { total } = Astro.props;
+---
+
+<div id="filters" class="toolbar">
+  <button type="button" id="open-filters" class="filtrar" aria-haspopup="dialog" aria-controls="sheet-panel" aria-expanded="false">
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M7 12h10M10 17h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+    <span>Filtros</span>
+    <span id="filtros-n" class="fbadge" hidden>0</span>
+  </button>
+
+  <p id="results-count" class="sr-only" role="status" aria-live="polite">{total} productos</p>
+
+  <div class="orden">
+    <label for="sort">Ordenar<span class="orden-por"> por</span></label>
+    <select id="sort">
+      <option value="relevancia">Más pedidos</option>
+      <option value="menor">Menor precio</option>
+      <option value="mayor">Mayor precio</option>
+    </select>
+  </div>
+</div>
+
+<style>
+  /* Barra sobre la grilla: botón Filtros (móvil/tablet) y orden. Fija bajo el header compacto (64px) */
+  .toolbar {
+    position: sticky;
+    top: 64px;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-inline: -16px;
+    padding: 10px 16px;
+    background: var(--vl-crema); /* opaca: las tarjetas no se transparentan bajo la barra */
+    border-bottom: 1px solid var(--vl-durazno);
+  }
+  .filtrar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1.5px solid var(--vl-vino);
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-blanco);
+    color: var(--vl-vino);
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 15px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.18s ease;
+  }
+  .filtrar svg {
+    flex: none;
+  }
+  @media (hover: hover) {
+    .filtrar:hover {
+      background: var(--vl-blush);
+    }
+  }
+  .fbadge {
+    display: grid;
+    place-items: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-frambuesa);
+    color: var(--vl-blanco);
+    font-size: 12px;
+    line-height: 1;
+  }
+  .fbadge[hidden] {
+    display: none;
+  }
+
+  .orden {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--vl-tinta-suave);
+  }
+  .orden-por {
+    display: none;
+  }
+  .orden select {
+    height: 44px;
+    min-width: 0;
+    padding: 0 12px;
+    border: 1px solid var(--vl-vino);
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-blanco);
+    color: var(--vl-tinta);
+    font-family: var(--vl-font-ui);
+    font-size: 14px;
+  }
+
+  /* Desde 760px hay sitio para la palabra "por" */
+  @media (min-width: 760px) {
+    .orden-por {
+      display: inline;
+    }
+  }
+
+  /* Desde 1024px el botón sobra (la barra lateral ya está visible): solo el orden, a la derecha */
+  @media (min-width: 1024px) {
+    .filtrar {
+      display: none;
+    }
+    .toolbar {
+      position: static;
+      justify-content: flex-end;
+      margin-inline: 0;
+      padding: 8px 0 12px;
+    }
+    .orden select {
+      height: 40px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .filtrar {
+      transition: none;
+    }
+  }
+</style>

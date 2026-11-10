@@ -1,0 +1,35 @@
+---
+/** Estado vacío: se muestra cuando los filtros no dejan ningún producto. Lo activa el JS. */
+---
+
+<div id="empty" class="empty" hidden>
+  <svg class="empty-ico" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+    <use href="#i-basket" />
+  </svg>
+  <p class="empty-txt">No encontramos flores con esos filtros</p>
+  <button type="button" id="empty-clear" class="btn btn-primary">Quitar filtros</button>
+</div>
+
+<style>
+  .empty {
+    display: grid;
+    justify-items: center;
+    gap: 16px;
+    padding: 56px 16px 24px;
+    text-align: center;
+  }
+  .empty[hidden] {
+    display: none;
+  }
+  .empty-ico {
+    width: 96px;
+    height: 96px;
+    color: var(--vl-vino);
+  }
+  .empty-txt {
+    font-family: var(--vl-font-title);
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--vl-vino);
+  }
+</style>

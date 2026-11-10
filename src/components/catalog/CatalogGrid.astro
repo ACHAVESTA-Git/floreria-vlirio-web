@@ -1,0 +1,70 @@
+---
+import ProductCard from '../product/ProductCard.astro';
+import type { CeldaCatalogo } from '../../lib/catalogFacets';
+
+/**
+ * Grilla de productos en orden de relevancia. Cada celda lleva sus datos en data-*:
+ * el JS (catalogFilters.ts) las lee una vez y oculta o reordena las celdas al filtrar.
+ */
+interface Props {
+  celdas: CeldaCatalogo[];
+}
+const { celdas } = Astro.props;
+---
+
+<ul id="grid" class="grid">
+  {
+    celdas.map((c) => (
+      <li
+        class="cell"
+        data-cell
+        data-cat={c.categoria}
+        data-oca={c.ocasiones}
+        data-color={c.colores}
+        data-precio={c.precio}
+        data-rel={c.rel}
+      >
+        <ProductCard producto={c.producto} variant="compact" />
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  /* ---------- Grilla: 2 columnas en móvil ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding-top: 16px;
+  }
+  .cell {
+    min-width: 0;
+  }
+  .cell[hidden] {
+    display: none;
+  }
+
+  /* Desde 760px: tarjetas de ancho fijo, centradas */
+  @media (min-width: 760px) {
+    .grid {
+      grid-template-columns: repeat(auto-fill, var(--vl-card-w));
+      justify-content: center;
+      gap: 24px;
+      padding-top: 24px;
+    }
+  }
+
+  /* Desde 1024px: tarjetas fluidas que llenan el ancho que deja la barra lateral (3 columnas) */
+  @media (min-width: 1024px) {
+    .grid {
+      grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+      gap: 20px;
+      padding-top: 20px;
+    }
+    /* La tarjeta es de ProductCard: :global porque el selector llega a un hijo de otro componente */
+    .grid :global(.card) {
+      width: 100%;
+    }
+  }
+</style>
