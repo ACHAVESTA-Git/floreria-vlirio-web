@@ -13,7 +13,7 @@
     "azul"
   ],
   "imagen": "../../assets/productos/ramo-rosas-azules-lirios-papel-azul.png",
-  "flor": "rosa",
+  "flores": ["rosa"],
   "demo": true,
   "imagenAmbiente": "../../assets/productos/cf-ramo-rosas-azules-lirios-papel-azul.jpg"
 }

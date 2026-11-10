@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { getImage } from 'astro:assets';
+import type { FlyTipo } from '../config/site';
 
 export type Producto = CollectionEntry<'productos'>;
 
@@ -27,7 +28,7 @@ export interface CatalogEntry {
   nombre: string;
   precio: number;
   precioOferta?: number;
-  flor: 'girasol' | 'tulipan' | 'rosa';
+  flores: FlyTipo[];
   categoria: string;
   img: string; // miniatura webp 160px
 }
@@ -42,7 +43,7 @@ export async function getCatalogMap(): Promise<Record<string, CatalogEntry>> {
         nombre: p.data.nombre,
         precio: p.data.precio,
         precioOferta: p.data.precioOferta,
-        flor: p.data.flor,
+        flores: p.data.flores,
         categoria: p.data.categoria,
         img: thumb.src,
       };

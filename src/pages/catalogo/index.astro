@@ -25,41 +25,79 @@ const relevancia = new Map(enOrden.map((p, i) => [p.id, i]));
 
 // Solo las categorías que tienen productos.
 const categorias = CATEGORIAS.filter((c) => productos.some((p) => p.data.categoria === c.slug));
-const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
+// Distinta de la de Ramos: si no, "Todos" y "Ramos" se veían iguales.
+const imgTodos = getAsset('ramo-rosas-rosadas-lirios-papel-blanco');
+
+/** Minúsculas y sin tildes: 'Salmón' → 'salmon' (igual que en ProductInfo). */
+const normalizar = (t: string): string =>
+  t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+const capitalizar = (t: string): string => t.charAt(0).toUpperCase() + t.slice(1);
+
+// Cuántos productos hay por ocasión y por color (se muestra junto a cada opción).
+const porOcasion = new Map(OCASIONES.map((o) => [o.slug, productos.filter((p) => p.data.ocasiones.includes(o.slug)).length]));
+const ocasiones = OCASIONES.filter((o) => (porOcasion.get(o.slug) ?? 0) > 0);
+
+/** Tokens existentes en tokens.css (--vl-color-<nombre>). */
+const TOKENS_COLOR = ['rojo', 'rosado', 'fucsia', 'salmon', 'naranja', 'amarillo', 'blanco', 'azul', 'lila'];
+const coloresDe = (p: Producto): string[] => [...new Set(p.data.colores.map(normalizar))];
+const colores = TOKENS_COLOR.map((slug) => ({
+  slug,
+  nombre: capitalizar(slug === 'salmon' ? 'salmón' : slug),
+  n: productos.filter((p) => coloresDe(p).includes(slug)).length,
+})).filter((c) => c.n > 0);
+
+// Precio: límites del slider (múltiplos de 10) y rangos rápidos para móvil.
+const precios = productos.map((p) => precioFinal(p.data));
+const precioMin = Math.floor(Math.min(...precios) / 10) * 10;
+const precioMax = Math.ceil(Math.max(...precios) / 10) * 10;
+const RANGOS: { min: number | null; max: number | null; nombre: string }[] = [
+  { min: null, max: 50, nombre: 'Hasta S/50' },
+  { min: 50, max: 100, nombre: 'S/50 – S/100' },
+  { min: 100, max: 150, nombre: 'S/100 – S/150' },
+  { min: 150, max: null, nombre: 'Más de S/150' },
+];
 ---
 
 <BaseLayout title="Catálogo" description="Catálogo de Florería V'Lirio: ramos, buchones, arreglos, box, tulipanes, peluches y chocolates en Lima. Filtra por tipo y ocasión y pide por WhatsApp.">
   <section class="hdr" aria-labelledby="cat-title">
     <div class="wrap hdr-inner">
       <div class="hdr-txt">
-        <div class="eyebrow">Nuestro catálogo</div>
-        <h1 id="cat-title" class="title">Catálogo</h1>
+        <h1 id="cat-title" class="title"><span id="cat-name">Catálogo</span> <span id="cat-count" class="cat-count">· {productos.length} detalles</span></h1>
         <p id="cat-sub" class="sub">Elige tu detalle favorito y pídelo por WhatsApp.</p>
       </div>
-      <div class="hdr-img">
-        <Image
-          src={imgTodos}
-          widths={[240, 360]}
-          sizes="(max-width: 760px) 132px, 260px"
-          format="webp"
-          alt="Ramo de gerberas rosas con papel fucsia de Florería V'Lirio"
-          loading="eager"
-          data-hdr-cat="todos"
-          data-nombre="Catálogo"
-        />
+
+      <div class="cats" role="group" aria-label="Tipo de arreglo">
+        <button type="button" class="cat" data-filter-cat="todos" data-nombre="Catálogo" aria-pressed="true">
+          <span class="cat-img">
+            <Image
+              src={imgTodos}
+              widths={[128, 192]}
+              sizes="84px"
+              format="webp"
+              alt=""
+              loading="eager"
+              decoding="async"
+            />
+          </span>
+          <span class="cat-name">Todos</span>
+        </button>
         {
           categorias.map((c) => (
-            <Image
-              src={getAsset(c.imagen)}
-              widths={[240, 360]}
-              sizes="(max-width: 760px) 132px, 260px"
-              format="webp"
-              alt={`Arreglo de ${c.nombre.toLowerCase()} de Florería V'Lirio`}
-              hidden
-              data-hdr-cat={c.slug}
-              data-nombre={c.nombre}
-              style={`view-transition-name: vt-cat-${c.slug}`}
-            />
+            <button type="button" class="cat" data-filter-cat={c.slug} data-nombre={c.nombre} aria-pressed="false">
+              <span class="cat-img">
+                <Image
+                  src={getAsset(c.imagen)}
+                  widths={[128, 192]}
+                  sizes="84px"
+                  format="webp"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  style={`view-transition-name: vt-cat-${c.slug}`}
+                />
+              </span>
+              <span class="cat-name">{c.nombre}</span>
+            </button>
           ))
         }
       </div>
@@ -69,243 +107,353 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
   <script is:inline>
     (function () {
       var cat = new URLSearchParams(location.search).get('categoria');
-      var imgs = Array.prototype.slice.call(document.querySelectorAll('[data-hdr-cat]'));
+      var botones = Array.prototype.slice.call(document.querySelectorAll('[data-filter-cat]'));
       var activa = null;
-      imgs.forEach(function (el) {
-        if (el.getAttribute('data-hdr-cat') === cat) activa = el;
+      botones.forEach(function (b) {
+        if (b.getAttribute('data-filter-cat') === cat) activa = b;
       });
       if (!activa) return;
-      imgs.forEach(function (el) {
-        if (el === activa) el.removeAttribute('hidden');
-        else el.setAttribute('hidden', '');
-      });
-      var titulo = document.getElementById('cat-title');
       var nombre = activa.getAttribute('data-nombre');
+      var titulo = document.getElementById('cat-name');
       if (titulo && nombre) titulo.textContent = nombre;
     })();
   </script>
 
   <section class="listado">
-    <div id="filters" class="filters">
-      <div class="wrap">
-        <div class="tabs" role="group" aria-label="Tipo de arreglo">
-          <button type="button" class="tab" data-filter-cat="todos" aria-pressed="true">Todos</button>
-          {
-            categorias.map((c) => (
-              <button type="button" class="tab" data-filter-cat={c.slug} aria-pressed="false">{c.nombre}</button>
-            ))
-          }
-        </div>
+    <div class="wrap layout">
+      <!-- Filtros: panel inferior en móvil y tablet; barra lateral fija desde 1024px -->
+      <aside id="sheet" class="sheet" aria-label="Filtros">
+        <div id="sheet-scrim" class="sheet-scrim"></div>
+        <!-- role="dialog" y aria-modal los pone filterSheet.ts solo mientras está abierto: en escritorio no es un diálogo -->
+        <div id="sheet-panel" class="sheet-panel" aria-labelledby="sheet-title">
+          <div class="sp-head">
+            <h2 id="sheet-title" class="sp-title">Filtros</h2>
+            <button type="button" id="clear" class="clear" hidden>Limpiar</button>
+            <button type="button" id="sheet-close" class="sp-x" aria-label="Cerrar filtros">
+              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+            </button>
+          </div>
 
-        <div class="chips-f" role="group" aria-label="Ocasión">
-          {
-            OCASIONES.map((o) => (
-              <button type="button" class="chip-f" data-filter-oca={o.slug} aria-pressed="false">{o.nombre}</button>
-            ))
-          }
-        </div>
+          <div class="sp-body">
+            <details class="acc" open>
+              <summary>
+                <span class="acc-t">Ocasión</span>
+                <span class="acc-n" data-acc-n="oca" hidden></span>
+                <svg class="acc-ico" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              </summary>
+              <div class="opts" role="group" aria-label="Ocasión">
+                {
+                  ocasiones.map((o) => (
+                    <button type="button" class="opt" data-filter-oca={o.slug} aria-pressed="false">
+                      <span class="check" aria-hidden="true">
+                        <svg width="12" height="12" viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </span>
+                      <span class="opt-t">{o.nombre}</span>
+                      <span class="opt-n" aria-label={`${porOcasion.get(o.slug)} productos`}>{porOcasion.get(o.slug)}</span>
+                    </button>
+                  ))
+                }
+              </div>
+            </details>
 
-        <div class="controles">
+            <details class="acc">
+              <summary>
+                <span class="acc-t">Color</span>
+                <span class="acc-n" data-acc-n="color" hidden></span>
+                <svg class="acc-ico" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              </summary>
+              <div class="opts opts-color" role="group" aria-label="Color">
+                {
+                  colores.map((c) => (
+                    <button type="button" class="opt" data-filter-color={c.slug} aria-pressed="false">
+                      <span class="swatch" aria-hidden="true" style={`--sw: var(--vl-color-${c.slug})`} />
+                      <span class="opt-t">{c.nombre}</span>
+                      <span class="opt-n" aria-label={`${c.n} productos`}>{c.n}</span>
+                    </button>
+                  ))
+                }
+              </div>
+            </details>
+
+            <details class="acc" open>
+              <summary>
+                <span class="acc-t">Precio</span>
+                <span class="acc-n" data-acc-n="precio" hidden></span>
+                <svg class="acc-ico" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              </summary>
+
+              <!-- Móvil y tablet: rangos de un toque -->
+              <div class="rangos" role="group" aria-label="Rango de precio">
+                {
+                  RANGOS.map((r) => (
+                    <button
+                      type="button"
+                      class="rango-chip"
+                      data-rango-min={r.min ?? ''}
+                      data-rango-max={r.max ?? ''}
+                      aria-pressed="false"
+                    >
+                      {r.nombre}
+                    </button>
+                  ))
+                }
+              </div>
+
+              <!-- Escritorio: slider de dos puntos -->
+              <div class="slider" id="slider" data-min={precioMin} data-max={precioMax} style={`--a: 0%; --b: 100%`}>
+                <div class="track" aria-hidden="true"><span class="fill"></span></div>
+                <label class="sr-only" for="pmin">Precio mínimo</label>
+                <input id="pmin" type="range" min={precioMin} max={precioMax} step="5" value={precioMin} />
+                <label class="sr-only" for="pmax">Precio máximo</label>
+                <input id="pmax" type="range" min={precioMin} max={precioMax} step="5" value={precioMax} />
+                <p class="slider-val" id="slider-val" aria-hidden="true">S/{precioMin} – S/{precioMax}</p>
+              </div>
+            </details>
+          </div>
+
+          <div class="sp-foot">
+            <button type="button" id="sheet-apply" class="btn btn-primary sp-apply">Ver {productos.length} productos</button>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main">
+        <div id="filters" class="toolbar">
+          <button type="button" id="open-filters" class="filtrar" aria-haspopup="dialog" aria-controls="sheet-panel" aria-expanded="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M7 12h10M10 17h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+            <span>Filtros</span>
+            <span id="filtros-n" class="fbadge" hidden>0</span>
+          </button>
+
+          <p id="results-count" class="sr-only" role="status" aria-live="polite">{productos.length} productos</p>
+
           <div class="orden">
-            <label for="sort">Ordenar por</label>
+            <label for="sort">Ordenar<span class="orden-por"> por</span></label>
             <select id="sort">
               <option value="relevancia">Más pedidos</option>
               <option value="menor">Menor precio</option>
               <option value="mayor">Mayor precio</option>
             </select>
           </div>
-
-          <div class="rango" role="group" aria-label="Rango de precio">
-            <div class="campo">
-              <label class="sr-only" for="min">Precio mínimo</label>
-              <span class="pref" aria-hidden="true">S/</span>
-              <input id="min" type="number" inputmode="numeric" min="0" placeholder="Mín" />
-            </div>
-            <div class="campo">
-              <label class="sr-only" for="max">Precio máximo</label>
-              <span class="pref" aria-hidden="true">S/</span>
-              <input id="max" type="number" inputmode="numeric" min="0" placeholder="Máx" />
-            </div>
-          </div>
-
-          <div class="acc">
-            <button type="button" id="clear" class="btn btn-ghost clear">Limpiar filtros</button>
-            <p id="results-count" class="count" role="status" aria-live="polite">{productos.length} productos</p>
-          </div>
         </div>
-      </div>
-    </div>
 
-    <div class="wrap">
-      <h2 class="sr-only">Productos del catálogo</h2>
-      <ul id="grid" class="grid">
-        {
-          enOrden.map((p) => (
-            <li
-              class="cell"
-              data-cell
-              data-cat={p.data.categoria}
-              data-oca={p.data.ocasiones.join(' ')}
-              data-precio={precioFinal(p.data)}
-              data-rel={relevancia.get(p.id)}
-            >
-              <ProductCard producto={p} />
-            </li>
-          ))
-        }
-      </ul>
+        <h2 class="sr-only">Productos del catálogo</h2>
+        <ul id="grid" class="grid">
+          {
+            enOrden.map((p) => (
+              <li
+                class="cell"
+                data-cell
+                data-cat={p.data.categoria}
+                data-oca={p.data.ocasiones.join(' ')}
+                data-color={coloresDe(p).join(' ')}
+                data-precio={precioFinal(p.data)}
+                data-rel={relevancia.get(p.id)}
+              >
+                <ProductCard producto={p} variant="compact" />
+              </li>
+            ))
+          }
+        </ul>
 
-      <div id="empty" class="empty" hidden>
-        <svg class="empty-ico" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
-          <use href="#i-basket" />
-        </svg>
-        <p class="empty-txt">No encontramos flores con esos filtros</p>
-        <button type="button" id="empty-clear" class="btn btn-primary">Quitar filtros</button>
+        <div id="empty" class="empty" hidden>
+          <svg class="empty-ico" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+            <use href="#i-basket" />
+          </svg>
+          <p class="empty-txt">No encontramos flores con esos filtros</p>
+          <button type="button" id="empty-clear" class="btn btn-primary">Quitar filtros</button>
+        </div>
       </div>
     </div>
   </section>
 
   <script>
     import { initCatalog } from '../../components/catalog/catalogFilters';
+    import { initFilterSheet } from '../../components/catalog/filterSheet';
     initCatalog();
+    initFilterSheet();
   </script>
 </BaseLayout>
 
 <style>
-  /* ---------- Encabezado ---------- */
+  /* ---------- Encabezado: 84px del header fijo + 16px ---------- */
   .hdr {
-    padding-top: 130px;
-    padding-bottom: 32px;
+    padding-top: 100px;
+    padding-bottom: 8px;
     background: linear-gradient(180deg, var(--vl-blush), var(--vl-crema));
   }
   .hdr-inner {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 16px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
   }
   .hdr-txt {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     min-width: 0;
   }
+  .cat-count {
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--vl-tinta-suave);
+    white-space: nowrap;
+  }
   .sub {
+    display: none; /* en móvil el contador basta; en escritorio se muestra */
     max-width: 44ch;
     color: var(--vl-tinta-suave);
     font-size: 17px;
   }
-  .hdr-img {
-    position: relative;
-    width: 132px;
-  }
-  .hdr-img :global(img) {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-    filter: var(--vl-drop);
-  }
-  .hdr-img :global([hidden]) {
-    display: none;
-  }
 
-  /* ---------- Barra de filtros (sticky) ---------- */
-  .listado {
-    padding-bottom: 96px;
-  }
-  .filters {
-    position: relative; /* en móvil la barra ocupa ~200px: solo es sticky desde 900px */
-    z-index: 40;
-    padding: 14px 0 12px;
-    background: var(--vl-header-glass);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--vl-durazno);
-    box-shadow: var(--vl-shadow);
-  }
-
-  @media (min-width: 900px) {
-    .filters {
-      position: sticky;
-      top: 64px;
-    }
-  }
-
-  /* Filas scrollables en móvil: sin barra visible y con snap */
-  .tabs,
-  .chips-f {
+  /* Fila de categorías con foto (reemplaza las pastillas). Móvil: scroll horizontal sin barra */
+  .cats {
     display: flex;
-    gap: 8px;
+    gap: 12px;
+    min-width: 0;
     overflow-x: auto;
     scroll-snap-type: x proximity;
     scrollbar-width: none;
-    overscroll-behavior-x: contain;
     margin-inline: -16px;
-    padding: 4px 16px;
-    scroll-padding-inline: 16px;
+    padding: 2px 16px 0;
+    scroll-padding-inline: 16px; /* sin esto el snap pegaba "Todos" al borde y cortaba su anillo */
   }
-  .tabs::-webkit-scrollbar,
-  .chips-f::-webkit-scrollbar {
+  .cats::-webkit-scrollbar {
     display: none;
   }
-  .chips-f {
-    margin-top: 10px;
-  }
-
-  .tab,
-  .chip-f {
+  .cat {
     flex: none;
+    width: 80px;
     scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
     font-family: var(--vl-font-ui);
     font-weight: 600;
-    font-size: 14px;
-    line-height: 1;
-    white-space: nowrap;
-    padding: 10px 16px;
-    border: 1px solid var(--vl-vino);
-    border-radius: var(--vl-radius-pill);
-    background: transparent;
+    font-size: 12px;
+    line-height: 1.2;
+    text-align: center;
+    color: var(--vl-tinta);
+    border-radius: 12px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .cat-img {
+    display: block;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--vl-blanco);
+    box-shadow: var(--vl-shadow);
+    transition: box-shadow 0.25s var(--vl-ease);
+  }
+  .cat-img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .cat[aria-pressed='true'] .cat-img {
+    box-shadow:
+      0 0 0 3px var(--vl-crema),
+      0 0 0 5px var(--vl-vino);
+  }
+  .cat[aria-pressed='true'] .cat-name {
     color: var(--vl-vino);
-    transition:
-      background 0.3s var(--vl-ease),
-      color 0.3s var(--vl-ease);
   }
-  .chip-f {
-    font-weight: 500;
-    padding: 8px 14px;
-  }
-  .tab:hover,
-  .chip-f:hover {
-    background: var(--vl-blush);
-  }
-  .tab[aria-pressed='true'],
-  .chip-f[aria-pressed='true'] {
-    background: var(--vl-vino);
-    color: var(--vl-blanco);
+  .cat-name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
-  /* Controles: en móvil, orden + precio en la primera fila y acciones en la segunda */
-  .controles {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px 12px;
-    margin-top: 12px;
+  /* ---------- Listado: columna de filtros + productos ---------- */
+  .listado {
+    padding-bottom: 72px;
   }
+  .layout {
+    display: block;
+  }
+  .main {
+    min-width: 0;
+  }
+
+  /* Barra sobre la grilla: botón Filtros (móvil/tablet) y orden. Fija bajo el header compacto (64px) */
+  .toolbar {
+    position: sticky;
+    top: 64px;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-inline: -16px;
+    padding: 10px 16px;
+    background: var(--vl-crema); /* opaca: las tarjetas no se transparentan bajo la barra */
+    border-bottom: 1px solid var(--vl-durazno);
+  }
+  .filtrar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1.5px solid var(--vl-vino);
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-blanco);
+    color: var(--vl-vino);
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 15px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.18s ease;
+  }
+  .filtrar svg {
+    flex: none;
+  }
+  @media (hover: hover) {
+    .filtrar:hover {
+      background: var(--vl-blush);
+    }
+  }
+  .fbadge {
+    display: grid;
+    place-items: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-frambuesa);
+    color: var(--vl-blanco);
+    font-size: 12px;
+    line-height: 1;
+  }
+  .fbadge[hidden] {
+    display: none;
+  }
+
   .orden {
     display: flex;
     align-items: center;
     gap: 8px;
-    flex: 1 1 100%; /* en móvil el orden ocupa su propia fila */
     min-width: 0;
     font-family: var(--vl-font-ui);
     font-weight: 600;
     font-size: 14px;
     color: var(--vl-tinta-suave);
   }
-  .orden select,
-  .campo input {
-    height: 40px;
+  .orden-por {
+    display: none;
+  }
+  .orden select {
+    height: 44px;
+    min-width: 0;
+    padding: 0 12px;
     border: 1px solid var(--vl-vino);
     border-radius: var(--vl-radius-pill);
     background: var(--vl-blanco);
@@ -313,63 +461,339 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
     font-family: var(--vl-font-ui);
     font-size: 14px;
   }
-  .orden select {
-    flex: 1;
-    min-width: 0;
-    padding: 0 12px;
+
+  /* ---------- Panel de filtros (bottom sheet hasta 1023px) ---------- */
+  .sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    visibility: hidden;
+    transition: visibility 0s linear 0.35s;
   }
-  .rango {
-    display: flex;
-    gap: 6px;
-    flex: 1 1 100%; /* y el rango de precio la suya, para que Mín/Máx se lean completos */
-    min-width: 0;
+  .sheet.on {
+    visibility: visible;
+    transition: none;
   }
-  .campo {
-    position: relative;
-    flex: 1 1 0;
-    min-width: 0;
-  }
-  .campo input {
-    width: 100%;
-    padding: 0 12px 0 36px;
-  }
-  .pref {
+  .sheet-scrim {
     position: absolute;
-    left: 13px;
-    top: 50%;
-    transform: translateY(-50%);
+    inset: 0;
+    background: var(--vl-scrim);
+    opacity: 0;
+    transition: opacity 0.35s;
+  }
+  .sheet.on .sheet-scrim {
+    opacity: 1;
+  }
+  /* El botón flotante de WhatsApp (z 60) quedaría encima del panel: se oculta mientras está abierto */
+  :global(body:has(.sheet.on) .wa-float),
+  :global(body:has(.sheet.on) .wa-tip) {
+    visibility: hidden;
+  }
+  .sheet-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    max-height: 86vh;
+    max-height: 86dvh;
+    border-radius: 24px 24px 0 0;
+    background: var(--vl-crema);
+    box-shadow: var(--vl-shadow-lg);
+    transform: translateY(100%);
+    transition: transform 0.35s var(--vl-ease);
+  }
+  .sheet.on .sheet-panel {
+    transform: none;
+  }
+  .sp-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px 8px;
+  }
+  .sp-title {
+    margin-right: auto;
+    font-family: var(--vl-font-title);
+    font-weight: 900;
+    font-size: 20px;
+    color: var(--vl-vino);
+  }
+  .clear {
+    min-height: 44px;
+    padding: 0 6px;
     font-family: var(--vl-font-ui);
     font-weight: 600;
     font-size: 14px;
-    color: var(--vl-tinta-suave);
-    pointer-events: none;
+    color: var(--vl-frambuesa);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
+  .clear[hidden] {
+    display: none;
+  }
+  .sp-x {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--vl-blanco);
+    box-shadow: var(--vl-shadow);
+    color: var(--vl-vino);
+  }
+  .sp-body {
+    padding: 0 20px 12px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .sp-foot {
+    padding: 12px 20px calc(16px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--vl-durazno);
+    background: var(--vl-crema);
+  }
+  .sp-apply {
+    width: 100%;
+    min-height: 52px;
+    justify-content: center;
+  }
+
+  /* ---------- Acordeones ---------- */
   .acc {
-    flex: 1 1 100%;
+    border-bottom: 1px solid var(--vl-durazno);
+  }
+  .acc summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 56px;
+    list-style: none;
+    cursor: pointer;
+    font-family: var(--vl-font-title);
+    font-weight: 800;
+    font-size: 17px;
+    color: var(--vl-tinta);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .acc summary::-webkit-details-marker {
+    display: none;
+  }
+  .acc-t {
+    margin-right: auto;
+  }
+  .acc-n {
+    display: grid;
+    place-items: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-vino);
+    color: var(--vl-blanco);
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .acc-n[hidden] {
+    display: none;
+  }
+  .acc-ico {
+    flex: none;
+    color: var(--vl-vino);
+    transition: transform 0.25s var(--vl-ease);
+  }
+  .acc[open] .acc-ico {
+    transform: rotate(180deg);
+  }
+
+  /* Opciones con casilla (ocasión) o muestra de color */
+  .opts {
+    display: grid;
+    padding-bottom: 12px;
+  }
+  .opts-color {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 12px;
+  }
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding: 0 4px;
+    border-radius: 12px;
+    font-family: var(--vl-font-body);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--vl-tinta);
+    text-align: left;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  @media (hover: hover) {
+    .opt:hover {
+      background: var(--vl-blush);
+    }
+  }
+  .opt-t {
+    flex: 1;
+    min-width: 0;
+  }
+  .opt-n {
+    font-family: var(--vl-font-ui);
+    font-size: 13px;
+    color: var(--vl-tinta-suave);
+  }
+  .check {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid var(--vl-vino);
+    border-radius: 6px;
+    background: var(--vl-blanco);
+    color: transparent;
+    transition:
+      background-color 0.18s ease,
+      color 0.18s ease;
+  }
+  .opt[aria-pressed='true'] .check {
+    background: var(--vl-vino);
+    color: var(--vl-blanco);
+  }
+  .opt[aria-pressed='true'] .opt-t {
+    color: var(--vl-vino);
+  }
+  .swatch {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--sw);
+    box-shadow: inset 0 0 0 1px rgb(46 26 36 / 0.15);
+    transition: box-shadow 0.18s ease;
+  }
+  .opt[aria-pressed='true'] .swatch {
+    box-shadow:
+      0 0 0 2px var(--vl-crema),
+      0 0 0 4px var(--vl-vino);
+  }
+
+  /* Precio: rangos de un toque (móvil y tablet) */
+  .rangos {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px 12px;
+    gap: 8px;
+    padding-bottom: 16px;
   }
-  .clear {
-    padding: 8px 16px;
-    font-size: 14px;
-  }
-  .count {
+  .rango-chip {
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--vl-vino);
+    border-radius: var(--vl-radius-pill);
     font-family: var(--vl-font-ui);
+    font-weight: 500;
     font-size: 14px;
-    color: var(--vl-tinta-suave);
+    color: var(--vl-vino);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 0.18s ease,
+      color 0.18s ease;
+  }
+  .rango-chip[aria-pressed='true'] {
+    background: var(--vl-vino);
+    color: var(--vl-blanco);
+  }
+  @media (hover: hover) {
+    .rango-chip[aria-pressed='false']:hover {
+      background: var(--vl-blush);
+    }
+  }
+
+  /* Precio: slider de dos puntos (solo escritorio). Dos range superpuestos sobre una pista */
+  .slider {
+    display: none;
+    position: relative;
+    padding: 14px 9px 16px; /* 9px = medio punto: la columna con scroll recortaba los extremos */
+  }
+  .track {
+    position: relative;
+    height: 4px;
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-durazno);
+  }
+  .fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--a);
+    right: calc(100% - var(--b));
+    border-radius: inherit;
+    background: var(--vl-vino);
+  }
+  .slider input {
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 100%;
+    height: 22px;
+    margin: 0;
+    background: none;
+    pointer-events: none; /* solo los puntos reciben el mouse, así los dos se pueden arrastrar */
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .slider input::-webkit-slider-runnable-track {
+    background: none;
+  }
+  .slider input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 3px solid var(--vl-blanco);
+    background: var(--vl-vino);
+    box-shadow: var(--vl-shadow);
+    pointer-events: auto;
+    cursor: grab;
+  }
+  .slider input::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 3px solid var(--vl-blanco);
+    background: var(--vl-vino);
+    box-shadow: var(--vl-shadow);
+    pointer-events: auto;
+    cursor: grab;
+  }
+  .slider input:focus-visible::-webkit-slider-thumb {
+    outline: 3px solid var(--vl-frambuesa);
+    outline-offset: 2px;
+  }
+  .slider input:focus-visible::-moz-range-thumb {
+    outline: 3px solid var(--vl-frambuesa);
+    outline-offset: 2px;
+  }
+  .slider-val {
+    margin-top: 14px;
+    text-align: right;
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--vl-tinta);
   }
 
   /* ---------- Grilla ---------- */
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, var(--vl-card-w));
-    justify-content: center;
-    gap: 24px;
-    padding-top: 32px;
-    scroll-margin-top: 220px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding-top: 16px;
   }
   .cell {
     min-width: 0;
@@ -401,51 +825,150 @@ const imgTodos = getAsset('ramo-gerberas-rosas-papel-fucsia');
     color: var(--vl-vino);
   }
 
-  /* ---------- Tablet y escritorio ---------- */
+  /* ---------- Desde 760px: encabezado completo y grilla de tarjetas estándar ---------- */
   @media (min-width: 760px) {
-    .hdr-img {
-      width: 260px;
+    .hdr {
+      padding-bottom: 24px;
     }
-    .tabs,
-    .chips-f {
+    .hdr-inner {
+      gap: 20px;
+    }
+    .sub {
+      display: block;
+    }
+    .cats {
       flex-wrap: wrap;
       overflow: visible;
       margin-inline: 0;
-      padding: 0;
+      padding: 4px 0;
+      gap: 18px 22px;
     }
-    .chips-f {
-      margin-top: 12px;
+    .cat {
+      width: 96px;
+      font-size: 14px;
+      gap: 8px;
     }
-    .controles {
-      flex-wrap: nowrap;
-      margin-top: 14px;
+    .cat-img {
+      width: 84px;
+      height: 84px;
     }
-    .orden,
-    .rango {
-      flex: 0 0 auto;
-    }
-    .orden {
-      width: 270px;
-    }
-    .rango {
-      width: 240px;
-    }
-    .acc {
-      flex: 1 1 auto;
-      justify-content: flex-end;
+    .orden-por {
+      display: inline;
     }
     .grid {
-      scroll-margin-top: 170px;
+      grid-template-columns: repeat(auto-fill, var(--vl-card-w));
+      justify-content: center;
+      gap: 24px;
+      padding-top: 24px;
+    }
+    /* El panel no ocupa toda la pantalla en tablet */
+    .sheet-panel {
+      left: 50%;
+      right: auto;
+      width: min(560px, 100%);
+      translate: -50% 0;
+    }
+  }
+
+  /* ---------- Desde 1024px: barra lateral fija con acordeones ---------- */
+  @media (min-width: 1024px) {
+    .layout {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 32px;
+      align-items: start;
+    }
+    .sheet {
+      position: sticky;
+      top: 88px;
+      z-index: auto;
+      visibility: visible;
+      transition: none;
+      max-height: calc(100vh - 104px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      padding-top: 8px;
+    }
+    .sheet-scrim,
+    .sp-x,
+    .sp-foot,
+    .filtrar {
+      display: none;
+    }
+    .sheet-panel {
+      position: static;
+      left: auto;
+      width: auto;
+      max-height: none;
+      translate: none;
+      transform: none;
+      transition: none;
+      border-radius: 0;
+      background: none;
+      box-shadow: none;
+    }
+    .sp-head {
+      padding: 0 0 4px;
+      border-bottom: 1px solid var(--vl-durazno);
+    }
+    .sp-title {
+      font-size: 18px;
+    }
+    .sp-body {
+      padding: 0;
+      overflow: visible;
+    }
+    .acc summary {
+      min-height: 52px;
+      font-size: 16px;
+    }
+    .opt {
+      min-height: 38px;
+      font-size: 14.5px;
+    }
+    .opts-color {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .rangos {
+      display: none;
+    }
+    .slider {
+      display: block;
+    }
+
+    /* La barra superior ya no necesita el botón: solo el orden, a la derecha */
+    .toolbar {
+      position: static;
+      justify-content: flex-end;
+      margin-inline: 0;
+      padding: 8px 0 12px;
+    }
+    .orden select {
+      height: 40px;
+    }
+    /* Tarjetas fluidas: llenan el ancho que deja la barra lateral (3 columnas desde 1024px) */
+    .grid {
+      grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+      gap: 20px;
+      padding-top: 20px;
+    }
+    .grid :global(.card) {
+      width: 100%;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .tabs,
-    .chips-f {
-      scroll-behavior: auto;
-    }
-    .tab,
-    .chip-f {
+    .sheet,
+    .sheet.on,
+    .sheet-scrim,
+    .sheet-panel,
+    .acc-ico,
+    .check,
+    .swatch,
+    .rango-chip,
+    .filtrar,
+    .cat-img {
       transition: none;
     }
   }

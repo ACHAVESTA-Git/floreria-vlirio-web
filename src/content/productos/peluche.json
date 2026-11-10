@@ -11,7 +11,7 @@
   "destacado": false,
   "colores": [],
   "imagen": "../../assets/productos/arreglo-rosas-rojas-lirio-peluche-panda.png",
-  "flor": "rosa",
+  "flores": ["osito"],
   "demo": true,
   "imagenAmbiente": "../../assets/productos/cf-arreglo-rosas-rojas-lirio-peluche-panda.jpg"
 }

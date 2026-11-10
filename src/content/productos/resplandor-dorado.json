@@ -12,7 +12,7 @@
     "amarillo"
   ],
   "imagen": "../../assets/productos/buchon-girasoles.png",
-  "flor": "girasol",
+  "flores": ["girasol"],
   "demo": true,
   "imagenAmbiente": "../../assets/productos/cf-buchon-girasoles.jpg"
 }

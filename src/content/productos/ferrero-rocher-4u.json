@@ -10,7 +10,7 @@
   "destacado": false,
   "colores": [],
   "imagen": "../../assets/productos/arreglo-rosas-rojas-globo-corazon-ferrero.png",
-  "flor": "rosa",
+  "flores": ["chocolate"],
   "demo": true,
   "imagenAmbiente": "../../assets/productos/cf-arreglo-rosas-rojas-globo-corazon-ferrero.jpg"
 }

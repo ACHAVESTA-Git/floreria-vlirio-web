@@ -17,6 +17,9 @@
   /* Naturales */
   --vl-follaje: #5e7d5a;
   --vl-girasol: #f2b53a;
+  /* Solo para las ilustraciones que vuelan a la canasta (osito y chocolate). Nunca como texto */
+  --vl-miel: #c98b55;
+  --vl-cacao: #6b3e26;
   /* Puntos de color de los productos (solo para mostrar el color disponible) */
   --vl-color-rojo: #c0182f;
   --vl-color-rosado: #f4a3b5;

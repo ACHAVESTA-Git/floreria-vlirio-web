@@ -1,5 +1,9 @@
-/** Número de WhatsApp en un solo lugar. Demo = número de pruebas. Producción: '51933099986' */
-export const WHATSAPP_NUMBER = '51936688729';
+/**
+ * Número de WhatsApp en un solo lugar. Lo decide astro.config.mjs según la rama:
+ * main → número de la demo del cliente; dev y feature/* → número de pruebas.
+ * Al entregar, cambiar NUMERO_PRODUCCION en astro.config.mjs por el de la florería (51933099986).
+ */
+export const WHATSAPP_NUMBER: string = __WHATSAPP_NUMBER__;
 
 export const SITE = {
   nombre: "Florería V'Lirio",
@@ -19,9 +23,16 @@ export const SITE = {
   mapa: 'https://www.google.com/maps?q=Mercado+Unicachi+de+Comas+Lima&output=embed',
 } as const;
 
-/** Flor de la animación al agregar a la canasta */
-export type FlyFlower = 'girasol' | 'tulipan' | 'producto';
-export const FLY_FLOWER: FlyFlower = 'girasol';
+/** Lo que puede volar a la canasta: una flor o un extra (osito, chocolate). */
+export const FLY_TIPOS = ['rosa', 'tulipan', 'girasol', 'lirio', 'gerbera', 'osito', 'chocolate'] as const;
+export type FlyTipo = (typeof FLY_TIPOS)[number];
+
+/**
+ * Animación al agregar a la canasta: 'producto' usa las `flores` de cada producto;
+ * un tipo fijo hace volar siempre ese.
+ */
+export type FlyFlower = FlyTipo | 'producto';
+export const FLY_FLOWER: FlyFlower = 'producto';
 
 export const waLink = (texto: string): string =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texto)}`;
