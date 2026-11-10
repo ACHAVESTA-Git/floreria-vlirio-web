@@ -13,6 +13,6 @@
     "blanco"
   ],
   "imagen": "../../assets/productos/ramo-rosas-rosadas-lirios-papel-blanco.png",
-  "flor": "rosa",
+  "flores": ["lirio"],
   "demo": true
 }

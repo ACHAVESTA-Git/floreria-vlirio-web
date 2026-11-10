@@ -13,7 +13,7 @@
     "rosado"
   ],
   "imagen": "../../assets/productos/arreglo-rosas-rojas-lirio-peluche-panda.png",
-  "flor": "rosa",
+  "flores": ["rosa", "rosa", "lirio"],
   "demo": true,
   "imagenAmbiente": "../../assets/productos/cf-arreglo-rosas-rojas-lirio-peluche-panda.jpg"
 }

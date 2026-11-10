@@ -13,7 +13,7 @@
     "fucsia"
   ],
   "imagen": "../../assets/productos/box-rosas-rosadas-feliz-cumpleanos.png",
-  "flor": "rosa",
+  "flores": ["rosa"],
   "demo": true,
   "imagenAmbiente": "../../assets/productos/cf-box-rosas-rosadas-feliz-cumpleanos.jpg"
 }

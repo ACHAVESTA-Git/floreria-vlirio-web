@@ -13,7 +13,7 @@
     "fucsia"
   ],
   "imagen": "../../assets/productos/ramo-rosas-fucsia-papel-lila.png",
-  "flor": "rosa",
+  "flores": ["rosa"],
   "demo": true,
   "imagenAmbiente": "../../assets/productos/cf-ramo-rosas-fucsia-papel-lila.jpg"
 }
