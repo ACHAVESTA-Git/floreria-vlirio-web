@@ -1,6 +1,8 @@
 ---
 import type { Producto } from '../../lib/catalog';
 import { OCASIONES, soles } from '../../config/site';
+import { colorCss } from '../../lib/colors';
+import { capitalizar } from '../../lib/text';
 
 interface Props {
   producto: Producto;
@@ -15,22 +17,7 @@ const oferta = precioOferta !== undefined && precioOferta < precio ? precioOfert
 const actual = oferta ?? precio;
 const descuento = oferta !== undefined ? Math.round((1 - oferta / precio) * 100) : 0;
 
-/** Tokens de color existentes en tokens.css (--vl-color-<nombre>). */
-const TOKENS_COLOR = ['rojo', 'rosado', 'fucsia', 'salmon', 'naranja', 'amarillo', 'blanco', 'azul', 'lila'];
-
-/** Minúsculas y sin tildes: 'salmón' → 'salmon'. */
-const normalizar = (texto: string): string =>
-  texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
-
-const capitalizar = (texto: string): string => texto.charAt(0).toUpperCase() + texto.slice(1);
-
-const coloresInfo = colores.map((c) => {
-  const token = normalizar(c);
-  return {
-    nombre: c,
-    fondo: TOKENS_COLOR.includes(token) ? `var(--vl-color-${token})` : 'var(--vl-rosa)',
-  };
-});
+const coloresInfo = colores.map((c) => ({ nombre: c, fondo: colorCss(c) }));
 
 const ocasionesInfo = ocasiones.flatMap((slug) => OCASIONES.filter((o) => o.slug === slug));
 ---
