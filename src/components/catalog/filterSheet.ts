@@ -90,7 +90,7 @@ export function initFilterSheet(): void {
   });
 
   // Si se amplía a escritorio con el panel abierto, se cierra sin mover el foco.
-  window.matchMedia('(min-width: 760px)').addEventListener('change', (e) => {
+  window.matchMedia('(min-width: 1024px)').addEventListener('change', (e) => {
     if (!e.matches || !abierto) return;
     abierto = false;
     marcarDialogo(false);

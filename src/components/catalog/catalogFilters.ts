@@ -5,6 +5,7 @@ type Orden = 'relevancia' | 'menor' | 'mayor';
 interface Estado {
   categoria: string;
   ocasiones: Set<string>;
+  colores: Set<string>;
   orden: Orden;
   min: number | null;
   max: number | null;
@@ -55,6 +56,10 @@ function coincide(cell: HTMLElement, e: Estado): boolean {
     const ocasionesCelda = (cell.dataset.oca ?? '').split(' ').filter(Boolean);
     if (!ocasionesCelda.some((o) => e.ocasiones.has(o))) return false;
   }
+  if (e.colores.size > 0) {
+    const coloresCelda = (cell.dataset.color ?? '').split(' ').filter(Boolean);
+    if (!coloresCelda.some((c) => e.colores.has(c))) return false;
+  }
   const precio = precioDe(cell);
   if (e.min !== null && precio < e.min) return false;
   if (e.max !== null && precio > e.max) return false;
@@ -78,10 +83,21 @@ export function initCatalog(): void {
 
   const catBtns = all<HTMLButtonElement>('[data-filter-cat]');
   const chips = all<HTMLButtonElement>('[data-filter-oca]');
+  const colorBtns = all<HTMLButtonElement>('[data-filter-color]');
+  const rangoBtns = all<HTMLButtonElement>('[data-rango-min]');
   const cells = all<HTMLElement>('[data-cell]', grid);
   const sort = must<HTMLSelectElement>('#sort');
-  const minInput = must<HTMLInputElement>('#min');
-  const maxInput = must<HTMLInputElement>('#max');
+  const slider = must<HTMLElement>('#slider');
+  const pmin = must<HTMLInputElement>('#pmin');
+  const pmax = must<HTMLInputElement>('#pmax');
+  const sliderVal = must<HTMLElement>('#slider-val');
+  const accN = {
+    oca: must<HTMLElement>('[data-acc-n="oca"]'),
+    color: must<HTMLElement>('[data-acc-n="color"]'),
+    precio: must<HTMLElement>('[data-acc-n="precio"]'),
+  };
+  const BORDE_MIN = Number(slider.dataset.min ?? 0);
+  const BORDE_MAX = Number(slider.dataset.max ?? 0);
   const clearBtn = must<HTMLButtonElement>('#clear');
   const emptyClearBtn = must<HTMLButtonElement>('#empty-clear');
   const empty = must<HTMLElement>('#empty');
@@ -94,32 +110,42 @@ export function initCatalog(): void {
 
   const categoriasValidas = new Set<string>([TODOS, ...catBtns.map((b) => b.dataset.filterCat ?? '')]);
   const ocasionesValidas = chips.map((c) => c.dataset.filterOca ?? '').filter(Boolean);
+  const coloresValidos = colorBtns.map((c) => c.dataset.filterColor ?? '').filter(Boolean);
   const subBase = sub.textContent ?? '';
 
   const estadoInicial = (): Estado => ({
     categoria: TODOS,
     ocasiones: new Set<string>(),
+    colores: new Set<string>(),
     orden: 'relevancia',
     min: null,
     max: null,
   });
 
-  const clonar = (e: Estado): Estado => ({ ...e, ocasiones: new Set(e.ocasiones) });
+  const clonar = (e: Estado): Estado => ({ ...e, ocasiones: new Set(e.ocasiones), colores: new Set(e.colores) });
+
+  /** Lee una lista separada por comas (?ocasion=amor,aniversario) quedándose con los valores válidos. */
+  function leerLista(p: URLSearchParams, clave: string, validos: string[]): Set<string> {
+    const out = new Set<string>();
+    for (const raw of p.getAll(clave)) {
+      for (const parte of raw.split(',')) {
+        const slug = parte.trim();
+        if (validos.includes(slug)) out.add(slug);
+      }
+    }
+    return out;
+  }
 
   function leerUrl(): Estado {
     const p = new URLSearchParams(window.location.search);
     const cat = p.get('categoria') ?? TODOS;
-    const ocasiones = new Set<string>();
-    for (const raw of p.getAll('ocasion')) {
-      for (const parte of raw.split(',')) {
-        const slug = parte.trim();
-        if (ocasionesValidas.includes(slug)) ocasiones.add(slug);
-      }
-    }
+    const ocasiones = leerLista(p, 'ocasion', ocasionesValidas);
+    const colores = leerLista(p, 'color', coloresValidos);
     const ordenRaw = p.get('orden');
     return {
       categoria: categoriasValidas.has(cat) ? cat : TODOS,
       ocasiones,
+      colores,
       orden: isOrden(ordenRaw) ? ordenRaw : 'relevancia',
       min: parseLimite(p.get('min')),
       max: parseLimite(p.get('max')),
@@ -131,6 +157,8 @@ export function initCatalog(): void {
     if (e.categoria !== TODOS) partes.push(`categoria=${encodeURIComponent(e.categoria)}`);
     const oc = ocasionesValidas.filter((s) => e.ocasiones.has(s));
     if (oc.length > 0) partes.push(`ocasion=${oc.map(encodeURIComponent).join(',')}`);
+    const col = coloresValidos.filter((s) => e.colores.has(s));
+    if (col.length > 0) partes.push(`color=${col.map(encodeURIComponent).join(',')}`);
     if (e.orden !== 'relevancia') partes.push(`orden=${e.orden}`);
     if (e.min !== null) partes.push(`min=${e.min}`);
     if (e.max !== null) partes.push(`max=${e.max}`);
@@ -139,7 +167,7 @@ export function initCatalog(): void {
   }
 
   function hayFiltros(e: Estado): boolean {
-    return e.categoria !== TODOS || e.ocasiones.size > 0 || e.orden !== 'relevancia' || e.min !== null || e.max !== null;
+    return e.categoria !== TODOS || e.ocasiones.size > 0 || e.colores.size > 0 || e.orden !== 'relevancia' || e.min !== null || e.max !== null;
   }
 
   function nombreCategoria(slug: string): string {
@@ -158,10 +186,25 @@ export function initCatalog(): void {
     }
   }
 
-  function setInput(input: HTMLInputElement, v: number | null): void {
-    const txt = v === null ? '' : String(v);
-    // No pisar lo que el usuario está escribiendo
-    if (document.activeElement !== input && input.value !== txt) input.value = txt;
+  /** Mueve el slider y su relleno al rango del estado (sin límite = el borde). */
+  function pintarSlider(min: number | null, max: number | null): void {
+    const a = min ?? BORDE_MIN;
+    const b = max ?? BORDE_MAX;
+    pmin.value = String(a);
+    pmax.value = String(b);
+    const pct = (v: number): string => `${((v - BORDE_MIN) / Math.max(1, BORDE_MAX - BORDE_MIN)) * 100}%`;
+    slider.style.setProperty('--a', pct(a));
+    slider.style.setProperty('--b', pct(b));
+    sliderVal.textContent = `S/${a} – S/${b}`;
+    pmin.setAttribute('aria-valuetext', `S/${a}`);
+    pmax.setAttribute('aria-valuetext', `S/${b}`);
+  }
+
+  const leerRango = (raw: string | undefined): number | null => parseLimite(raw ?? null);
+
+  function marcarBadge(el: HTMLElement, n: number): void {
+    el.textContent = String(n);
+    el.hidden = n === 0;
   }
 
   function sincronizar(e: Estado): void {
@@ -171,9 +214,19 @@ export function initCatalog(): void {
     for (const c of chips) {
       c.setAttribute('aria-pressed', String(e.ocasiones.has(c.dataset.filterOca ?? '')));
     }
+    for (const c of colorBtns) {
+      c.setAttribute('aria-pressed', String(e.colores.has(c.dataset.filterColor ?? '')));
+    }
+    for (const r of rangoBtns) {
+      const activo =
+        (e.min !== null || e.max !== null) &&
+        leerRango(r.dataset.rangoMin) === e.min &&
+        leerRango(r.dataset.rangoMax) === e.max;
+      r.setAttribute('aria-pressed', String(activo));
+    }
     sort.value = e.orden;
-    setInput(minInput, e.min);
-    setInput(maxInput, e.max);
+    // No mover el slider mientras se arrastra (lo pinta su propio evento)
+    if (!arrastrando) pintarSlider(e.min, e.max);
 
     const visibles = cells.filter((c) => !c.hidden).length;
     const etiqueta =
@@ -186,11 +239,12 @@ export function initCatalog(): void {
     contadorCat.textContent = `· ${visibles} ${visibles === 1 ? 'detalle' : 'detalles'}`;
     aplicarBtn.textContent = visibles === 0 ? 'Ver sin resultados' : `Ver ${etiqueta.toLowerCase()}`;
 
-    // Badge del botón "Filtrar y ordenar": ocasiones + precio + orden distinto de relevancia
-    const activos =
-      e.ocasiones.size + (e.min !== null || e.max !== null ? 1 : 0) + (e.orden !== 'relevancia' ? 1 : 0);
-    filtrosN.textContent = String(activos);
-    filtrosN.hidden = activos === 0;
+    // Badges: botón "Filtros" (todo lo del panel) y cada acordeón
+    const conPrecio = e.min !== null || e.max !== null ? 1 : 0;
+    marcarBadge(filtrosN, e.ocasiones.size + e.colores.size + conPrecio);
+    marcarBadge(accN.oca, e.ocasiones.size);
+    marcarBadge(accN.color, e.colores.size);
+    marcarBadge(accN.precio, conPrecio);
 
     const nombre = e.categoria === TODOS ? TITULO_BASE : nombreCategoria(e.categoria);
     nombreCat.textContent = nombre;
@@ -202,6 +256,7 @@ export function initCatalog(): void {
   }
 
   let estado: Estado = estadoInicial();
+  let arrastrando = false;
 
   function aplicar(e: Estado, animar: boolean): void {
     estado = e;
@@ -277,18 +332,54 @@ export function initCatalog(): void {
     });
   });
 
-  const escucharPrecio = (input: HTMLInputElement, campo: 'min' | 'max'): void => {
+  for (const c of colorBtns) {
+    c.addEventListener('click', () => {
+      const color = c.dataset.filterColor ?? '';
+      if (!color) return;
+      cambiar((e) => {
+        if (e.colores.has(color)) e.colores.delete(color);
+        else e.colores.add(color);
+      });
+    });
+  }
+
+  // Rangos rápidos: tocar el activo lo quita
+  for (const r of rangoBtns) {
+    r.addEventListener('click', () => {
+      const min = leerRango(r.dataset.rangoMin);
+      const max = leerRango(r.dataset.rangoMax);
+      const yaActivo = r.getAttribute('aria-pressed') === 'true';
+      cambiar((e) => {
+        e.min = yaActivo ? null : min;
+        e.max = yaActivo ? null : max;
+      });
+    });
+  }
+
+  // Slider: los puntos no se cruzan; en el borde equivale a "sin límite"
+  const escucharSlider = (input: HTMLInputElement, campo: 'min' | 'max'): void => {
     input.addEventListener('input', () => {
+      let a = Number(pmin.value);
+      let b = Number(pmax.value);
+      if (a > b) {
+        if (campo === 'min') a = b;
+        else b = a;
+      }
+      arrastrando = true;
+      pintarSlider(a, b);
+      const min = a <= BORDE_MIN ? null : a;
+      const max = b >= BORDE_MAX ? null : b;
       conDebounce(() => {
-        const valor = parseLimite(input.value);
         cambiar((e) => {
-          e[campo] = valor;
+          e.min = min;
+          e.max = max;
         });
+        arrastrando = false;
       });
     });
   };
-  escucharPrecio(minInput, 'min');
-  escucharPrecio(maxInput, 'max');
+  escucharSlider(pmin, 'min');
+  escucharSlider(pmax, 'max');
 
   clearBtn.addEventListener('click', limpiar);
   emptyClearBtn.addEventListener('click', limpiar);
