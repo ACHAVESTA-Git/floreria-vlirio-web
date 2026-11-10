@@ -28,7 +28,7 @@ const { total, ocasiones, colores, precio } = Astro.props;
       </button>
     </div>
 
-    <div class="sp-body">
+    <div class="sp-body" data-lenis-prevent>
       <FilterAccordion titulo="Ocasión" acc="oca" open>
         <FilterOptions tipo="ocasion" grupo="Ocasión" items={ocasiones} />
       </FilterAccordion>

@@ -14,6 +14,7 @@
 </button>
 
 <script>
+  import { EVENTO_ABRIR_CANASTA } from '../../lib/events';
   import { $canasta, getCount } from './basketStore';
 
   const boton = document.getElementById('basketBtn');
@@ -28,7 +29,7 @@
     });
 
     boton.addEventListener('click', () => {
-      document.dispatchEvent(new CustomEvent('vl:abrir-canasta'));
+      document.dispatchEvent(new CustomEvent(EVENTO_ABRIR_CANASTA));
     });
   }
 </script>

@@ -6,6 +6,7 @@
 import { all, must } from '../../lib/dom';
 import { lockScroll, unlockScroll } from '../../lib/scrollLock';
 import { trapFocus } from '../../lib/focusTrap';
+import { EVENTO_ABRIR_CANASTA } from '../../lib/events';
 
 /** Desde este ancho el menú móvil desaparece y se usa la navegación en línea. */
 const ESCRITORIO_MQ = '(min-width: 900px)';
@@ -83,6 +84,10 @@ export function initMobileMenu(): void {
     e.preventDefault();
     cerrar();
   });
+
+  // Abrir la canasta (su botón sigue visible sobre el menú) cierra el menú: si no, las dos
+  // trampas de foco se pelean el Tab. Sin devolver el foco: la canasta pone el suyo.
+  document.addEventListener(EVENTO_ABRIR_CANASTA, () => cerrar(false));
 
   // Pasar a escritorio con el menú abierto: cerrar sin mover el foco.
   window.matchMedia(ESCRITORIO_MQ).addEventListener('change', (e) => {

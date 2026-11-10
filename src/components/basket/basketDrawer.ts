@@ -4,6 +4,7 @@
  */
 import { lockScroll, unlockScroll } from '../../lib/scrollLock';
 import { trapFocus } from '../../lib/focusTrap';
+import { EVENTO_ABRIR_CANASTA } from '../../lib/events';
 import { initAddButtons } from './basketAddButtons';
 import { leerNodosCanasta, type BasketNodes } from './basketNodes';
 import { renderItems, renderTotales, renderUpsell } from './basketRender';
@@ -11,7 +12,6 @@ import { $canasta, $cardMessage, cantidadDe, setQty } from './basketStore';
 import { claveAccion } from './basketText';
 
 const ID_BOTON_CANASTA = 'basketBtn';
-const EVENTO_ABRIR = 'vl:abrir-canasta';
 
 /** Un drawer por documento aunque initBasketDrawer() se llame dos veces. */
 const montados = new WeakSet<HTMLElement>();
@@ -81,7 +81,7 @@ function conectarEventos(nodos: BasketNodes, panel: Panel): void {
   });
   nodos.closeBtn.addEventListener('click', panel.cerrar);
   nodos.scrim.addEventListener('click', panel.cerrar);
-  document.addEventListener(EVENTO_ABRIR, panel.abrir);
+  document.addEventListener(EVENTO_ABRIR_CANASTA, panel.abrir);
 }
 
 /** Botones de cantidad y "Quitar" de una fila; después devuelve el foco al control equivalente. */

@@ -1,5 +1,6 @@
 ---
 import type { Faceta } from '../../lib/catalogFacets';
+import { plural } from '../../lib/text';
 
 /** Lista de opciones con casilla (ocasión) o muestra de color (color). */
 interface Props {
@@ -29,7 +30,7 @@ const atributo = esColor ? 'data-filter-color' : 'data-filter-oca';
           )
         }
         <span class="opt-t">{o.nombre}</span>
-        <span class="opt-n" aria-label={`${o.n} productos`}>{o.n}</span>
+        <span class="opt-n" aria-label={plural(o.n, 'producto')}>{o.n}</span>
       </button>
     ))
   }

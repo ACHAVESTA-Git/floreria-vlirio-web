@@ -41,6 +41,9 @@ Antes de escribir un helper, busca si ya existe (`grep -rn "function nombre" src
 | Quitar tildes, capitalizar, plurales | `src/lib/text.ts` | Otra `normalizar` local |
 | Color de producto → token CSS | `src/lib/colors.ts` | Listas `TOKENS_COLOR` copiadas |
 | Datos de productos | `src/lib/catalog.ts` | Leer la colección o escribir precios en el componente |
+| Conteos y facetas del catálogo | `src/lib/catalogFacets.ts` | Calcularlos en el frontmatter de la página |
+| Emitir o escuchar un evento propio | Constante de `src/lib/events.ts` | Escribir `'vl:algo'` a mano en dos archivos |
+| Favoritos o canasta | `favoritesStore.ts` / `basketStore.ts` | Leer `localStorage` desde un componente |
 
 Si copias un bloque por segunda vez, es momento de extraerlo.
 
@@ -83,7 +86,8 @@ const { ocasiones, colores } = getFacetas(productos); // la lógica vive en lib
 - Exporta una función `initX()` por módulo y haz que sea **idempotente** (que llamarla dos veces no duplique listeners). Patrón: `WeakSet` del elemento raíz.
 - **Nada de estado global de módulo** salvo que sea a propósito (y comentado). Los temporizadores y el estado van dentro de `initX()`.
 - Nombres: funciones en español o inglés, pero **consistentes dentro del archivo**. Componentes en inglés (`FilterPanel.astro`) y textos visibles en español (regla de `CLAUDE.md`).
-- Nada de números mágicos: `const DEBOUNCE_MS = 250;` arriba del archivo.
+- Nada de números mágicos: `const DEBOUNCE_MS = 250;` arriba del archivo. **Pero con criterio:** nombra los valores que alguien querría ajustar o que no se entienden solos (duraciones, límites, cortes). Una curva con 30 constantes (`RUIDO_ALTURA_PX`, `ESCALA_PICO`…) no se lee mejor que con los números y un comentario. Agrúpalas en un objeto (`const VUELO = { duracionMs: 820, pasos: 22 }`) si son de lo mismo.
+- **Dos paneles pueden convivir**: si un panel nuevo atrapa el foco, piensa qué pasa si otro se abre encima (ejemplo: abrir la canasta cierra el menú móvil).
 
 ## 6. CSS
 
@@ -98,7 +102,14 @@ const { ocasiones, colores } = getFacetas(productos); // la lógica vive en lib
 - Encabezado corto en cada módulo `.ts` diciendo qué hace y qué no.
 - Borra el código comentado y los `console.log`.
 
-## 8. Antes de hacer commit (checklist)
+## 8. Lecciones del primer refactor (nov 2026)
+
+- **Que un archivo sea corto no lo hace legible.** `flyToBasket.ts` pasó de 137 a 236 líneas al nombrar cada número. El objetivo es entender el archivo rápido, no cumplir un contador.
+- **Al separar componentes, los ids y `data-*` son el contrato.** Compara la lista de ids y `data-*` del HTML antes y después (`grep -o 'id="[^"]*"' | sort`). Así se verificó el refactor del catálogo: 262 atributos idénticos.
+- **Lo que no puedes probar, dilo.** "Compila" no es lo mismo que "funciona": la prueba en el navegador (375px y 1280px, teclado, scroll) se hace siempre antes de fusionar.
+- **Si ves un bug fuera de tu área, repórtalo; no lo arregles en silencio.** Así salió a la luz el conflicto entre el menú y la canasta.
+
+## 9. Antes de hacer commit (checklist)
 
 1. `npm run build` → **0 errores** (`astro check` incluido).
 2. Ningún archivo nuevo o tocado pasa los límites de la sección 1 sin una razón escrita en el PR o commit.
