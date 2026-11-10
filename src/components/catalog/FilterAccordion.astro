@@ -1,0 +1,81 @@
+---
+/** Sección plegable de los filtros: título, badge con el conteo activo y contenido en el slot. */
+interface Props {
+  titulo: string;
+  /** Valor de data-acc-n: el JS escribe ahí cuántos filtros de esta sección están activos. */
+  acc: string;
+  open?: boolean;
+}
+const { titulo, acc, open = false } = Astro.props;
+---
+
+<details class="acc" open={open}>
+  <summary>
+    <span class="acc-t">{titulo}</span>
+    <span class="acc-n" data-acc-n={acc} hidden></span>
+    <svg class="acc-ico" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+  </summary>
+  <slot />
+</details>
+
+<style>
+  .acc {
+    border-bottom: 1px solid var(--vl-durazno);
+  }
+  .acc summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 56px;
+    list-style: none;
+    cursor: pointer;
+    font-family: var(--vl-font-title);
+    font-weight: 800;
+    font-size: 17px;
+    color: var(--vl-tinta);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .acc summary::-webkit-details-marker {
+    display: none;
+  }
+  .acc-t {
+    margin-right: auto;
+  }
+  .acc-n {
+    display: grid;
+    place-items: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: var(--vl-radius-pill);
+    background: var(--vl-vino);
+    color: var(--vl-blanco);
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .acc-n[hidden] {
+    display: none;
+  }
+  .acc-ico {
+    flex: none;
+    color: var(--vl-vino);
+    transition: transform 0.25s var(--vl-ease);
+  }
+  .acc[open] .acc-ico {
+    transform: rotate(180deg);
+  }
+
+  @media (min-width: 1024px) {
+    .acc summary {
+      min-height: 52px;
+      font-size: 16px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .acc-ico {
+      transition: none;
+    }
+  }
+</style>
