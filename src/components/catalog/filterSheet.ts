@@ -1,57 +1,81 @@
 /**
  * Panel "Filtrar y ordenar" del catálogo en móvil (bottom sheet).
  * Solo abre/cierra: los controles (chips, orden, precio) son los mismos elementos
- * de la página y los gestiona catalogFilters.ts. Desde 760px el panel no existe
- * visualmente (display: contents en CSS) y este módulo no hace nada útil.
+ * de la página y los gestiona catalogFilters.ts. Desde 1024px el panel no es un diálogo
+ * y este módulo lo cierra si estaba abierto.
  */
+import { must } from '../../lib/dom';
+import { lockScroll, unlockScroll } from '../../lib/scrollLock';
+import { trapFocus } from '../../lib/focusTrap';
 
-const FOCUSABLE =
-  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+/** Desde este ancho los controles van en línea y el panel deja de ser un diálogo. */
+const ESCRITORIO_MQ = '(min-width: 1024px)';
 
-function must<T extends HTMLElement>(id: string): T {
-  const el = document.getElementById(id);
-  if (!el) throw new Error(`[catalogo] Falta #${id} para el panel de filtros`);
-  return el as T;
+interface SheetNodes {
+  abrirBtn: HTMLButtonElement;
+  sheet: HTMLElement;
+  cerrarBtn: HTMLButtonElement;
+  scrim: HTMLElement;
+  aplicarBtn: HTMLButtonElement;
+  panel: HTMLElement;
+}
+
+function leerNodos(): SheetNodes {
+  return {
+    abrirBtn: must<HTMLButtonElement>('#open-filters'),
+    sheet: must('#sheet'),
+    cerrarBtn: must<HTMLButtonElement>('#sheet-close'),
+    scrim: must('#sheet-scrim'),
+    aplicarBtn: must<HTMLButtonElement>('#sheet-apply'),
+    panel: must('#sheet-panel'),
+  };
+}
+
+/** Solo es un diálogo mientras está abierto (en escritorio los controles van en línea). */
+function marcarDialogo(panel: HTMLElement, on: boolean): void {
+  if (on) {
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+  } else {
+    panel.removeAttribute('role');
+    panel.removeAttribute('aria-modal');
+  }
 }
 
 export function initFilterSheet(): void {
-  const abrirBtn = must<HTMLButtonElement>('open-filters');
-  const sheet = must<HTMLElement>('sheet');
-  const cerrarBtn = must<HTMLButtonElement>('sheet-close');
-  const scrim = must<HTMLElement>('sheet-scrim');
-  const aplicarBtn = must<HTMLButtonElement>('sheet-apply');
-
-  const panel = must<HTMLElement>('sheet-panel');
+  const nodos = leerNodos();
+  const { abrirBtn, sheet, cerrarBtn, scrim, aplicarBtn, panel } = nodos;
   let abierto = false;
+  let soltarFoco: (() => void) | null = null;
 
-  /** Solo es un diálogo mientras está abierto (en escritorio los controles van en línea). */
-  function marcarDialogo(on: boolean): void {
-    if (on) {
-      panel.setAttribute('role', 'dialog');
-      panel.setAttribute('aria-modal', 'true');
-    } else {
-      panel.removeAttribute('role');
-      panel.removeAttribute('aria-modal');
-    }
+  /** Estado visible y de foco del panel; sin tocar el scroll (eso lo hacen abrir y cerrar). */
+  function mostrar(on: boolean): void {
+    marcarDialogo(panel, on);
+    sheet.classList.toggle('on', on);
+    abrirBtn.setAttribute('aria-expanded', String(on));
   }
 
   function abrir(): void {
     if (abierto) return;
     abierto = true;
-    marcarDialogo(true);
-    sheet.classList.add('on');
-    abrirBtn.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
+    mostrar(true);
+    lockScroll();
+    soltarFoco = trapFocus(sheet);
     cerrarBtn.focus();
+  }
+
+  /** Quita el bloqueo y el atrapado de foco; el llamador decide dónde queda el foco. */
+  function ocultar(): void {
+    abierto = false;
+    soltarFoco?.();
+    soltarFoco = null;
+    mostrar(false);
+    unlockScroll();
   }
 
   function cerrar(): void {
     if (!abierto) return;
-    abierto = false;
-    marcarDialogo(false);
-    sheet.classList.remove('on');
-    abrirBtn.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
+    ocultar();
     abrirBtn.focus();
   }
 
@@ -61,41 +85,14 @@ export function initFilterSheet(): void {
   aplicarBtn.addEventListener('click', cerrar);
 
   document.addEventListener('keydown', (e) => {
-    if (!abierto) return;
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      cerrar();
-      return;
-    }
-    if (e.key !== 'Tab') return;
-
-    // Foco atrapado dentro del panel (solo elementos visibles)
-    const foco = [...sheet.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((el) => el.getClientRects().length > 0);
-    const primero = foco[0];
-    const ultimo = foco[foco.length - 1];
-    if (!primero || !ultimo) {
-      e.preventDefault();
-      cerrarBtn.focus();
-      return;
-    }
-    const activo = document.activeElement;
-    const dentro = activo instanceof Node && sheet.contains(activo);
-    if (e.shiftKey && (activo === primero || !dentro)) {
-      e.preventDefault();
-      ultimo.focus();
-    } else if (!e.shiftKey && (activo === ultimo || !dentro)) {
-      e.preventDefault();
-      primero.focus();
-    }
+    if (!abierto || e.key !== 'Escape') return;
+    e.preventDefault();
+    cerrar();
   });
 
   // Si se amplía a escritorio con el panel abierto, se cierra sin mover el foco.
-  window.matchMedia('(min-width: 1024px)').addEventListener('change', (e) => {
+  window.matchMedia(ESCRITORIO_MQ).addEventListener('change', (e) => {
     if (!e.matches || !abierto) return;
-    abierto = false;
-    marcarDialogo(false);
-    sheet.classList.remove('on');
-    abrirBtn.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
+    ocultar();
   });
 }
