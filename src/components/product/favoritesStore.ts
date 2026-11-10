@@ -17,7 +17,7 @@ function leerStorage(): string[] {
   }
 }
 
-function guardar(favs: string[]): void {
+function guardar(favs: readonly string[]): void {
   try {
     localStorage.setItem(CLAVE, JSON.stringify(favs));
   } catch {
