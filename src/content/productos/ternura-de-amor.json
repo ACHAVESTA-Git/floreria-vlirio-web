@@ -14,7 +14,7 @@
     "rosado"
   ],
   "imagen": "../../assets/productos/arreglo-rosas-rojas-lirios-peluche-oso.png",
-  "flor": "rosa",
+  "flores": ["rosa", "osito"],
   "demo": true,
   "imagenAmbiente": "../../assets/productos/cf-arreglo-rosas-rojas-lirios-peluche-oso.jpg"
 }

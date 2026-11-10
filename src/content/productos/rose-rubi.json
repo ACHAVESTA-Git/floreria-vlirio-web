@@ -13,7 +13,7 @@
     "amarillo"
   ],
   "imagen": "../../assets/productos/box-corazon-girasoles-lirios-peluche-lotso.png",
-  "flor": "girasol",
+  "flores": ["rosa", "girasol", "lirio", "osito"],
   "demo": true,
   "imagenAmbiente": "../../assets/productos/cf-box-corazon-girasoles-lirios-peluche-lotso.jpg"
 }

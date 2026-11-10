@@ -23,9 +23,16 @@ export const SITE = {
   mapa: 'https://www.google.com/maps?q=Mercado+Unicachi+de+Comas+Lima&output=embed',
 } as const;
 
-/** Flor de la animación al agregar a la canasta */
-export type FlyFlower = 'girasol' | 'tulipan' | 'producto';
-export const FLY_FLOWER: FlyFlower = 'girasol';
+/** Lo que puede volar a la canasta: una flor o un extra (osito, chocolate). */
+export const FLY_TIPOS = ['rosa', 'tulipan', 'girasol', 'lirio', 'gerbera', 'osito', 'chocolate'] as const;
+export type FlyTipo = (typeof FLY_TIPOS)[number];
+
+/**
+ * Animación al agregar a la canasta: 'producto' usa las `flores` de cada producto;
+ * un tipo fijo hace volar siempre ese.
+ */
+export type FlyFlower = FlyTipo | 'producto';
+export const FLY_FLOWER: FlyFlower = 'producto';
 
 export const waLink = (texto: string): string =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texto)}`;
