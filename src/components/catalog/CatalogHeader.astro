@@ -1,0 +1,84 @@
+---
+import CategoryRail from './CategoryRail.astro';
+import type { CategoriaCatalogo } from '../../lib/catalogFacets';
+
+/** Título del catálogo con el total, subtítulo y las categorías con foto. */
+interface Props {
+  /** Productos del catálogo sin filtrar. El JS lo sustituye al filtrar. */
+  total: number;
+  categorias: CategoriaCatalogo[];
+}
+const { total, categorias } = Astro.props;
+---
+
+<section class="hdr" aria-labelledby="cat-title">
+  <div class="wrap hdr-inner">
+    <div class="hdr-txt">
+      <h1 id="cat-title" class="title"><span id="cat-name">Catálogo</span> <span id="cat-count" class="cat-count">· {total} detalles</span></h1>
+      <p id="cat-sub" class="sub">Elige tu detalle favorito y pídelo por WhatsApp.</p>
+    </div>
+
+    <CategoryRail categorias={categorias} />
+  </div>
+</section>
+
+<!-- Va antes de que cargue el JS para que el título no parpadee con "Catálogo" al abrir una categoría -->
+<script is:inline>
+  (function () {
+    var cat = new URLSearchParams(location.search).get('categoria');
+    var botones = Array.prototype.slice.call(document.querySelectorAll('[data-filter-cat]'));
+    var activa = null;
+    botones.forEach(function (b) {
+      if (b.getAttribute('data-filter-cat') === cat) activa = b;
+    });
+    if (!activa) return;
+    var nombre = activa.getAttribute('data-nombre');
+    var titulo = document.getElementById('cat-name');
+    if (titulo && nombre) titulo.textContent = nombre;
+  })();
+</script>
+
+<style>
+  /* ---------- Encabezado: 84px del header fijo + 16px ---------- */
+  .hdr {
+    padding-top: 100px;
+    padding-bottom: 8px;
+    background: linear-gradient(180deg, var(--vl-blush), var(--vl-crema));
+  }
+  .hdr-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .hdr-txt {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .cat-count {
+    font-family: var(--vl-font-ui);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--vl-tinta-suave);
+    white-space: nowrap;
+  }
+  .sub {
+    display: none; /* en móvil el contador basta; en escritorio se muestra */
+    max-width: 44ch;
+    color: var(--vl-tinta-suave);
+    font-size: 17px;
+  }
+
+  @media (min-width: 760px) {
+    .hdr {
+      padding-bottom: 24px;
+    }
+    .hdr-inner {
+      gap: 20px;
+    }
+    .sub {
+      display: block;
+    }
+  }
+</style>

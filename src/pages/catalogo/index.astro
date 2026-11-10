@@ -1,8 +1,7 @@
 ---
-import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductCard from '../../components/product/ProductCard.astro';
-import { getAsset } from '../../lib/images';
+import CatalogHeader from '../../components/catalog/CatalogHeader.astro';
 import { getProductos, getDestacados } from '../../lib/catalog';
 import {
   categoriasConProductos,
@@ -20,70 +19,10 @@ const celdas = celdasCatalogo(productos, destacados);
 const ocasiones = facetasOcasion(productos);
 const colores = facetasColor(productos);
 const precio = limitesPrecio(productos);
-// Distinta de la de Ramos: si no, "Todos" y "Ramos" se veían iguales.
-const imgTodos = getAsset('ramo-rosas-rosadas-lirios-papel-blanco');
 ---
 
 <BaseLayout title="Catálogo" description="Catálogo de Florería V'Lirio: ramos, buchones, arreglos, box, tulipanes, peluches y chocolates en Lima. Filtra por tipo y ocasión y pide por WhatsApp.">
-  <section class="hdr" aria-labelledby="cat-title">
-    <div class="wrap hdr-inner">
-      <div class="hdr-txt">
-        <h1 id="cat-title" class="title"><span id="cat-name">Catálogo</span> <span id="cat-count" class="cat-count">· {productos.length} detalles</span></h1>
-        <p id="cat-sub" class="sub">Elige tu detalle favorito y pídelo por WhatsApp.</p>
-      </div>
-
-      <div class="cats" role="group" aria-label="Tipo de arreglo">
-        <button type="button" class="cat" data-filter-cat="todos" data-nombre="Catálogo" aria-pressed="true">
-          <span class="cat-img">
-            <Image
-              src={imgTodos}
-              widths={[128, 192]}
-              sizes="84px"
-              format="webp"
-              alt=""
-              loading="eager"
-              decoding="async"
-            />
-          </span>
-          <span class="cat-name">Todos</span>
-        </button>
-        {
-          categorias.map((c) => (
-            <button type="button" class="cat" data-filter-cat={c.slug} data-nombre={c.nombre} aria-pressed="false">
-              <span class="cat-img">
-                <Image
-                  src={getAsset(c.imagen)}
-                  widths={[128, 192]}
-                  sizes="84px"
-                  format="webp"
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  style={`view-transition-name: vt-cat-${c.slug}`}
-                />
-              </span>
-              <span class="cat-name">{c.nombre}</span>
-            </button>
-          ))
-        }
-      </div>
-    </div>
-  </section>
-
-  <script is:inline>
-    (function () {
-      var cat = new URLSearchParams(location.search).get('categoria');
-      var botones = Array.prototype.slice.call(document.querySelectorAll('[data-filter-cat]'));
-      var activa = null;
-      botones.forEach(function (b) {
-        if (b.getAttribute('data-filter-cat') === cat) activa = b;
-      });
-      if (!activa) return;
-      var nombre = activa.getAttribute('data-nombre');
-      var titulo = document.getElementById('cat-name');
-      if (titulo && nombre) titulo.textContent = nombre;
-    })();
-  </script>
+  <CatalogHeader total={productos.length} categorias={categorias} />
 
   <section class="listado">
     <div class="wrap layout">
@@ -242,101 +181,6 @@ const imgTodos = getAsset('ramo-rosas-rosadas-lirios-papel-blanco');
 </BaseLayout>
 
 <style>
-  /* ---------- Encabezado: 84px del header fijo + 16px ---------- */
-  .hdr {
-    padding-top: 100px;
-    padding-bottom: 8px;
-    background: linear-gradient(180deg, var(--vl-blush), var(--vl-crema));
-  }
-  .hdr-inner {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 10px;
-  }
-  .hdr-txt {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 0;
-  }
-  .cat-count {
-    font-family: var(--vl-font-ui);
-    font-weight: 600;
-    font-size: 15px;
-    color: var(--vl-tinta-suave);
-    white-space: nowrap;
-  }
-  .sub {
-    display: none; /* en móvil el contador basta; en escritorio se muestra */
-    max-width: 44ch;
-    color: var(--vl-tinta-suave);
-    font-size: 17px;
-  }
-
-  /* Fila de categorías con foto (reemplaza las pastillas). Móvil: scroll horizontal sin barra */
-  .cats {
-    display: flex;
-    gap: 12px;
-    min-width: 0;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;
-    margin-inline: -16px;
-    padding: 2px 16px 0;
-    scroll-padding-inline: 16px; /* sin esto el snap pegaba "Todos" al borde y cortaba su anillo */
-  }
-  .cats::-webkit-scrollbar {
-    display: none;
-  }
-  .cat {
-    flex: none;
-    width: 80px;
-    scroll-snap-align: start;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    font-family: var(--vl-font-ui);
-    font-weight: 600;
-    font-size: 12px;
-    line-height: 1.2;
-    text-align: center;
-    color: var(--vl-tinta);
-    border-radius: 12px;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-  }
-  .cat-img {
-    display: block;
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: var(--vl-blanco);
-    box-shadow: var(--vl-shadow);
-    transition: box-shadow 0.25s var(--vl-ease);
-  }
-  .cat-img :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .cat[aria-pressed='true'] .cat-img {
-    box-shadow:
-      0 0 0 3px var(--vl-crema),
-      0 0 0 5px var(--vl-vino);
-  }
-  .cat[aria-pressed='true'] .cat-name {
-    color: var(--vl-vino);
-  }
-  .cat-name {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
   /* ---------- Listado: columna de filtros + productos ---------- */
   .listado {
     padding-bottom: 72px;
@@ -793,31 +637,6 @@ const imgTodos = getAsset('ramo-rosas-rosadas-lirios-papel-blanco');
 
   /* ---------- Desde 760px: encabezado completo y grilla de tarjetas estándar ---------- */
   @media (min-width: 760px) {
-    .hdr {
-      padding-bottom: 24px;
-    }
-    .hdr-inner {
-      gap: 20px;
-    }
-    .sub {
-      display: block;
-    }
-    .cats {
-      flex-wrap: wrap;
-      overflow: visible;
-      margin-inline: 0;
-      padding: 4px 0;
-      gap: 18px 22px;
-    }
-    .cat {
-      width: 96px;
-      font-size: 14px;
-      gap: 8px;
-    }
-    .cat-img {
-      width: 84px;
-      height: 84px;
-    }
     .orden-por {
       display: inline;
     }
@@ -933,8 +752,7 @@ const imgTodos = getAsset('ramo-rosas-rosadas-lirios-papel-blanco');
     .check,
     .swatch,
     .rango-chip,
-    .filtrar,
-    .cat-img {
+    .filtrar {
       transition: none;
     }
   }
