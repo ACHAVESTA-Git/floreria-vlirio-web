@@ -37,9 +37,11 @@
 </section>
 
 <script>
+  import { prefersReducedMotion } from '../../lib/dom';
+
   // La línea punteada se dibuja al entrar en pantalla. Sin JS o con reduced-motion se ve completa.
   const steps = document.querySelector<HTMLElement>('[data-how]');
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = prefersReducedMotion();
 
   if (steps && !reduce && 'IntersectionObserver' in window) {
     steps.classList.add('js-line');

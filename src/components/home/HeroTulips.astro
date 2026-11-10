@@ -1,0 +1,89 @@
+---
+// Ilustración del hero: jardín de 7 tulipanes en arco (como el logo). Mismas medidas que el boceto.
+// La animación (heroScroll.ts) busca las clases .garden, .stem, .leaf y .bulb: no las renombres sin cambiarla.
+
+const TULIPANES = [
+  { x: 110, h: 170 },
+  { x: 210, h: 230 },
+  { x: 310, h: 280 },
+  { x: 410, h: 330 },
+  { x: 510, h: 280 },
+  { x: 610, h: 230 },
+  { x: 710, h: 170 },
+].map((t, i) => {
+  const side = i % 2 ? -1 : 1;
+  const h = t.h;
+  return {
+    ...t,
+    leaf: `M0 ${-h * 0.32} C ${side * 34} ${-h * 0.42}, ${side * 44} ${-h * 0.62}, ${side * 40} ${-h * 0.72} C ${side * 20} ${-h * 0.62}, ${side * 6} ${-h * 0.5}, 0 ${-h * 0.36}Z`,
+  };
+});
+
+const BULBO = 'M-22 0 C-28 -22 -24 -44 -15 -54 L-8 -38 L0 -60 L8 -38 L15 -54 C24 -44 28 -22 22 0 C14 10 -14 10 -22 0Z';
+const BULBO_HL = 'M0 -60 L8 -38 L15 -54 C22 -42 24 -22 18 -2 C12 4 4 6 0 6Z';
+---
+
+<svg class="garden" id="garden" viewBox="0 0 820 440" aria-hidden="true" focusable="false">
+  {
+    TULIPANES.map((t) => (
+      <g class="tulip" transform={`translate(${t.x},440)`} data-h={t.h}>
+        <rect class="stem" x="-2" y={-t.h} width="4" height={t.h} rx="2" />
+        <path class="leaf" d={t.leaf} />
+        <g transform={`translate(0,${-t.h})`}>
+          <g class="bulb" style={`--h:${t.h}`}>
+            <path d={BULBO} />
+            <path class="hl" d={BULBO_HL} />
+          </g>
+        </g>
+      </g>
+    ))
+  }
+</svg>
+
+<style>
+  /* ---------- Jardín de tulipanes (estado inicial solo con CSS) ---------- */
+  .garden {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-inline: auto;
+    width: min(820px, 120vw);
+    height: auto;
+  }
+  .garden .stem {
+    fill: var(--vl-follaje);
+    transform: scaleY(0.35);
+    transform-origin: 0 0;
+  }
+  .garden .leaf {
+    fill: var(--vl-follaje);
+    opacity: 0;
+    transform: scale(0.3);
+    transform-origin: 0 0;
+  }
+  .garden .bulb {
+    transform: translateY(calc(var(--h) * 0.65px)) scale(0.55);
+    transform-origin: 0 0;
+  }
+  .garden .bulb path {
+    fill: var(--vl-vino);
+  }
+  .garden .bulb path.hl {
+    fill: var(--vl-frambuesa);
+    opacity: 0.55;
+  }
+
+  /* ---------- Estado estático (reduced-motion o sin GSAP): HeroScroll pone .static en el hero ---------- */
+  :global(.hero.static) .garden {
+    opacity: 0.15;
+  }
+  :global(.hero.static) .garden .stem,
+  :global(.hero.static) .garden .bulb {
+    transform: none;
+  }
+  :global(.hero.static) .garden .leaf {
+    transform: none;
+    opacity: 0.85;
+  }
+</style>

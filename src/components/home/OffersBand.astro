@@ -31,33 +31,10 @@ const ofertas = await getOfertas();
 </section>
 
 <script>
-  /** Próximo domingo a las 23:59:59 (hora local). Si ya pasó, el de la semana siguiente. */
-  function proximoCierre(ahora: Date): Date {
-    const fin = new Date(ahora);
-    fin.setDate(ahora.getDate() + ((7 - ahora.getDay()) % 7));
-    fin.setHours(23, 59, 59, 0);
-    if (fin.getTime() <= ahora.getTime()) fin.setDate(fin.getDate() + 7);
-    return fin;
-  }
+  import { initOffersCountdown } from './offersCountdown';
 
-  function pintarCuenta(): void {
-    const ahora = new Date();
-    let s = Math.max(0, Math.floor((proximoCierre(ahora).getTime() - ahora.getTime()) / 1000));
-    const dias = Math.floor(s / 86400);
-    s -= dias * 86400;
-    const horas = Math.floor(s / 3600);
-    s -= horas * 3600;
-    const min = Math.floor(s / 60);
-
-    const valores: Record<string, number> = { dias, horas, min };
-    for (const [clave, valor] of Object.entries(valores)) {
-      const el = document.querySelector<HTMLElement>(`[data-cd="${clave}"]`);
-      if (el) el.textContent = String(valor).padStart(2, '0');
-    }
-  }
-
-  pintarCuenta();
-  window.setInterval(pintarCuenta, 30000);
+  const cuenta = document.querySelector<HTMLElement>('.countdown');
+  if (cuenta) initOffersCountdown(cuenta);
 </script>
 
 <style>

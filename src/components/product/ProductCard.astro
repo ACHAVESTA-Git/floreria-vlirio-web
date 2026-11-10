@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import type { Producto } from '../../lib/catalog';
 import { soles, waLink } from '../../config/site';
+import FavButton from './FavButton.astro';
 
 interface Props {
   producto: Producto;
@@ -33,17 +34,7 @@ const mensajeWa = `Hola V'Lirio 🌷, quiero el ${nombre} (${soles(actual)}). ¿
       decoding="async"
       style={`view-transition-name: vt-img-${producto.id}`}
     />
-    <button
-      type="button"
-      class="fav"
-      data-fav={producto.id}
-      data-nombre={nombre}
-      aria-pressed="false"
-      aria-label={`Guardar ${nombre} en favoritos`}
-    >
-      <svg class="f-vacio" width="18" height="17" viewBox="0 0 24 22" aria-hidden="true" focusable="false"><use href="#i-heart-o" /></svg>
-      <svg class="f-lleno" width="18" height="17" viewBox="0 0 24 22" aria-hidden="true" focusable="false"><use href="#i-heart" /></svg>
-    </button>
+    <FavButton slug={producto.id} nombre={nombre} />
     <a class="wa-mini" href={waLink(mensajeWa)} target="_blank" rel="noopener" aria-label={`Pedir ${nombre} por WhatsApp`}>
       <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-wa" /></svg>
     </a>
@@ -64,50 +55,10 @@ const mensajeWa = `Hola V'Lirio 🌷, quiero el ${nombre} (${soles(actual)}). ¿
 </article>
 
 <script>
-  const CLAVE = 'vl-favs';
+  import { initFavorites } from './favorites';
 
-  function leerFavs(): string[] {
-    try {
-      const data: unknown = JSON.parse(localStorage.getItem(CLAVE) ?? '[]');
-      return Array.isArray(data) ? data.filter((x): x is string => typeof x === 'string') : [];
-    } catch {
-      return [];
-    }
-  }
-
-  function guardarFavs(favs: string[]): void {
-    try {
-      localStorage.setItem(CLAVE, JSON.stringify(favs));
-    } catch {
-      /* sin almacenamiento: el favorito solo dura la página */
-    }
-  }
-
-  function pintarFavs(): void {
-    const favs = new Set(leerFavs());
-    document.querySelectorAll<HTMLButtonElement>('[data-fav]').forEach((b) => {
-      const slug = b.dataset.fav ?? '';
-      const on = favs.has(slug);
-      b.setAttribute('aria-pressed', String(on));
-      const nombre = b.dataset.nombre ?? '';
-      b.setAttribute('aria-label', on ? `Quitar ${nombre} de favoritos` : `Guardar ${nombre} en favoritos`);
-    });
-  }
-
-  pintarFavs();
-
-  document.addEventListener('click', (e) => {
-    if (!(e.target instanceof Element)) return;
-    const boton = e.target.closest<HTMLButtonElement>('[data-fav]');
-    const slug = boton?.dataset.fav;
-    if (!slug) return;
-    const favs = leerFavs();
-    const i = favs.indexOf(slug);
-    if (i >= 0) favs.splice(i, 1);
-    else favs.push(slug);
-    guardarFavs(favs);
-    pintarFavs();
-  });
+  // Idempotente: cada tarjeta lo llama, pero solo se conecta una vez por página.
+  initFavorites();
 </script>
 
 <style>
@@ -164,25 +115,6 @@ const mensajeWa = `Hola V'Lirio 🌷, quiero el ${nombre} (${soles(actual)}). ¿
     font-weight: 600;
     font-size: 13px;
   }
-
-  .fav {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 2;
-    display: grid;
-    place-items: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--vl-blanco);
-    box-shadow: var(--vl-shadow);
-    color: var(--vl-frambuesa);
-  }
-  .fav svg { width: 18px; height: 17px; }
-  .fav .f-lleno { display: none; }
-  .fav[aria-pressed="true"] .f-lleno { display: block; }
-  .fav[aria-pressed="true"] .f-vacio { display: none; }
 
   .wa-mini {
     position: absolute;
@@ -296,14 +228,9 @@ const mensajeWa = `Hola V'Lirio 🌷, quiero el ${nombre} (${soles(actual)}). ¿
       padding: 3px 8px;
       font-size: 12px;
     }
-    .card.compact .fav,
     .card.compact .wa-mini {
       width: 40px;
       height: 40px;
-    }
-    .card.compact .fav {
-      top: 8px;
-      right: 8px;
     }
     .card.compact .wa-mini {
       right: 8px;
