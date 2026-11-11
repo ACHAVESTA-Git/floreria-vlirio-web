@@ -9,6 +9,7 @@
 | `docs/02-catalogo-e-imagenes.md` | Productos y precios del catálogo e índice de las imágenes renombradas |
 | `docs/03-diseno-ux-animaciones.md` | Estructura del home, componentes, animaciones y canasta |
 | `docs/04-guia-de-codigo.md` | Tamaños máximos, estructura de archivos, utilidades compartidas y checklist antes de commit |
+| `docs/05-contexto-y-estado.md` | **Léelo al retomar el proyecto:** qué está hecho, reglas de trabajo con el autor, simulación de venta (propuesta, contratos y precios) y pendientes |
 | `PROMPT-INICIAL.md` | Prompt para arrancar la Fase 1 del desarrollo |
 | `boceto/index.html` | Boceto navegable del home (referencia visual aprobada en conversación) |
 
@@ -146,7 +147,7 @@ src/
 5. **Rendimiento:** LCP < 2.5s en 4G. La animación del hero no puede bloquear el primer render. Las imágenes van optimizadas y con `loading="lazy"` debajo del fold.
 6. **Datos en un solo lugar.** No escribas productos ni precios a mano en los componentes.
 7. **La demo no cobra.** El flujo termina en "Pedir por WhatsApp" con el mensaje prellenado. No publiques números de cuenta bancaria en la web.
-   - **Número de WhatsApp en un solo lugar:** `src/config/site.ts` → `WHATSAPP_NUMBER`. **Durante la demo es el número de pruebas del desarrollador: `51967446580`** (967 446 580). Antes de entregar se cambia por el de la florería (933 099 986).
+   - **Número de WhatsApp por rama:** lo define `astro.config.mjs`. `main` usa `51936688729` (producción) y cualquier otra rama usa `51967446580` (pruebas del desarrollador). `src/config/site.ts` lo expone como `WHATSAPP_NUMBER`. **No cambies estos números.** Si un merge choca con ellos, consérvalos y avisa al autor.
    - **No se usa ninguna API de WhatsApp.** Basta un enlace `https://wa.me/<número>?text=<encodeURIComponent(mensaje)>`, que abre la app en el móvil y WhatsApp Web en la PC. La WhatsApp Business Cloud API (Meta) solo haría falta en el futuro para mensajes automáticos (confirmaciones o estados de pedido).
 8. **Precios y descuentos de ejemplo** se marcan en los datos con `demo: true`. El cliente aún no definió ofertas reales.
 9. Usa nombres de componentes en inglés y textos visibles en español. Haz commits pequeños y descriptivos.
