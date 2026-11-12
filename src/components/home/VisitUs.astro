@@ -12,8 +12,8 @@ const redes = [
   { nombre: 'TikTok', url: SITE.redes.tiktok, icono: 'i-tiktok' },
 ] as const;
 
-/** Teléfono a enlace tel: (ej. "933 099 986" → "tel:+51933099986"). */
-const telHref = (t: string): string => `tel:+51${t.replace(/\s/g, '')}`;
+/** Teléfono a enlace tel: (ej. "933 099 986" → "tel:+51933099986"). Solo dígitos por seguridad. */
+const telHref = (t: string): string => `tel:+51${t.replace(/\D/g, '')}`;
 ---
 
 <section class="block visit-sec" id="visitanos" aria-labelledby="visitanos-titulo">
@@ -59,12 +59,12 @@ const telHref = (t: string): string => `tel:+51${t.replace(/\s/g, '')}`;
       <div class="socials">
         {
           redes.map((r) => (
-            <a href={r.url} target="_blank" rel="noopener" aria-label={r.nombre}>
+            <a href={r.url} target="_blank" rel="noopener noreferrer" aria-label={r.nombre}>
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href={`#${r.icono}`} /></svg>
             </a>
           ))
         }
-        <a class="wa" href={WA} target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+        <a class="wa" href={WA} target="_blank" rel="noopener noreferrer" aria-label="Escríbenos por WhatsApp">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-wa" /></svg>
         </a>
       </div>
@@ -74,7 +74,8 @@ const telHref = (t: string): string => `tel:+51${t.replace(/\s/g, '')}`;
         src={SITE.mapa}
         title="Mapa de ubicación de Florería V'Lirio en el Mercado Unicachi de Comas"
         loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade"
+        referrerpolicy="strict-origin-when-cross-origin"
+        sandbox="allow-scripts allow-same-origin allow-popups"
       ></iframe>
     </div>
   </div>

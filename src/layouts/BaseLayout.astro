@@ -16,6 +16,7 @@ import WhatsAppFloat from '../components/layout/WhatsAppFloat.astro';
 import BasketDrawer from '../components/basket/BasketDrawer.astro';
 import Toast from '../components/basket/Toast.astro';
 import { getCatalogMap } from '../lib/catalog';
+import { safeJsonStringify } from '../lib/text';
 import { SITE } from '../config/site';
 
 interface Props {
@@ -53,7 +54,7 @@ const catalogo = await getCatalogMap();
     <WhatsAppFloat />
     <BasketDrawer />
     <Toast />
-    <script type="application/json" id="vl-catalog" set:html={JSON.stringify(catalogo)}></script>
+    <script type="application/json" id="vl-catalog" set:html={safeJsonStringify(catalogo)}></script>
   </body>
 </html>
 

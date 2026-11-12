@@ -23,12 +23,12 @@ function ramaActual() {
 
 const rama = ramaActual();
 const esPruebas = rama !== '' && rama !== 'main' && rama !== 'HEAD';
-const numero = process.env.WHATSAPP_NUMBER_OVERRIDE || (esPruebas ? NUMERO_PRUEBAS : NUMERO_PRODUCCION);
-console.log(`[vlirio] rama "${rama || 'desconocida'}" → WhatsApp ${numero}`);
+const numeroLimpio = String(process.env.WHATSAPP_NUMBER_OVERRIDE || (esPruebas ? NUMERO_PRUEBAS : NUMERO_PRODUCCION)).replace(/\D/g, '');
+console.log(`[vlirio] rama "${rama || 'desconocida'}" → WhatsApp ${numeroLimpio}`);
 
 export default defineConfig({
   devToolbar: { enabled: false },
   vite: {
-    define: { __WHATSAPP_NUMBER__: JSON.stringify(numero) },
+    define: { __WHATSAPP_NUMBER__: JSON.stringify(numeroLimpio) },
   },
 });
