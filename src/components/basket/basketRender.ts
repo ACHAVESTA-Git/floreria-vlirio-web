@@ -53,6 +53,10 @@ function desactivarPedido(checkout: HTMLAnchorElement): void {
 }
 
 function activarPedido(checkout: HTMLAnchorElement, enlace: string): void {
+  if (!enlace.startsWith('https://wa.me/')) {
+    desactivarPedido(checkout);
+    return;
+  }
   checkout.href = enlace;
   checkout.removeAttribute('aria-disabled');
   checkout.classList.remove('off');
