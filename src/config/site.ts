@@ -34,8 +34,10 @@ export type FlyTipo = (typeof FLY_TIPOS)[number];
 export type FlyFlower = FlyTipo | 'producto';
 export const FLY_FLOWER: FlyFlower = 'producto';
 
+const NUMERO_SEGURO = (typeof WHATSAPP_NUMBER === 'string' ? WHATSAPP_NUMBER : '').replace(/\D/g, '');
+
 export const waLink = (texto: string): string =>
-  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texto)}`;
+  `https://wa.me/${NUMERO_SEGURO}?text=${encodeURIComponent(texto)}`;
 
 export const soles = (n: number): string => 'S/' + (Number.isInteger(n) ? n : n.toFixed(2));
 

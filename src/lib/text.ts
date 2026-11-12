@@ -14,3 +14,11 @@ export function capitalizar(texto: string): string {
 export function plural(n: number, singular: string, pluralForm = `${singular}s`): string {
   return `${n} ${n === 1 ? singular : pluralForm}`;
 }
+
+/**
+ * Serializa a JSON seguro para inyectar en etiquetas <script>,
+ * escapando '<' como '\\u003c' para evitar script breakout / XSS.
+ */
+export function safeJsonStringify(data: unknown): string {
+  return (JSON.stringify(data) ?? 'null').replace(/</g, '\\u003c');
+}

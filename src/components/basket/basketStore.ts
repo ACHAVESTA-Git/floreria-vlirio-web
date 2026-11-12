@@ -7,16 +7,29 @@ export type Canasta = Record<string, number>;
 export type Catalogo = Record<string, CatalogEntry>;
 
 const CLAVE = 'vl-canasta';
+export const MAX_CANTIDAD_POR_PRODUCTO = 99;
+export const MAX_ITEMS_CANASTA = 50;
+export const MAX_LONGITUD_SLUG = 64;
+export const MAX_LONGITUD_MENSAJE = 300;
+const SLUG_REGEX = /^[a-z0-9-]+$/;
+
+function esSlugValido(slug: string): boolean {
+  return typeof slug === 'string' && slug.length > 0 && slug.length <= MAX_LONGITUD_SLUG && SLUG_REGEX.test(slug);
+}
 
 function leerStorage(): Canasta {
   try {
     const raw = localStorage.getItem(CLAVE);
     if (!raw) return {};
     const data: unknown = JSON.parse(raw);
-    if (!data || typeof data !== 'object') return {};
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return {};
     const out: Canasta = {};
     for (const [slug, qty] of Object.entries(data)) {
-      if (typeof qty === 'number' && Number.isInteger(qty) && qty > 0) out[slug] = qty;
+      if (Object.keys(out).length >= MAX_ITEMS_CANASTA) break;
+      if (!esSlugValido(slug)) continue;
+      if (typeof qty === 'number' && Number.isInteger(qty) && qty > 0) {
+        out[slug] = Math.min(qty, MAX_CANTIDAD_POR_PRODUCTO);
+      }
     }
     return out;
   } catch {
@@ -71,10 +84,15 @@ export function cantidadDe(slug: string): number {
 }
 
 export function setQty(slug: string, qty: number): void {
+  if (!esSlugValido(slug)) return;
   const canasta = { ...$canasta.get() };
+  if (!(slug in canasta) && Object.keys(canasta).length >= MAX_ITEMS_CANASTA) return;
   const q = Math.floor(qty);
-  if (!Number.isFinite(q) || q <= 0) delete canasta[slug];
-  else canasta[slug] = q;
+  if (!Number.isFinite(q) || q <= 0) {
+    delete canasta[slug];
+  } else {
+    canasta[slug] = Math.min(q, MAX_CANTIDAD_POR_PRODUCTO);
+  }
   $canasta.set(canasta);
 }
 
@@ -111,7 +129,7 @@ export function buildWhatsAppMessage(catalogo: Catalogo): string {
     lineas.push(`• ${qty} × ${p.nombre} — ${soles(subtotal)}`);
   }
   const partes = ["Hola V'Lirio 🌷, quiero hacer este pedido:", ...lineas, `Total: ${soles(total)}`];
-  const mensaje = $cardMessage.get().trim();
+  const mensaje = $cardMessage.get().trim().slice(0, MAX_LONGITUD_MENSAJE);
   if (mensaje) partes.push(`Mensaje para la tarjeta: "${mensaje}"`);
   return partes.join('\n');
 }
