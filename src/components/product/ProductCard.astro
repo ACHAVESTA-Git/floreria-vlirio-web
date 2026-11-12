@@ -35,7 +35,7 @@ const mensajeWa = `Hola V'Lirio 🌷, quiero el ${nombre} (${soles(actual)}). ¿
       style={`view-transition-name: vt-img-${producto.id}`}
     />
     <FavButton slug={producto.id} nombre={nombre} />
-    <a class="wa-mini" href={waLink(mensajeWa)} target="_blank" rel="noopener" aria-label={`Pedir ${nombre} por WhatsApp`}>
+    <a class="wa-mini" href={waLink(mensajeWa)} target="_blank" rel="noopener noreferrer" aria-label={`Pedir ${nombre} por WhatsApp`}>
       <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-wa" /></svg>
     </a>
   </div>
